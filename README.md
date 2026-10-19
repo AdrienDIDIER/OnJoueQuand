@@ -1,53 +1,76 @@
 # OnJoueQuand
 
-Application web progressive privée pour aider un groupe de 6 à 15 amis et collègues à organiser ses sessions de jeu : renseigner ses disponibilités, trouver un créneau commun, voter, puis confirmer sa participation.
+Application web progressive privée pour aider un groupe de 6 à 15 amis et collègues à organiser ses sessions de jeu.
 
-**État du projet : cadrage documentaire J0 livré.** L'application, les migrations, les tests et les workflows de déploiement ne sont pas encore implémentés. Le plan produit et technique est approuvé ; les jalons applicatifs nécessitent une demande distincte.
+**J0 est commité. Le socle J1 est implémenté : Next.js, quatre onglets en français, thème sombre, environnement Supabase local, tests et CI.** Les écrans de ce socle sont publics et ne contiennent aucune donnée personnelle. L'authentification et les fonctionnalités métier commencent en J2 : ne pas connecter des données privées avant leurs contrôles serveur et RLS.
 
-## Le produit
+## Démarrer
 
-- Un seul groupe privé, sur invitation nominative, avec comptes individuels et connexion par code e-mail.
-- Disponibilités hebdomadaires rapides ou détaillées, copie des semaines et calendrier collectif.
-- Suggestions de créneaux communs, catalogue de jeux manuel et favoris personnels.
-- Propositions à plusieurs créneaux, votes multiples, confirmation manuelle et RSVP explicites.
-- Rappels ciblés le dimanche et le lundi à 18 h, notifications internes et Web Push.
-- Installation sur iOS, Android et ordinateur ; interface française, sombre, avec des accents violets discrets.
+Prérequis : **Node.js 24 LTS**, **npm 11.21.1** et, pour Supabase uniquement, Docker Desktop avec moteur Linux démarré. La version Node est déclarée dans `.nvmrc` et `package.json`. Les versions exactes et résultats figurent dans le [rapport J1](docs/j1-validation.md).
 
-Les quatre onglets sont **Accueil**, **Dispos**, **Sessions** et **Groupe**. Le fuseau de référence est **Europe/Paris**. « Premium » désigne l'expérience visuelle, sans abonnement ni paiement.
+```sh
+npm ci
+npm run dev
+```
 
-Les statistiques et sondages sont prévus après le MVP. Les groupes multiples, le matchmaking public et la facturation sont hors périmètre.
+Ouvrir [l'application locale](http://127.0.0.1:3000). La racine redirige vers `/accueil`. Les onglets Dispos, Sessions et Groupe présentent les capacités à venir, sans faux membres, statistiques ou actions métier simulées.
 
-## Documentation
+Le shell fonctionne sans Supabase. Pour personnaliser l'origine ou préparer sa connexion, copier `.env.example` vers `.env.local` (PowerShell : `Copy-Item .env.example .env.local`). Les deux variables publiques Supabase sont facultatives ensemble pour J1, mais une paire partielle ou une clé secrète est refusée. La future couche de données devra appeler `requireSupabaseConfig` pour les exiger.
 
-| Document | Rôle |
+## Supabase local
+
+```sh
+npm run db:start
+npm run db:status
+```
+
+| Service | Adresse locale |
 | --- | --- |
-| [Exigences produit](docs/product-requirements.md) | Parcours, exigences identifiées, MVP, règles métier et critères de réussite. |
-| [Architecture](docs/architecture.md) | Stack, structure cible, interfaces, matching, notifications, PWA, tests et exploitation. |
-| [Modèle de données](docs/database.md) | Relations, contraintes, transactions, états et autorisations RLS. |
-| [Feuille de route](docs/roadmap.md) | Jalons J0–J9, dépendances, acceptation, tests et conditions de lancement. |
-| [Décisions d'architecture](docs/decisions/README.md) | Neuf ADR acceptées, leur contexte et leurs conséquences. |
-| [Consignes de contribution](AGENTS.md) | Règles applicables aux futurs changements du dépôt. |
+| API | http://127.0.0.1:55321 |
+| PostgreSQL | Port 55322 |
+| Studio | http://127.0.0.1:55323 |
+| Boîte e-mail de test | http://127.0.0.1:55324 |
 
-## Stack retenue
+Les ports 55320–55324 évitent un conflit constaté avec un autre projet local utilisant les ports standards. Copier uniquement l'URL locale et la clé **publiable** dans les variables `NEXT_PUBLIC_SUPABASE_*` du fichier ignoré `.env.local`. Ne jamais y mettre la clé secrète ou `service_role`, ni copier la sortie complète de status dans les logs/commits.
 
-Monolithe modulaire Next.js App Router, TypeScript strict, Tailwind CSS et shadcn/ui ; Supabase Auth, PostgreSQL et RLS ; Web Push/VAPID ; Vercel ; Vitest, Playwright et GitHub Actions.
+`npm run db:reset` réinitialise exclusivement la base locale de ce projet ; cette commande efface ses données locales. Le seed J1 ne crée aucun compte ni table métier. Les inscriptions ouvertes sont désactivées. Les migrations et tests RLS seront ajoutés avec J2.
 
-Les repères de versions du plan approuvé sont Node.js 24 LTS, Next.js 16.4, React 19.3 et Tailwind CSS 4.3. **Ce ne sont pas des dépendances installées ou une matrice de compatibilité testée.** J1 vérifiera les versions stables, les correctifs et les contraintes de compatibilité avant de les verrouiller avec npm. Voir la [politique de versions](docs/architecture.md#stack-et-versions).
+`npm run db:stop` arrête les services locaux du projet en conservant leurs données. Aucun projet Supabase distant, SMTP réel ou déploiement n'est configuré.
 
-## Développement local — à venir en J1
+## Vérifier
 
-Il n'existe actuellement ni `package.json`, ni commande de lancement, ni environnement Supabase dans ce dépôt. Ne pas lancer une installation en supposant le socle déjà présent.
+```sh
+npm run check
+npx playwright install chromium firefox webkit
+npm run test:e2e
+```
 
-J1 documentera les commandes réellement créées pour :
+`check` exécute le lint sans avertissement, le typage strict, Vitest et le build de production. Playwright démarre automatiquement ce build sur le port **3100**, puis arrête son serveur ; ce port doit être libre. Sous Linux, installer les dépendances système avec `npx playwright install --with-deps chromium firefox webkit`.
 
-1. Installer les dépendances avec `npm ci` depuis le lockfile versionné.
-2. Configurer un fichier d'environnement local à partir d'un exemple sans secrets.
-3. Démarrer Supabase local avec Docker et appliquer les migrations et données synthétiques.
-4. Démarrer Next.js et consulter les e-mails de test dans la boîte locale.
-5. Exécuter lint, typage, tests, tests RLS et build.
+| Commande | Fonction |
+| --- | --- |
+| `npm run lint` | Règles Next.js/TypeScript. |
+| `npm run typecheck` | Génération des types de routes et contrôle TypeScript. |
+| `npm test` | Validation des variables et refus des configurations dangereuses. |
+| `npm run test:watch` | Vitest interactif. |
+| `npm run build` | Build de production. |
+| `npm run start` | Serveur local de production après build. |
+| `npm run test:e2e` | Navigation, français, responsive, clavier, page 404 et captures. |
 
-Les données métier seront privées ; aucun secret serveur ni export de données personnelles ne doit être commité. Les réglages de production, sauvegardes et procédures de restauration seront vérifiés avant le pilote J8.
+La [CI](.github/workflows/ci.yml) sépare qualité/parcours et démarrage/réinitialisation Supabase. Elle ne déploie rien et n'utilise aucun secret de production. Le [rapport J1](docs/j1-validation.md) distingue les vérifications locales de l'exécution GitHub distante, non encore réalisée.
 
-## Prochaine étape
+## Produit et documentation
 
-La [feuille de route](docs/roadmap.md) constitue le contrat de livraison. J1 prépare le socle ; J2 démarre les fonctionnalités de comptes et de groupe. Le périmètre de cette livraison reste documentaire.
+Quatre onglets : **Accueil**, **Dispos**, **Sessions**, **Groupe**. Fuseau : **Europe/Paris**. Le mode rapide prévu correspond à 20 h–23 h. Les futures suggestions partent de deux joueurs pendant une heure ; vote favorable et RSVP resteront distincts.
+
+| Document | Contenu |
+| --- | --- |
+| [Exigences produit](docs/product-requirements.md) | Parcours, MVP, règles et fonctions différées. |
+| [Architecture](docs/architecture.md) | Organisation, contrats, matching, notifications, PWA et exploitation. |
+| [Modèle de données](docs/database.md) | Relations, contraintes, états et matrice RLS à implémenter. |
+| [Feuille de route](docs/roadmap.md) | J0–J9, dépendances, acceptation et tests. |
+| [Décisions](docs/decisions/README.md) | Neuf ADR acceptées. |
+| [Validation J1](docs/j1-validation.md) | Versions installées, preuves et réserves. |
+| [Consignes de contribution](AGENTS.md) | Règles de changement et sécurité. |
+
+La PWA installable, les notifications et les données privées sont prévues aux jalons suivants. Aucune facturation : « premium » décrit l'expérience. Les statistiques et sondages sont différés après le MVP.

@@ -1,6 +1,6 @@
 # Décisions d'architecture
 
-Ces ADR consignent le plan approuvé le **15 octobre 2026**. Leur statut « Acceptée » porte sur la conception ; il ne signifie pas que le code existe. Le dépôt est au jalon documentaire J0.
+Ces ADR consignent le plan approuvé le **15 octobre 2026**. Leur statut « Acceptée » porte sur la conception ; il ne signifie pas que toutes les fonctionnalités existent. Le socle J1 est maintenant implémenté ; les [preuves de validation](../j1-validation.md) précisent la portée et les limites de cette réalisation.
 
 | ADR | Décision | Statut | Jalons concernés |
 | --- | --- | --- | --- |

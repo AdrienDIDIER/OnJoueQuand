@@ -1,0 +1,60 @@
+name: Vérifications J1
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  application:
+    name: Qualité et parcours
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      NEXT_TELEMETRY_DISABLED: "1"
+      NEXT_PUBLIC_APP_URL: http://127.0.0.1:3100
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm install --global npm@11.21.1
+      - run: npm ci
+      - run: npm run check
+      - run: npm audit --omit=dev --audit-level=high
+      - run: npx playwright install --with-deps chromium firefox webkit
+      - run: npm run test:e2e
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        if: failure()
+        with:
+          name: parcours-en-echec
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
+  supabase:
+    name: Supabase local
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm install --global npm@11.21.1
+      - run: npm ci
+      - run: npm run db:start
+      - run: npm run db:reset
+      - name: Vérifier PostgreSQL
+        run: docker exec supabase_db_OnJoueQuand psql -U postgres -d postgres -v ON_ERROR_STOP=1 -c 'select current_database(), version();'
+      - run: npm run db:stop
+        if: always()

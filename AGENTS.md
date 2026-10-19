@@ -2,7 +2,7 @@
 
 ## État et portée
 
-Le dépôt est au jalon documentaire J0. Le plan approuvé est décrit dans [le PRD](docs/product-requirements.md), [l'architecture](docs/architecture.md), [le modèle de données](docs/database.md) et [la feuille de route](docs/roadmap.md). Les [ADR](docs/decisions/README.md) sont acceptées comme décisions de conception, pas comme fonctionnalités déjà livrées.
+J0 est commité et le socle J1 est implémenté : shell Next.js sans données, configuration locale Supabase, tests et workflow CI. L'authentification et les fonctionnalités métier commencent en J2 ; le nom du groupe de routes `(prive)` ne constitue pas une protection. Le plan approuvé est décrit dans [le PRD](docs/product-requirements.md), [l'architecture](docs/architecture.md), [le modèle de données](docs/database.md) et [la feuille de route](docs/roadmap.md). Les [preuves de validation J1](docs/j1-validation.md) distinguent contrôles locaux et contrôles CI encore à exécuter. Les ADR restent la référence des décisions de conception.
 
 Ne pas démarrer les jalons applicatifs à partir d'une demande documentaire seule. Une demande explicite de réalisation d'un jalon ou d'une fonctionnalité autorise le travail correspondant ; ne pas redemander une autorisation déjà donnée. Ne pas provisionner de services payants, publier, migrer une production ou envoyer des invitations réelles sans autorisation correspondante.
 

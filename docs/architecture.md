@@ -1,6 +1,6 @@
 # Architecture — OnJoueQuand
 
-Statut : conception approuvée en J0 ; architecture cible non implémentée. Les règles produit sont dans le [PRD](product-requirements.md), les contraintes persistées dans le [modèle de données](database.md) et les contrôles de livraison dans la [feuille de route](roadmap.md).
+Statut : conception approuvée en J0 ; socle J1 implémenté, architecture métier encore cible. Les versions installées et vérifications sont dans le [rapport J1](j1-validation.md). Les règles produit sont dans le [PRD](product-requirements.md), les contraintes persistées dans le [modèle de données](database.md) et les contrôles de livraison dans la [feuille de route](roadmap.md).
 
 ## Vue d'ensemble
 
@@ -39,7 +39,7 @@ Les flèches vers les fournisseurs sont des frontières d'infrastructure, pas de
 | Vérification | Vitest, Playwright, ESLint | Versions stables compatibles ; PostgreSQL réel pour RLS et concurrence. |
 | Livraison | npm, Vercel, GitHub Actions, Supabase CLI | Versions d'outils fixées ; `package-lock.json`, `npm ci` et configuration runtime versionnés en J1. |
 
-Les repères ci-dessus proviennent du plan approuvé du 15 octobre 2026, pas d'une installation. J1 vérifiera les dernières versions stables compatibles et les correctifs de sécurité, consignera les versions exactes et les résultats de compilation/tests, puis verrouillera l'ensemble. Aucune utilisation de canary, bêta ou option expérimentale n'est requise. Sources de référence : [Node.js](https://nodejs.org/en/about/previous-releases), [Next.js](https://nextjs.org/docs/app/getting-started/installation), [React](https://react.dev/versions), [Tailwind CSS](https://tailwindcss.com/docs/installation/using-postcss), [shadcn/ui](https://ui.shadcn.com/docs/installation/next), [Vitest](https://vitest.dev/guide/), [Playwright](https://playwright.dev/docs/release-notes).
+Les repères ci-dessus proviennent du plan approuvé du 15 octobre 2026. Les versions effectivement vérifiées et verrouillées en J1, les résultats de compilation/tests et les réserves de sécurité sont consignés dans le [rapport J1](j1-validation.md). Aucune utilisation de canary, bêta ou option expérimentale n'est requise. Sources de référence : [Node.js](https://nodejs.org/en/about/previous-releases), [Next.js](https://nextjs.org/docs/app/getting-started/installation), [React](https://react.dev/versions), [Tailwind CSS](https://tailwindcss.com/docs/installation/using-postcss), [shadcn/ui](https://ui.shadcn.com/docs/installation/next), [Vitest](https://vitest.dev/guide/), [Playwright](https://playwright.dev/docs/release-notes).
 
 L'ajout de dépendances doit résoudre un besoin concret. Pas de bibliothèque de calendrier lourd, de gestion globale d'état ou de client de requêtes supplémentaire par défaut.
 
@@ -238,7 +238,7 @@ Un administrateur n'obtient pas le droit de modifier les disponibilités, votes 
 - **Validation manuelle ciblée** : installation iOS/Android/bureau, autorisation et réception Push, mise à jour du service worker, clavier et lecteur d'écran. L'émulation WebKit ne remplace pas un iPhone installé.
 - **Exploitation** : worker interrompu, fournisseur indisponible, migration compatible, rollback et restauration complète dans un projet isolé.
 
-Les cas et critères par jalon sont dans la [feuille de route](roadmap.md#catalogue-des-tests). Aucun test applicatif n'existe encore en J0.
+Les cas et critères par jalon sont dans la [feuille de route](roadmap.md#catalogue-des-tests). J1 apporte les tests d'environnement et de navigation décrits dans le [rapport de validation](j1-validation.md) ; les tests métier et RLS seront ajoutés avec leurs fonctionnalités.
 
 <a id="deploiement-couts-et-exploitation"></a>
 
@@ -257,7 +257,7 @@ Prévoir dans le futur exemple d'environnement : URL et clé publiable Supabase,
 
 ### CI et livraison
 
-GitHub Actions exécutera `npm ci`, lint explicite, typage strict, Vitest, démarrage Supabase et migrations/tests RLS, build, puis Playwright contre l'application construite. Les scripts exacts seront ajoutés et documentés en J1 ; ne pas les présenter comme disponibles avant cela. Dépendances et actions sont verrouillées, permissions de workflow minimales.
+Le workflow GitHub Actions de J1 configure `npm ci`, lint explicite, typage strict, Vitest, build et Playwright contre l'application construite, ainsi qu'un job Supabase local avec réinitialisation et contrôle PostgreSQL. Les tests de migrations métier et RLS seront ajoutés en J2. Les scripts sont documentés dans le [README](../README.md) ; les exécutions locales sont consignées dans le [rapport J1](j1-validation.md). Dépendances et actions sont verrouillées, permissions de workflow minimales. Le workflow distant n'a pas encore été exécuté.
 
 Les PR produisent une preview isolée. La production utilise un environnement GitHub protégé : migration additive testée, déploiement compatible puis smoke tests. Une évolution destructive attend une phase distincte après migration des usages. Un rollback Vercel ne restaure pas la base, Auth, Vault ou cron ; ces composants ont leur procédure propre. Préférer une migration corrective à une suppression de données.
 

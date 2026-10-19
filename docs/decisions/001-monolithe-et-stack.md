@@ -1,6 +1,6 @@
 # ADR 001 — Monolithe modulaire et stack
 
-- Statut : Acceptée, conception non implémentée.
+- Statut : Acceptée ; socle J1 implémenté, modules métier à venir. Voir les [versions et preuves J1](../j1-validation.md).
 - Date : 2026-10-15.
 - Portée : J1–J8 ; PR-13, PR-15, PR-16.
 

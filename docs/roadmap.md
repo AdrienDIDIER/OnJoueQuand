@@ -2,7 +2,7 @@
 
 ## État et ordre de livraison
 
-Le plan est approuvé. **J0 est la livraison documentaire de ce dépôt ; J1 à J9 ne sont pas implémentés.** La présente demande n'autorise ni le démarrage automatique des fonctionnalités, ni le provisionnement ou le déploiement de services.
+Le plan est approuvé. **J0 est commité ; J1 est implémenté et vérifié localement, avec les réserves consignées dans le [rapport J1](j1-validation.md). J2 à J9 ne sont pas implémentés.** Le démarrage de J1 a été explicitement autorisé. Aucun provisionnement distant, push Git ou déploiement n'est inclus dans cette livraison. La CI GitHub reste à exécuter après publication du code ; son succès n'est pas présumé.
 
 Les critères ci-dessous sont des portes de sortie : un jalon n'est livré que lorsque ses critères et tests sont vérifiés. Les résultats réels, versions, environnements et limites seront consignés au fur et à mesure. Aucune estimation calendaire ne vaut engagement.
 
@@ -39,6 +39,8 @@ Les interfaces d'engagements occupés sont définies en J4 et exercées avec des
 **Vérifications :** existence et contenu des documents, résolution des liens Markdown internes et ancres, correspondance PR/J/T/ADR, clôture des blocs de code, `git diff --check`, contrôle de la liste des fichiers modifiés. Aucun test applicatif n'est revendiqué.
 
 ### J1 — Fondation
+
+**État :** socle réalisé et vérifié sous Windows et Linux, y compris le focus clavier WebKit ; preuves et limites dans le [rapport de validation](j1-validation.md). La porte CI distante reste à vérifier après publication du code sur GitHub.
 
 **Dépendances :** J0 et demande distincte d'implémenter le socle.
 
@@ -177,7 +179,7 @@ La CI lance les tests pertinents disponibles à chaque jalon. Les tests RLS n'ut
 | Point | Responsable attendu | Échéance | Preuve de sortie |
 | --- | --- | --- | --- |
 | Approbation du cadrage documentaire | Porteur du produit | J0 | Acquise dans la demande d'implémenter ce plan ; ne pas la présenter comme encore bloquante. |
-| Début des fonctionnalités | Porteur du produit | Avant J1 | Demande distincte précisant le jalon à implémenter. |
+| Début des fonctionnalités | Porteur du produit | Avant J1 | J1 autorisé par « commit et go pour j1 ». J2 reste une étape distincte. |
 | Versions et compatibilité | Implémenteur | J1 | Matrice exacte, lockfile et pipeline vert. |
 | Parcours OTP avec comptes provisionnés | Implémenteur | J2 | Test réel local de la configuration Auth retenue, dont compte non confirmé et création publique désactivée. |
 | Domaine d'envoi et DNS | Exploitant | Avant e-mails réels/J8 | Domaine vérifié, SMTP et invitation livrés aux adresses de recette. |

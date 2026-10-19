@@ -1,6 +1,6 @@
 # Exigences produit — OnJoueQuand
 
-Statut : conception approuvée, livraison documentaire J0. Aucun comportement applicatif décrit ici n'est encore implémenté.
+Statut : conception approuvée en J0. J1 implémente la navigation française et le shell sombre de PR-13 ; les comportements métier décrits ici restent à implémenter. Voir les [preuves J1](j1-validation.md).
 
 ## Vision et utilisateurs
 
