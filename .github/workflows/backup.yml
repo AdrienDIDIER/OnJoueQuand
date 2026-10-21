@@ -1,0 +1,58 @@
+name: Sauvegarde privée (désactivée sur ce dépôt public)
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 3 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sauvegarde-production
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    # Copier dans un miroir d’exploitation PRIVÉ ; aucun export dans ce dépôt public.
+    if: github.event.repository.private == true && vars.BACKUP_ENABLED == 'true'
+    environment: backup-production
+    runs-on: ubuntu-latest
+    container: postgres:17.11-bookworm
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version-file: .nvmrc
+      - name: Installer les outils système
+        run: apt-get update -qq && apt-get install -y --no-install-recommends age ca-certificates
+      - name: Vérifier le chiffrement et les refus d’erreur
+        run: node --test tests/ops/backup.test.mjs
+      - name: Exporter directement vers age
+        env:
+          PGHOST: ${{ secrets.BACKUP_PGHOST }}
+          PGPORT: ${{ secrets.BACKUP_PGPORT }}
+          PGUSER: ${{ secrets.BACKUP_PGUSER }}
+          PGPASSWORD: ${{ secrets.BACKUP_PGPASSWORD }}
+          PGDATABASE: postgres
+          PGSSLMODE: verify-full
+          PGCONNECT_TIMEOUT: "15"
+          BACKUP_CA: ${{ secrets.BACKUP_CA }}
+          BACKUP_RECIPIENT: ${{ vars.BACKUP_RECIPIENT }}
+        run: |
+          umask 077
+          printf '%s' "$BACKUP_CA" > "$RUNNER_TEMP/postgres-ca.crt"
+          export PGSSLROOTCERT="$RUNNER_TEMP/postgres-ca.crt"
+          node scripts/ops/backup.mjs "$RUNNER_TEMP/onjouequand.dump.age"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: sauvegarde-${{ github.run_id }}
+          path: ${{ runner.temp }}/onjouequand.dump.age
+          if-no-files-found: error
+          retention-days: 7
+      - name: Effacer les fichiers temporaires
+        if: always()
+        run: rm -f "$RUNNER_TEMP/postgres-ca.crt" "$RUNNER_TEMP/onjouequand.dump.age" "$RUNNER_TEMP/onjouequand.dump.age.partial"

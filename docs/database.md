@@ -1,5 +1,7 @@
 # Données, états et sécurité — OnJoueQuand
 
+Diagnostic J8 : la [migration additive](../supabase/migrations/202610210009_operations_status.sql) enrichit `notification_job_status()` sans changer sa signature. Cette lecture `SECURITY DEFINER`, `search_path` vide, contrôle l’administration active puis retourne seulement activation du cron, date de vérification, dernier passage/succès, durées de retard et compteurs. Exécution accordée à `authenticated`, refus métier pour les non-administrateurs et révoqués ; aucune écriture ni accès aux secrets Vault. Les tables privées restent inaccessibles aux opérations ordinaires. Voir le [rapport J8](j8-validation.md).
+
 Statut : les migrations J2 à J6 livrent identité, disponibilités, jeux, sessions, votes, RSVP, notifications et traitements privés. Les migrations [J6](../supabase/migrations/202610210005_notifications.sql), [activation Push](../supabase/migrations/202610210006_push_activation.sql), [cron inactif](../supabase/migrations/202610210007_notification_cron.sql) et [lecture](../supabase/migrations/202610210008_notification_read.sql) complètent J5. Sondages et statistiques restent cibles. Les [types générés](../src/lib/supabase/database.types.ts) reflètent le schéma livré. Preuves : [J2](j2-validation.md), [J3](j3-validation.md), [J4](j4-validation.md), [J5](j5-validation.md), [J6](j6-validation.md).
 
 ## Conventions et relations

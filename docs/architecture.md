@@ -1,6 +1,6 @@
 # Architecture — OnJoueQuand
 
-Statut : J1 à J6 commités et poussés, CI distante réussie pour J6. Le code PWA J7 est réalisé localement ; preuves dans le [rapport J7](j7-validation.md). Installation/Push réels et exploitation J8 restent à valider. Cron désactivé par défaut. Voir le [PRD](product-requirements.md), les [données](database.md), la [roadmap](roadmap.md) et les rapports historiques [J1](j1-validation.md), [J2](j2-validation.md), [J3](j3-validation.md), [J4](j4-validation.md), [J5](j5-validation.md), [J6](j6-validation.md).
+Statut : J1 à J7 commités, J1–J6 poussés et CI distante réussie pour J6. Preuves PWA dans le [rapport J7](j7-validation.md). J8 prépare sauvegarde chiffrée, restauration et surveillance ; voir le [rapport J8](j8-validation.md). Installation/Push réels et exploitation distante restent à valider. Cron désactivé par défaut. Voir le [PRD](product-requirements.md), les [données](database.md), la [roadmap](roadmap.md) et les rapports historiques [J1](j1-validation.md), [J2](j2-validation.md), [J3](j3-validation.md), [J4](j4-validation.md), [J5](j5-validation.md), [J6](j6-validation.md).
 
 ## Vue d'ensemble
 
@@ -287,6 +287,8 @@ Procédure de restauration à éprouver : créer un projet isolé compatible, re
 Objectif pilote, sans SLA : dernière sauvegarde réussie datant de moins de 24 heures, restauration en une journée ouvrée. Les schedules GitHub pouvant être retardés, surveiller l'âge réel plutôt que la seule présence du workflow. Source : [sauvegardes Supabase](https://supabase.com/docs/guides/platform/backups).
 
 ### Surveillance et maintenance
+
+Préparation J8 : [guide d’exploitation](operations.md), [rapport local](j8-validation.md) et [ADR 015](decisions/015-sauvegardes-privees-et-recette-exploitation.md). Le dépôt étant public, le workflow de sauvegarde y est bloqué : sa cible doit être un miroir d’exploitation privé. L’export `pg_dump` custom est chiffré directement par age ; il inclut explicitement Auth et l’historique. Une restauration synthétique a réussi, avec contrôle RLS, sans constituer une preuve de restauration Supabase hébergée. L’outil opérateur surveille cron, heartbeat, outbox et échecs Push ; son exécution distante et le contrôle indépendant d’âge des sauvegardes restent à configurer.
 
 Consigner les erreurs serveur, heartbeat du worker, âge du plus ancien événement en attente, échecs de livraison, refus SMTP, quotas et âge de sauvegarde. Exposer un état technique réservé aux administrateurs ; le contrôle d'accès utilisateur ne dépend pas de cette page.
 

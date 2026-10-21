@@ -1,0 +1,47 @@
+name: Surveillance privée du traitement
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "11 * * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: surveillance-traitement
+  cancel-in-progress: false
+
+jobs:
+  check:
+    if: github.event.repository.private == true && vars.WORKER_MONITOR_ENABLED == 'true'
+    environment: backup-production
+    runs-on: ubuntu-latest
+    container: postgres:17.11-bookworm
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version-file: .nvmrc
+      - name: Contrôler cron, heartbeat et file sans mutation
+        env:
+          PGHOST: ${{ secrets.BACKUP_PGHOST }}
+          PGPORT: ${{ secrets.BACKUP_PGPORT }}
+          PGUSER: ${{ secrets.BACKUP_PGUSER }}
+          PGPASSWORD: ${{ secrets.BACKUP_PGPASSWORD }}
+          PGDATABASE: postgres
+          PGSSLMODE: verify-full
+          PGCONNECT_TIMEOUT: "15"
+          PGOPTIONS: -c default_transaction_read_only=on -c statement_timeout=10000
+          BACKUP_CA: ${{ secrets.BACKUP_CA }}
+        run: |
+          umask 077
+          printf '%s' "$BACKUP_CA" > "$RUNNER_TEMP/postgres-ca.crt"
+          export PGSSLROOTCERT="$RUNNER_TEMP/postgres-ca.crt"
+          node scripts/ops/monitor.mjs
+      - name: Effacer le certificat temporaire
+        if: always()
+        run: rm -f "$RUNNER_TEMP/postgres-ca.crt"

@@ -2,7 +2,7 @@
 
 ## État et ordre de livraison
 
-Le plan est approuvé. **J0 à J6 sont commités et poussés ; J6 porte le commit `19b6ce2` et sa CI distante a réussi. J7 est réalisé localement et reste non commité ; [rapport J7](j7-validation.md). J8–J9 ne sont pas implémentés.** « Push et continue » autorise J7 ; le caractère public du dépôt GitHub a été confirmé avant publication. Aucun déploiement ni migration de production. Cron inactif ; installation/Push réels restent des portes de lancement.
+Le plan est approuvé. **J0 à J7 sont commités ; J7 porte le commit `0980d66`. J0–J6 sont poussés, CI J6 réussie. J8 est en préparation locale : sauvegarde chiffrée, restauration synthétique et outils opérateur ; [rapport J8](j8-validation.md), [guide](operations.md). Pilote non lancé ; J9 non implémenté.** « Commit et continue » autorise la préparation J8. Aucun déploiement ni migration de production. Cron inactif ; installation/Push réels, restauration hébergée et configuration des alertes restent des portes de lancement.
 
 Les critères ci-dessous sont des portes de sortie : un jalon n'est livré que lorsque ses critères et tests sont vérifiés. Les résultats réels, versions, environnements et limites seront consignés au fur et à mesure. Aucune estimation calendaire ne vaut engagement.
 

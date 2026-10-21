@@ -5,6 +5,7 @@ import {Button} from "@/components/ui/button";
 import {dateTimeLabel} from "@/lib/time/paris";
 import {notificationAction,subscribeDevice,type NotificationState} from "../actions";
 import type {loadInbox,loadNotificationSettings} from "../server";
+import {jobHealthSchema,jobHealthAlerts} from "../domain/job-health";
 const initial:NotificationState={message:""};
 function Note({note}:{note:Awaited<ReturnType<typeof loadInbox>>["notes"][number]}){
   const [state,action,pending]=useActionState(notificationAction,initial);
@@ -45,6 +46,13 @@ export function NotificationSettings({view}:{view:Awaited<ReturnType<typeof load
   </section>;
 }
 function JobStatus({status}:{status:unknown}){
-  const s=status as {last_run?:{started_at:string;status:string};outbox_pending:number;outbox_failed:number;deliveries_pending:number;deliveries_failed:number};
-  return <><p>{s.last_run?`Dernier passage : ${dateTimeLabel(s.last_run.started_at)} · ${{running:"en cours",completed:"terminé",failed:"en échec",abandoned:"interrompu"}[s.last_run.status]??"inconnu"}`:"Aucun traitement exécuté."}</p><p>Événements en attente : {s.outbox_pending} · en échec : {s.outbox_failed}. Envois en attente : {s.deliveries_pending} · en échec : {s.deliveries_failed}.</p><p>Un dernier passage ancien peut signaler un ordonnanceur arrêté.</p></>;
+  const parsed=jobHealthSchema.safeParse(status);
+  if(!parsed.success)return <p>État technique indisponible. Réessayez après actualisation.</p>;
+  const s=parsed.data,alerts=jobHealthAlerts(s);
+  return <><h3>État technique</h3><p>Vérifié le {dateTimeLabel(s.checked_at)} · heure de Paris.</p>
+    {alerts.length?<ul>{alerts.map(message=><li key={message}>{message}</li>)}</ul>:<p>Ordonnanceur et traitement opérationnels.</p>}
+    <p>{s.last_run?`Dernier passage : ${dateTimeLabel(s.last_run.started_at)} · ${{running:"en cours",completed:"terminé",failed:"en échec",abandoned:"interrompu"}[s.last_run.status]}`:"Aucun traitement exécuté."}</p>
+    {s.last_success_at&&<p>Dernier succès : {dateTimeLabel(s.last_success_at)}.</p>}
+    <p>Événements en attente : {s.outbox_pending} · en échec : {s.outbox_failed}. Envois en attente : {s.deliveries_pending} · en échec : {s.deliveries_failed}.</p>
+    <p>Ce contrôle ne vérifie ni la livraison réelle du Push ni les sauvegardes privées.</p></>;
 }

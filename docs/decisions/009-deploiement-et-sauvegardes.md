@@ -1,6 +1,6 @@
 # ADR 009 — Déploiement économique et sauvegardes
 
-- Statut : Acceptée, conception non implémentée.
+- Statut : Acceptée ; préparation locale J8, précisée par l’[ADR 015](015-sauvegardes-privees-et-recette-exploitation.md). Déploiement et activation distants non effectués.
 - Date : 2026-10-15.
 - Portée : J1, J8 ; PR-16.
 

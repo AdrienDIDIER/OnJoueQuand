@@ -2,7 +2,7 @@
 
 Application web progressive privée pour aider un groupe de 6 à 15 amis et collègues à organiser ses sessions de jeu.
 
-**J0 à J6 sont commités et poussés ; J6 porte le commit `19b6ce2`, avec [CI GitHub réussie](https://github.com/AdrienDIDIER/OnJoueQuand/actions/runs/39583064447). J7 réalise la PWA et reste non commité.** Installation, réception Push et zones système sur appareils réels restent à valider ; le cron reste désactivé par défaut. Voir les rapports [J6](docs/j6-validation.md), [J7](docs/j7-validation.md) et le [guide notifications](docs/notifications-operations.md).
+**J0 à J7 sont commités ; J7 porte le commit `0980d66`. J0–J6 sont poussés, avec [CI distante J6 réussie](https://github.com/AdrienDIDIER/OnJoueQuand/actions/runs/39583064447). J8 prépare localement sauvegarde chiffrée, restauration et exploitation ; pilote non lancé.** Voir les rapports [J7](docs/j7-validation.md), [J8](docs/j8-validation.md), le [guide d’exploitation](docs/operations.md) et le [guide notifications](docs/notifications-operations.md). Appareils réels, configuration distante, restauration hébergée et alertes restent à valider ; cron inactif par défaut.
 
 ## Démarrer
 
