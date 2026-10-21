@@ -1,6 +1,6 @@
 # Recette — Soirées, états de l’accueil et test Push
 
-Date : 21 octobre 2026. Périmètre : [ADR 020](decisions/020-soirees-simples-et-test-push.md). Code local prêt ; aucune migration hébergée ni publication de cette révision pendant la recette.
+Date : 21 octobre 2026. Périmètre : [ADR 020](decisions/020-soirees-simples-et-test-push.md). Recette réalisée exclusivement sur données synthétiques ; accord utilisateur reçu ensuite et migrations hébergées appliquées avant publication du code.
 
 ## Résultat fonctionnel
 
@@ -21,12 +21,12 @@ Environnement : Supabase local **OnJoueQuandJ8Validation**, données et comptes 
 
 Le test de Push automatisé vérifie les conditions de déclenchement et les droits ; il ne prouve pas la réception sur l’iPhone réel. Aucun fournisseur externe n’est sollicité pendant cette recette.
 
-Après ajout de l’invitation d’installation de l’[ADR 021](decisions/021-invitation-installation-au-demarrage.md), une passe générale complète réussit : **183 parcours verts**, un test clavier WebKit ignoré sur Windows. Cette passe inclut toutes les attentes renommées, les soirées, les repères quotidiens, le test Push et vingt cas de première installation. La publication de l’ensemble reste en attente de l’accord pour les migrations hébergées.
+Après ajout de l’invitation d’installation de l’[ADR 021](decisions/021-invitation-installation-au-demarrage.md), une passe générale complète réussit : **183 parcours verts**, un test clavier WebKit ignoré sur Windows. Cette passe inclut toutes les attentes renommées, les soirées, les repères quotidiens, le test Push et vingt cas de première installation. L’accord pour les migrations hébergées a ensuite été reçu.
 
 ## Ordre de livraison
 
-1. Obtenir l’autorisation d’appliquer les migrations additives 011 et 012 au projet hébergé.
-2. Vérifier la cible et les migrations déjà appliquées ; appliquer uniquement les migrations attendues, puis confirmer leur présence.
+1. Autorisation reçue pour les migrations additives 011 et 012.
+2. Cible `catspvwwtoyhwgnjhrix` vérifiée ; dry-run limité aux migrations 011/012 ; application réussie et liste distante confirmée. Aucun seed, changement de rôle ou envoi réel pendant cette opération.
 3. Publier le code et vérifier Vercel/CI.
 4. Sur l’iPhone installé : activer cet appareil si nécessaire, toucher Tester les notifications et constater la réception. Vérifier ensuite une réponse Dispo puis Non et leur couleur sur l’accueil ; organiser une soirée et répondre avec un second membre.
 

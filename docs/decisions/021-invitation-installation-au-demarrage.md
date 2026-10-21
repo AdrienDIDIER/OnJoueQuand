@@ -1,6 +1,6 @@
 # ADR 021 — Invitation à installer au démarrage
 
-- Statut : implémentée et validée localement ; publication en attente avec le lot précédent.
+- Statut : implémentée et validée localement ; livraison avec le lot précédent autorisée, migrations préalables appliquées.
 - Date : 2026-10-21.
 - Demande explicite : proposer l’installation à l’ouverture du site hors mode application. Complète l’ADR 014 ; remplace la limitation de la sollicitation aux réglages de l’ADR 017.
 
@@ -24,4 +24,4 @@ Le dialogue assure modalité, fermeture clavier et retour du focus. Sur téléph
 
 `installation.spec.ts` couvre le contexte vierge, le report persistant, le bouton natif après clic uniquement, les instructions iPhone, le mode autonome et l’événement d’installation sans rechargement. Les autres parcours simulent explicitement une invitation déjà reportée ; les tests d’installation utilisent des contextes vierges. Les tests PWA vérifient toujours l’aide manuelle, les mises à jour et l’absence de cache privé. Le parcours système réel reste à valider sur appareils.
 
-Recette exécutée sur J8Validation, comptes synthétiques : **183 parcours réussis**, un test clavier WebKit ignoré sur Windows, dont les vingt cas d’installation sur les quatre profils. Lint, typage, 56 tests Vitest et build réussis. Captures bureau et mobile inspectées. Aucune migration ou modification du worker pour cette invitation ; les migrations 011/012 du lot Soirées/Push restent à autoriser avant publication de l’ensemble.
+Recette exécutée sur J8Validation, comptes synthétiques : **183 parcours réussis**, un test clavier WebKit ignoré sur Windows, dont les vingt cas d’installation sur les quatre profils. Lint, typage, 56 tests Vitest et build réussis. Captures bureau et mobile inspectées. Aucune migration ou modification du worker pour cette invitation ; les migrations 011/012 du lot Soirées/Push ont été autorisées et appliquées avant publication de l’ensemble.

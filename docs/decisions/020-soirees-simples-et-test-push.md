@@ -1,6 +1,6 @@
 # ADR 020 — Soirées simples, repères quotidiens et test Push
 
-- Statut : implémentée, en recette locale ; migrations distantes non appliquées.
+- Statut : implémentée et validée localement ; migrations 011/012 appliquées au projet hébergé le 21 octobre 2026 après accord utilisateur.
 - Date : 2026-10-21.
 - Décision produit approuvée ; remplace la création de nouvelles propositions prévue par les ADR 006 et 012. Les données et parcours historiques restent compatibles.
 
@@ -24,6 +24,6 @@ Le serveur valide l’endpoint et les clés puis utilise VAPID pour un message g
 
 ## Migrations et livraison
 
-`202610210011_evenings.sql` et `202610210012_push_test.sql` sont additives ; les tables et RLS publiques existantes restent inchangées. Les types sont régénérés depuis la base synthétique. Appliquer les migrations avant le déploiement applicatif. AGENTS.md exige l’autorisation correspondante avant de migrer la base hébergée ; aucune migration distante n’est effectuée pendant cette recette.
+`202610210011_evenings.sql` et `202610210012_push_test.sql` sont additives ; les tables et RLS publiques existantes restent inchangées. Les types sont régénérés depuis la base synthétique. L’utilisateur a autorisé la migration le 21 octobre 2026 ; un dry-run a confirmé les deux seuls fichiers attendus, puis `db push --linked` les a appliqués à `catspvwwtoyhwgnjhrix`. La liste distante confirme les quatorze versions alignées. Aucun seed, rôle, invitation ou traitement collectif ajouté. Les migrations précèdent la publication applicative par GitHub/Vercel.
 
 Tests : domaine temporel sous Vitest ; PostgreSQL réel pour atomicité, idempotence, accès anonyme/non-membre/révoqué, participations concurrentes, propriété d’appareil, préférences et limitation ; Playwright pour le parcours à deux comptes, le formulaire court et les repères après modification. La réception Push reste à essayer sur l’iPhone installé.

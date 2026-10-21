@@ -105,7 +105,7 @@ Dans **Dispos**, le lien **Créneaux communs** rejoint la recherche. Valeurs ini
 
 ## Proposer et rejoindre une session
 
-**Nouveau parcours en recette locale :** l’onglet **Soirées** permet d’organiser directement un rendez-vous à horaire unique. Jour et début suffisent ; nom, jeu et fin prévue se règlent dans les détails. Chacun répond **Je viens** ou **Sans moi**, sans vote ni participation implicite. Les anciennes propositions restent compatibles. Le paragraphe suivant décrit le parcours historique de J5. Les migrations 011/012 doivent précéder la publication : [ADR 020](docs/decisions/020-soirees-simples-et-test-push.md).
+**Nouveau parcours :** l’onglet **Soirées** permet d’organiser directement un rendez-vous à horaire unique. Jour et début suffisent ; nom, jeu et fin prévue se règlent dans les détails. Chacun répond **Je viens** ou **Sans moi**, sans vote ni participation implicite. Les anciennes propositions restent compatibles. Le paragraphe suivant décrit le parcours historique de J5. Les migrations 011/012 ont été appliquées après accord avant publication : [ADR 020](docs/decisions/020-soirees-simples-et-test-push.md).
 
 Dans **Sessions**, ouvrir **Proposer une session**, choisir de deux à six horaires futurs à Paris, puis enregistrer le brouillon et le publier. Chaque membre peut sélectionner tous les créneaux acceptables ; un bulletin vide signifie explicitement qu’aucun ne convient. Le créateur ou un administrateur choisit un créneau, avant ou après clôture. Un vote favorable ne devient jamais automatiquement une participation.
 
@@ -113,7 +113,7 @@ Après confirmation, répondre dans **Ma participation**. Les réponses restent 
 
 ## Notifications et rappels
 
-En recette : dans **Groupe → Mes réglages**, **Tester les notifications** envoie un Push à l’appareil courant déjà activé, au plus une fois par minute. Le test ne déclenche pas les rappels collectifs. Les sept traits de l’accueil représentent lundi à dimanche : vert disponible, rouge indisponible, neutre discontinu sans réponse ; une saisie enregistrée invalide immédiatement cette vue.
+Dans **Groupe → Mes réglages**, **Tester les notifications** envoie un Push à l’appareil courant déjà activé, au plus une fois par minute. Le test ne déclenche pas les rappels collectifs. Les sept traits de l’accueil représentent lundi à dimanche : vert disponible, rouge indisponible, neutre discontinu sans réponse ; une saisie enregistrée invalide immédiatement cette vue.
 
 Dans **Accueil**, la boîte affiche les vingt dernières notifications et permet de les marquer comme lues. Dans **Groupe → Mes notifications**, régler rappels et Push, puis activer volontairement les appareils personnels. Les messages Push restent génériques ; leur clic ouvre la boîte privée après connexion. Le worker J7 ne conserve que la page hors connexion générique et quatre icônes publiques.
 
@@ -121,7 +121,7 @@ Le dimanche à 18 h vise la semaine suivante ; le lundi à 18 h relance la même
 
 ## Produit et documentation
 
-Une invitation à installer est préparée au démarrage dans le navigateur, y compris avant connexion. Bouton d’installation native si disponible ; étapes Safari sur iPhone. Plus tard reporte la fenêtre de sept jours. Elle ne s’affiche pas en mode application ; l’aide reste dans les réglages. Aucun cache privé supplémentaire : [ADR 021](docs/decisions/021-invitation-installation-au-demarrage.md).
+Une invitation à installer est proposée au démarrage dans le navigateur, y compris avant connexion. Bouton d’installation native si disponible ; étapes Safari sur iPhone. Plus tard reporte la fenêtre de sept jours. Elle ne s’affiche pas en mode application ; l’aide reste dans les réglages. Aucun cache privé supplémentaire : [ADR 021](docs/decisions/021-invitation-installation-au-demarrage.md).
 
 Les quatre onglets sont préchargés en mémoire avec une vérification d’accès avant réutilisation. Une saisie enregistrée invalide les écrans concernés ; le bouton d’actualisation près de la marque récupère aussi les modifications des autres membres. Aucun contenu privé n’est conservé hors connexion. Mesures, limites et essai manuel : [recette de navigation](docs/navigation-validation.md).
 

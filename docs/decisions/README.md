@@ -23,7 +23,7 @@ Ces ADR consignent le plan approuvé le **15 octobre 2026**. Leur statut « Acce
 | [017](017-navigation-mobile-et-reponses-rapides.md) | Écrans mobiles et réponses rapides | Implémentée | Revue mobile |
 | [018](018-interface-chaleureuse-et-latence.md) | Interface chaleureuse et exécution à Dublin | Implémentée ; cache précisé par 019 | Revue mobile |
 | [019](019-cache-navigation-privee.md) | Cache des onglets en mémoire, contrôles frais et invalidation | Implémentée ; voir recette | Revue mobile |
-| [020](020-soirees-simples-et-test-push.md) | Soirée à horaire unique, états quotidiens et test Push personnel | Recette locale ; migrations distantes requises | Simplification produit |
-| [021](021-invitation-installation-au-demarrage.md) | Invitation au démarrage et installation native si disponible | Recette locale ; aucune migration supplémentaire | Installation PWA |
+| [020](020-soirees-simples-et-test-push.md) | Soirée à horaire unique, états quotidiens et test Push personnel | Validée localement ; migrations distantes appliquées | Simplification produit |
+| [021](021-invitation-installation-au-demarrage.md) | Invitation au démarrage et installation native si disponible | Validée localement ; aucune migration supplémentaire | Installation PWA |
 
 Chaque ADR contient contexte, décision, alternatives, conséquences et vérification. Une modification structurelle crée une nouvelle ADR qui remplace explicitement l'ancienne ; ne pas effacer l'historique d'une décision appliquée. Les détails normatifs évoluent dans le [PRD](../product-requirements.md), l'[architecture](../architecture.md) et le [modèle de données](../database.md) avec la même modification.
