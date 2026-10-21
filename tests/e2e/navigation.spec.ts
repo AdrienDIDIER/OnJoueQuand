@@ -36,12 +36,12 @@ test("les quatre onglets sont réellement navigables", async ({ page }) => {
   }
 });
 
-test("le Push non configuré est expliqué avant toute demande d’autorisation", async ({ page }) => {
+test("un navigateur sans Push est expliqué avant toute demande d’autorisation", async ({ page }) => {
+  await page.addInitScript(()=>{Object.defineProperty(window,"PushManager",{value:undefined});});
   await page.goto("/groupe/reglages");
   const settings = page.getByRole("region", { name: "Mes notifications", exact: true });
-  await expect(settings.getByRole("status").filter({ hasText: "ne sont pas encore configurées par l’administrateur" })).toBeVisible();
   await settings.getByRole("button", { name: "Activer sur cet appareil" }).click();
-  await expect(settings.getByRole("status").filter({ hasText: /Le Push n’est pas encore configuré|ne prend pas en charge/ })).toBeVisible();
+  await expect(settings.getByRole("status").filter({ hasText: "ne prend pas en charge" })).toBeVisible();
 });
 
 test("le clavier permet de rejoindre directement le contenu", async ({ page, browserName }) => {

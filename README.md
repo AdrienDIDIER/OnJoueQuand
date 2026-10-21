@@ -113,6 +113,8 @@ Après confirmation, répondre dans **Ma participation**. Les réponses restent 
 
 ## Notifications et rappels
 
+Au lancement depuis l’icône et après connexion, une invitation propose d’activer les notifications sur l’appareil compatible. La permission système et l’inscription ne démarrent qu’après un clic. Plus tard reporte la proposition de sept jours ; un refus, une préférence désactivée ou un appareil déjà actif sont respectés. Détails : [ADR 022](docs/decisions/022-notifications-au-lancement-installe.md).
+
 Dans **Groupe → Mes réglages**, **Tester les notifications** envoie un Push à l’appareil courant déjà activé, au plus une fois par minute. Le test ne déclenche pas les rappels collectifs. Les sept traits de l’accueil représentent lundi à dimanche : vert disponible, rouge indisponible, neutre discontinu sans réponse ; une saisie enregistrée invalide immédiatement cette vue.
 
 Dans **Accueil**, la boîte affiche les vingt dernières notifications et permet de les marquer comme lues. Dans **Groupe → Mes notifications**, régler rappels et Push, puis activer volontairement les appareils personnels. Les messages Push restent génériques ; leur clic ouvre la boîte privée après connexion. Le worker J7 ne conserve que la page hors connexion générique et quatre icônes publiques.

@@ -3,9 +3,10 @@ import Link from "next/link";
 import {useActionState,useState} from "react";
 import {Button} from "@/components/ui/button";
 import {dateTimeLabel} from "@/lib/time/paris";
-import {notificationAction,subscribeDevice,testDeviceNotification,type NotificationState} from "../actions";
+import {notificationAction,testDeviceNotification,type NotificationState} from "../actions";
 import type {loadInbox,loadNotificationSettings} from "../server";
 import {jobHealthSchema,jobHealthAlerts} from "../domain/job-health";
+import {activateDevice} from "./activate-device";
 const initial:NotificationState={message:""};
 function Note({note}:{note:Awaited<ReturnType<typeof loadInbox>>["notes"][number]}){
   const [state,action,pending]=useActionState(notificationAction,initial);
@@ -17,20 +18,8 @@ export function Inbox({view}:{view:Awaited<ReturnType<typeof loadInbox>>}){
 function DevicePush({publicKey}:{publicKey:string}){
   const [message,setMessage]=useState(publicKey?"":"Les notifications sur cet appareil ne sont pas encore configurées par l’administrateur. Vos notifications restent disponibles dans Accueil."),[pending,setPending]=useState(false);
   async function enable(){
-    setPending(true);
-    setMessage("Vérification des notifications sur cet appareil…");
-    try{
-      if(!window.isSecureContext||!("serviceWorker" in navigator)||!("PushManager" in window)||!("Notification" in window)){setMessage("Ce navigateur ne prend pas en charge les notifications Push. Sur iPhone ou iPad compatible, ajoutez d’abord l’application à l’écran d’accueil.");return;}
-      if(!publicKey){setMessage("Le Push n’est pas encore configuré. Vos notifications restent disponibles dans Accueil.");return;}
-      const permission=await Notification.requestPermission();if(permission!=="granted"){setMessage("Autorisation non accordée. Vous pouvez continuer à consulter vos notifications dans Accueil.");return;}
-      setMessage("Préparation des notifications…");
-      await navigator.serviceWorker.register("/sw.js",{scope:"/"});
-      let timer:ReturnType<typeof setTimeout>|undefined;
-      const registration=await Promise.race([navigator.serviceWorker.ready,new Promise<never>((_,reject)=>{timer=setTimeout(()=>reject(new Error("service worker indisponible")),15000);})]).finally(()=>clearTimeout(timer));
-      const key=Uint8Array.from(atob(publicKey.replace(/-/g,"+").replace(/_/g,"/")),c=>c.charCodeAt(0));
-      const subscription=await registration.pushManager.getSubscription()??await registration.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:key});
-      const result=await subscribeDevice(subscription.toJSON());setMessage(result.message);
-    }catch{setMessage("Activation impossible. Vérifiez votre connexion et les autorisations de ce navigateur puis réessayez.");}finally{setPending(false);}
+    setPending(true);setMessage("Vérification des notifications sur cet appareil…");
+    try{setMessage((await activateDevice(publicKey,setMessage)).message);}finally{setPending(false);}
   }
   async function disable(){
     setPending(true);try{const registration=await navigator.serviceWorker.getRegistration("/");const subscription=await registration?.pushManager.getSubscription();if(subscription)await subscription.unsubscribe();setMessage("Abonnement désactivé dans ce navigateur. Vous pouvez aussi retirer sa ligne dans la liste des appareils.");}catch{setMessage("Désactivation impossible dans ce navigateur.");}finally{setPending(false);}

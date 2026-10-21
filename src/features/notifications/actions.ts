@@ -7,6 +7,18 @@ import {pushConfiguration} from "./infrastructure/worker";
 import webpush from "web-push";
 export type NotificationState={message:string;done?:boolean;resetDevice?:boolean};
 function refresh(){revalidatePrivateViews();}
+export async function pushInvitationStatus(rawEndpoint:unknown):Promise<"active"|"muted"|"missing"|"unavailable">{
+  const {client}=await requireMember();
+  const endpoint=z.union([endpointSchema,z.null()]).safeParse(rawEndpoint);
+  if(!endpoint.success)return"unavailable";
+  const [preference,device]=await Promise.all([
+    client.from("notification_preferences").select("push_enabled").maybeSingle(),
+    endpoint.data?client.from("push_subscriptions").select("id").eq("endpoint",endpoint.data).maybeSingle():Promise.resolve({data:null,error:null}),
+  ]);
+  if(preference.error||device.error)return"unavailable";
+  if(preference.data?.push_enabled===false)return"muted";
+  return device.data?"active":"missing";
+}
 export async function testDeviceNotification(raw:unknown):Promise<NotificationState>{
   const {client}=await requireMember();
   const endpoint=endpointSchema.safeParse(raw);

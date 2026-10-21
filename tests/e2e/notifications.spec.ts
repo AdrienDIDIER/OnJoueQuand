@@ -5,6 +5,8 @@ import {randomUUID} from "node:crypto";
 import {execFileSync} from "node:child_process";
 import {clients,checked,identity} from "../../scripts/local-supabase.mjs";
 test("notifications privées, préférences et job HTTP authentifié",async({page,request},info)=>{
+  // Ce parcours vérifie la boîte et le job ; l’activation native est simulée séparément.
+  await page.addInitScript(()=>{Object.defineProperty(window,"PushManager",{configurable:true,value:undefined});});
   const {admin,anonymous,config}=clients();const people=[];const members:string[]=[];let session="";
   const group=checked(await admin.from("groups").select("id").single());
   try{

@@ -9,8 +9,9 @@ const LATER_KEY="ojq-install-later-until";
 const LATER_MS=7*24*60*60_000;
 function subscribeDisplay(changed:()=>void){const media=matchMedia("(display-mode: standalone)");media.addEventListener("change",changed);return()=>media.removeEventListener("change",changed);}
 function browserMode(){return installationMode({userAgent:navigator.userAgent,platform:navigator.platform,touchPoints:navigator.maxTouchPoints,standalone:matchMedia("(display-mode: standalone)").matches||!!(navigator as Navigator&{standalone?:boolean}).standalone});}
-type Installation={mode:ReturnType<typeof browserMode>;available:boolean;pending:boolean;message:string;install:()=>Promise<void>};
+type Installation={mode:ReturnType<typeof browserMode>;launchMode:ReturnType<typeof browserMode>;available:boolean;pending:boolean;message:string;install:()=>Promise<void>};
 const Context=createContext<Installation|null>(null);
+export function useInstallationMode(){return useContext(Context)?.launchMode??"browser";}
 
 function Instructions({ios}:{ios:boolean}){
   return ios?<ol><li>Ouvrez ce site dans <strong>Safari</strong>.</li><li>Touchez <strong>Partager</strong>, puis <strong>Sur l’écran d’accueil</strong>.</li><li>Validez <strong>Ajouter</strong>, puis ouvrez l’icône OnJoueQuand.</li></ol>:<p>Ouvrez le menu de votre navigateur, puis choisissez « Installer l’application » ou « Ajouter à l’écran d’accueil » si cette option est proposée.</p>;
@@ -54,7 +55,7 @@ export function InstallationProvider({children}:{children:ReactNode}){
     }catch{setMessage("L’installation automatique est indisponible. Utilisez le menu de votre navigateur.");}
     finally{busy.current=false;setPending(false);}
   }
-  return <Context value={{mode,available:!!prompt,pending,message,install}}>{children}
+  return <Context value={{mode,launchMode:detected,available:!!prompt,pending,message,install}}>{children}
     <dialog ref={dialog} className="install-dialog" aria-labelledby="install-invitation-title" onClose={()=>{later();if(previousFocus.current?.isConnected)previousFocus.current.focus({preventScroll:true});}}>
       {visible&&mode!=="installed"&&<>
       <button type="button" className="install-close" aria-label="Fermer l’invitation" onClick={later}><X size={22} aria-hidden="true"/></button>
