@@ -1,6 +1,6 @@
 # Architecture — OnJoueQuand
 
-Statut : socle J1, identité J2, disponibilités J3 et jeux/matching J4 implémentés. Le reste de l'architecture métier demeure cible. Versions et vérifications sont dans les rapports [J1](j1-validation.md), [J2](j2-validation.md), [J3](j3-validation.md) et [J4](j4-validation.md). Les règles produit sont dans le [PRD](product-requirements.md), les contraintes persistées dans le [modèle de données](database.md) et les contrôles de livraison dans la [feuille de route](roadmap.md).
+Statut : socle J1, identité J2, disponibilités J3, jeux/matching J4 et sessions/votes/RSVP J5 implémentés localement. Notifications, rappels et jalons suivants restent cibles. Versions et vérifications figurent dans les rapports [J1](j1-validation.md), [J2](j2-validation.md), [J3](j3-validation.md), [J4](j4-validation.md) et [J5](j5-validation.md). Les règles produit sont dans le [PRD](product-requirements.md), les contraintes persistées dans le [modèle de données](database.md) et les contrôles de livraison dans la [feuille de route](roadmap.md).
 
 ## Vue d'ensemble
 
@@ -158,7 +158,7 @@ J3 livre cet adaptateur dans `src/lib/time/paris.ts`, le domaine pur dans `featu
 
 Le matching reçoit un instant `now`, les intervalles normalisés, les engagements et les favoris ; il ne lit ni base ni horloge globale. Le cas d'usage charge ces données et appelle le calcul pur.
 
-J4 implémente ce calcul dans `features/matching/domain.ts`. Les lectures passent par les contrats publics `availability/queries.ts` et `games/queries.ts`. `matching/contracts.ts` définit la lecture des engagements ; son adaptateur actuel retourne un ensemble vide, car aucune session n'est encore persistée. J5 devra le brancher aux seuls RSVP positifs de sessions confirmées et de membres actifs. La soustraction est déjà testée dans le domaine avec des engagements de référence.
+J4 implémente ce calcul dans `features/matching/domain.ts`. Les lectures passent par les contrats publics `availability/queries.ts` et `games/queries.ts`. `matching/contracts.ts` définit la lecture des engagements ; son adaptateur utilise désormais le contrat public `sessions/queries.ts` et la RPC RLS `read_confirmed_commitments`. Seuls les RSVP positifs de sessions confirmées et d’adhésions actives, à l’époque courante, soustraient du temps. Annulations, refus et anciennes réponses après réinvitation ne bloquent pas le matching. Le parcours J5 exerce ce branchement réel.
 
 Les jeux et favoris sont dans `features/games`, avec validation de saisie, lectures RLS, Server Actions et RPC transactionnelles. Tout membre peut créer un jeu ; créateur ou administrateur peut le modifier/archiver. L'archivage conserve la ligne et les favoris historiques, tout en excluant le jeu des nouvelles recherches. Les suggestions ne sont jamais persistées ni confirmées automatiquement.
 

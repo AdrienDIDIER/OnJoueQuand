@@ -1,5 +1,9 @@
 import "server-only";
 import type { BusyReader } from "../contracts";
-// J4 : aucune session n'est encore persistée. J5 branchera le contrat sur les
-// seuls RSVP positifs de sessions confirmées, avec leurs membres encore actifs.
-export const readConfirmedCommitments: BusyReader = async () => ({});
+import { readConfirmedBusy } from "@/features/sessions/queries";
+export const readConfirmedCommitments: BusyReader = async request => {
+  const rows=await readConfirmedBusy(request.memberIds,request.starts_at,request.ends_at);
+  const result:Awaited<ReturnType<BusyReader>>={};
+  for(const row of rows) (result[row.membership_id]??=[]).push({starts_at:row.starts_at,ends_at:row.ends_at});
+  return result;
+};

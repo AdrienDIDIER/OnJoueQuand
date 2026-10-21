@@ -34,6 +34,7 @@ jobs:
       - run: npm run db:reset
       - run: npm run test:integration
       - run: npx playwright install --with-deps chromium firefox webkit
+      - run: node scripts/with-local-env.mjs node_modules/next/dist/bin/next build
       - run: npm run test:e2e
       - run: npm run db:stop
         if: always()

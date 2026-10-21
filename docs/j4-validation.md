@@ -1,6 +1,6 @@
 # J4 — Jeux, favoris et créneaux communs
 
-État au **21 octobre 2026**. J2 est commité dans `5cac4e7`, J3 dans `b62d4b7`, séparément. J4 est implémenté dans le répertoire de travail et n'est pas encore commité. Aucun push, déploiement, migration distante ni envoi réel.
+État au **21 octobre 2026**. J2 est commité dans `5cac4e7`, J3 dans `b62d4b7`, séparément. J4 est commité dans `55aa56d`. Aucun push, déploiement, migration distante ni envoi réel. Ce rapport conserve les résultats au terme de J4 ; le raccordement ultérieur des RSVP figure dans le [rapport J5](j5-validation.md).
 
 ## Portée livrée
 

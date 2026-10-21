@@ -1,6 +1,6 @@
 # ADR 006 — Votes multiples, confirmation et RSVP
 
-- Statut : Acceptée, conception non implémentée.
+- Statut : Implémentée localement en J5 ; précisée par [ADR 012](012-sessions-transactions-et-retour-membre.md). Voir le [rapport J5](../j5-validation.md).
 - Date : 2026-10-15.
 - Portée : J5 ; PR-08, PR-09, PR-15.
 

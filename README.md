@@ -2,7 +2,7 @@
 
 Application web progressive privée pour aider un groupe de 6 à 15 amis et collègues à organiser ses sessions de jeu.
 
-**J2 est commité dans `5cac4e7`, J3 dans `b62d4b7`. J4 ajoute les jeux, favoris et suggestions de créneaux communs ; ses changements ne sont pas encore commités.** Sessions reste un écran d'attente. Voir les rapports [J2](docs/j2-validation.md), [J3](docs/j3-validation.md) et [J4](docs/j4-validation.md) pour les vérifications et limites.
+**J2, J3 et J4 sont commités séparément (`5cac4e7`, `b62d4b7`, `55aa56d`). J5 ajoute propositions, votes multiples, confirmation et RSVP explicites, reliés au matching et à l’accueil.** Ses changements restent dans le répertoire de travail. Voir les rapports [J2](docs/j2-validation.md), [J3](docs/j3-validation.md), [J4](docs/j4-validation.md) et [J5](docs/j5-validation.md). Notifications et rappels viennent en J6.
 
 ## Démarrer
 
@@ -52,6 +52,8 @@ Pour mettre à jour une installation J2 existante, lancer `npm run db:migrate` :
 
 La migration J4 ajoute les jeux, favoris et commandes sécurisées avec la même procédure, sans supprimer les données existantes.
 
+Les migrations J5 ajoutent sessions, créneaux, bulletins, votes, RSVP, époque de participation et outbox privée. Appliquer avec `npm run db:migrate`. Le traitement des événements, les rappels et le cron seront raccordés en J6 ; aucune notification n’est encore envoyée. `npm run test:sessions` vérifie les règles SQL avec des comptes synthétiques.
+
 `npm run db:stop` arrête les services locaux du projet en conservant leurs données. Aucun projet Supabase distant, SMTP réel ou déploiement n'est configuré.
 
 ## Vérifier
@@ -95,11 +97,17 @@ Le calendrier collectif affiche les réponses des membres actifs. La mise à jou
 
 Dans **Groupe**, chaque membre peut ajouter un jeu personnalisé et gérer ses favoris. Le créateur ou un administrateur peut modifier ou archiver un jeu ; l'archivage conserve l'historique. Une préférence ne garantit pas la possession du jeu. Les jeux archivés restent consultables via le filtre dédié et sont retirés des nouvelles recherches.
 
-Dans **Dispos**, le lien **Créneaux communs** rejoint la recherche. Valeurs initiales : semaine affichée, membres actifs, deux joueurs, une heure. Ajuster période, durée, seuil, membres et jeu facultatif, puis lancer le calcul. Les critères restent affichés après recherche. Au plus dix propositions sont classées par nombre de joueurs disponibles pendant toute la durée, puis favoris du jeu choisi, puis horaire. Aucune session n'est confirmée automatiquement. Le contrat d'exclusion des engagements est testé avec fixtures ; les RSVP réels seront branchés en J5.
+Dans **Dispos**, le lien **Créneaux communs** rejoint la recherche. Valeurs initiales : semaine affichée, membres actifs, deux joueurs, une heure. Ajuster période, durée, seuil, membres et jeu facultatif, puis lancer le calcul. Les critères restent affichés après recherche. Au plus dix propositions sont classées par nombre de joueurs disponibles pendant toute la durée, puis favoris du jeu choisi, puis horaire. Aucune session n'est confirmée automatiquement. Les RSVP positifs de sessions confirmées sont soustraits des disponibilités ; une annulation libère ce temps.
+
+## Proposer et rejoindre une session
+
+Dans **Sessions**, ouvrir **Proposer une session**, choisir de deux à six horaires futurs à Paris, puis enregistrer le brouillon et le publier. Chaque membre peut sélectionner tous les créneaux acceptables ; un bulletin vide signifie explicitement qu’aucun ne convient. Le créateur ou un administrateur choisit un créneau, avant ou après clôture. Un vote favorable ne devient jamais automatiquement une participation.
+
+Après confirmation, répondre dans **Ma participation**. Les réponses restent modifiables jusqu’au début ; un engagement chevauchant une autre participation est refusé. L’accueil affiche la prochaine session du groupe. L’annulation conserve l’historique et libère les engagements. Après révocation puis nouvelle invitation, les anciennes réponses doivent être renouvelées.
 
 ## Produit et documentation
 
-Quatre onglets : **Accueil**, **Dispos**, **Sessions**, **Groupe**. Fuseau : **Europe/Paris**. Le mode rapide prévu correspond à 20 h–23 h. Les futures suggestions partent de deux joueurs pendant une heure ; vote favorable et RSVP resteront distincts.
+Quatre onglets : **Accueil**, **Dispos**, **Sessions**, **Groupe**. Fuseau : **Europe/Paris**. Le mode rapide correspond à 20 h–23 h. Les suggestions partent de deux joueurs pendant une heure ; vote favorable et RSVP sont distincts.
 
 | Document | Contenu |
 | --- | --- |
@@ -112,6 +120,7 @@ Quatre onglets : **Accueil**, **Dispos**, **Sessions**, **Groupe**. Fuseau : **E
 | [Validation J2](docs/j2-validation.md) | Sécurité, tests Auth/RLS, exploitation et limites. |
 | [Validation J3](docs/j3-validation.md) | Disponibilités, temps de Paris, copie, concurrence et preuves. |
 | [Validation J4](docs/j4-validation.md) | Catalogue, favoris, matching, benchmark et sécurité. |
+| [Validation J5](docs/j5-validation.md) | Sessions, votes, confirmation, RSVP, concurrence et branchement du matching. |
 | [Consignes de contribution](AGENTS.md) | Règles de changement et sécurité. |
 
-La PWA installable, les notifications et la coordination des sessions sont prévues aux jalons suivants. Aucune facturation : « premium » décrit l'expérience. Les statistiques et sondages sont différés après le MVP.
+La PWA installable et les notifications sont prévues aux jalons suivants. Aucune facturation : « premium » décrit l'expérience. Les statistiques et sondages sont différés après le MVP.

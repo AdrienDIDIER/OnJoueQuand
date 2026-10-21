@@ -2,7 +2,7 @@
 
 ## État et ordre de livraison
 
-Le plan est approuvé. **J0 à J3 sont commités séparément ; J4 est implémenté et vérifié localement, avec les preuves du [rapport J4](j4-validation.md). J5 à J9 ne sont pas implémentés.** Le démarrage de J4 a été explicitement autorisé. Aucun provisionnement distant, push Git ou déploiement n'est inclus dans cette livraison. La CI GitHub reste à exécuter après publication du code ; son succès n'est pas présumé.
+Le plan est approuvé. **J0 à J4 sont commités séparément ; J4 porte le commit `55aa56d`. J5 est réalisé localement, avec les preuves et limites du [rapport J5](j5-validation.md) ; ses changements ne sont pas encore commités. J6 à J9 ne sont pas implémentés.** J5 a été explicitement autorisé par « commit et go j5 ». Aucun provisionnement distant, push Git ou déploiement n'est inclus dans cette livraison. La CI GitHub reste à exécuter après publication du code ; son succès n'est pas présumé.
 
 Les critères ci-dessous sont des portes de sortie : un jalon n'est livré que lorsque ses critères et tests sont vérifiés. Les résultats réels, versions, environnements et limites seront consignés au fur et à mesure. Aucune estimation calendaire ne vaut engagement.
 
@@ -22,7 +22,7 @@ flowchart LR
     J8 --> J9["J9 Statistiques et sondages"]
 ```
 
-Les interfaces d'engagements occupés sont définies en J4 et exercées avec des fixtures ; leur branchement sur les RSVP réels arrive en J5. Cette séquence évite une dépendance circulaire entre matching et sessions. Le MVP n'est complet qu'après J8.
+Les interfaces d'engagements occupés sont définies en J4 et exercées avec des fixtures ; leur branchement sur les RSVP réels est livré en J5. Cette séquence évite une dépendance circulaire entre matching et sessions. Le MVP n'est complet qu'après J8.
 
 <a id="jalons-detailles"></a>
 
@@ -76,7 +76,7 @@ Les interfaces d'engagements occupés sont définies en J4 et exercées avec des
 
 ### J4 — Catalogue et matching
 
-**État :** réalisé localement : catalogue, favoris, suggestions expliquées et filtres ; [preuves J4](j4-validation.md). Le calcul soustrait les engagements fournis par contrat ; l'adaptateur des RSVP persistés reste à brancher en J5.
+**État :** réalisé localement : catalogue, favoris, suggestions expliquées et filtres ; [preuves J4](j4-validation.md). Le calcul soustrait les engagements fournis par contrat ; l’adaptateur des RSVP persistés est branché en J5.
 
 **Dépendances :** J3 ; contrat de lecture des engagements occupés défini, fixtures disponibles avant J5.
 
@@ -87,6 +87,8 @@ Les interfaces d'engagements occupés sont définies en J4 et exercées avec des
 **Tests :** T-GAMES et T-MATCH ; comparaison sur petits cas avec un oracle simple d'intersection ; disponibilités disjointes, trous, membres changeant à une borne, intervalles contigus, égalités de classement, seuil impossible et aucune suggestion. Benchmark cible : p95 du calcul < 100 ms après échauffement pour quinze membres/quatre semaines, fixture et machine documentées. La soustraction des engagements est testée avec fixtures puis intégrée en J5.
 
 ### J5 — Propositions, votes et RSVP
+
+**État :** réalisé localement ; [rapport J5](j5-validation.md), [ADR 012](decisions/012-sessions-transactions-et-retour-membre.md). Échéances SQL, confirmations atomiques, RSVP concurrents, historique, accueil et raccordement au matching vérifiés. L’outbox est persistée ; sa consommation et le cron restent en J6.
 
 **Dépendances :** J2 et J4.
 

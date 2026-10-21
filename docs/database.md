@@ -1,6 +1,6 @@
 # Données, états et sécurité — OnJoueQuand
 
-Statut : modèle logique approuvé en J0. Les migrations [J2](../supabase/migrations/202610190001_identity.sql), [J3](../supabase/migrations/202610200001_availability.sql) et [J4](../supabase/migrations/202610210001_games.sql) livrent identité, disponibilités, jeux et favoris. Les autres entités restent un modèle cible. Les [types générés](../src/lib/supabase/database.types.ts) reflètent uniquement le schéma livré. Références : [PRD](product-requirements.md), [architecture](architecture.md), [roadmap](roadmap.md), preuves [J2](j2-validation.md), [J3](j3-validation.md) et [J4](j4-validation.md).
+Statut : modèle logique approuvé en J0. Les migrations [J2](../supabase/migrations/202610190001_identity.sql), [J3](../supabase/migrations/202610200001_availability.sql), [J4](../supabase/migrations/202610210001_games.sql) et [J5](../supabase/migrations/202610210002_sessions.sql) livrent identité, disponibilités, jeux, sessions, votes, RSVP et outbox privée. Les [gardes J5](../supabase/migrations/202610210003_session_guards.sql) et les [cascades de purge](../supabase/migrations/202610210004_session_retention.sql) complètent ce schéma. Le consommateur de notifications et les autres entités restent cibles. Les [types générés](../src/lib/supabase/database.types.ts) reflètent le schéma livré. Preuves : [J2](j2-validation.md), [J3](j3-validation.md), [J4](j4-validation.md), [J5](j5-validation.md).
 
 ## Conventions et relations
 
@@ -77,11 +77,15 @@ J4 ajoute les RPC `create_game`, `update_game`, `archive_game` et `set_game_favo
 | `session_slots` | `id`, `group_id`, `session_id`, `starts_at`, `ends_at` | Début < fin ; paire d'instants unique par proposition. Deux à six candidats valides au moment de publier. |
 | `session_ballots` | `id`, `group_id`, `session_id`, `membership_id`, `submitted_at`, `revision` | Unique session/membre. Existe même lorsque la sélection est vide. |
 | `session_votes` | `group_id`, `session_id`, `ballot_id`, `slot_id` | Unique bulletin/créneau ; FK composites garantissant même session et groupe pour bulletin et créneau. |
-| `session_rsvps` | `group_id`, `session_id`, `membership_id`, `response`, `revision`, `updated_at` | Unique session/membre ; `attending/declined`. Pas de ligne = réponse attendue. |
+| `session_rsvps` | `group_id`, `session_id`, `membership_id`, `response`, `membership_epoch`, `revision`, `updated_at` | Unique session/membre ; `attending/declined`. Pas de ligne = réponse attendue. Une ancienne époque reste historique et exige une nouvelle réponse. |
 
 La FK du créneau confirmé est ajoutée après la création des deux tables pour résoudre la référence circulaire. Les contraintes/guards imposent un créneau pour `confirmed/completed` ; un créneau peut être conservé pour une session annulée après confirmation. Un statut ne peut pas être modifié directement pour contourner les transitions.
 
 Les candidats peuvent se chevaucher entre eux : ce sont des alternatives. Les engagements RSVP, eux, ne peuvent pas se chevaucher pour un même membre. Le contrôle intersessions exige la transaction décrite plus bas ; un `CHECK` sur `session_rsvps` ne suffit pas.
+
+En J5, `memberships.participation_epoch` est maintenu par trigger : chaque changement de statut l’incrémente, un changement de rôle seul le préserve. Le matching et le décompte des participants exigent une époque RSVP identique et une adhésion active. Les commandes verrouillent groupe → session → adhésion, puis vérifient les révisions. Aucun client ordinaire ne possède de droit DML direct sur les tables de sessions. L’identifiant de création `sessions.idempotency_key` rend les répétitions d’une requête sans effet supplémentaire. Voir [ADR 012](decisions/012-sessions-transactions-et-retour-membre.md).
+
+`create_session` crée un brouillon, `session_command` expose `update/publish/vote/close/confirm/cancel/rsvp`. Les révisions de bulletin et RSVP, nulles lors de la première écriture, figurent dans le payload ; la révision de session est toujours requise. Les transitions temporelles utilisent l’horloge SQL et peuvent ajouter leur propre révision. `session_clock` fournit l’instant de référence aux lectures ; `advance_sessions`, réservé à `service_role`, matérialise les états arrivés à échéance par lots bornés. Le cron sera raccordé en J6. L’outbox est déjà écrite dans les transactions, sans consommation ni livraison en J5.
 
 ### Notifications et infrastructure
 

@@ -133,14 +133,14 @@ isOneToOne: false
                   ]
                 },"memberships": {
                   Row: {
-                    "group_id": string,"id": string,"joined_at": string,"revision": number,"revoked_at": string | null,"role": string,"status": string,"user_id": string
+                    "group_id": string,"id": string,"joined_at": string,"participation_epoch": number,"revision": number,"revoked_at": string | null,"role": string,"status": string,"user_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "group_id": string,"id"?: string,"joined_at"?: string,"revision"?: number,"revoked_at"?: string | null,"role"?: string,"status"?: string,"user_id": string
+                    "group_id": string,"id"?: string,"joined_at"?: string,"participation_epoch"?: number,"revision"?: number,"revoked_at"?: string | null,"role"?: string,"status"?: string,"user_id": string
                   }
                   Update: {
-                    "group_id"?: string,"id"?: string,"joined_at"?: string,"revision"?: number,"revoked_at"?: string | null,"role"?: string,"status"?: string,"user_id"?: string
+                    "group_id"?: string,"id"?: string,"joined_at"?: string,"participation_epoch"?: number,"revision"?: number,"revoked_at"?: string | null,"role"?: string,"status"?: string,"user_id"?: string
                   }
                   Relationships: [
                     {
@@ -165,6 +165,142 @@ isOneToOne: false
                   Relationships: [
 
                   ]
+                },"session_ballots": {
+                  Row: {
+                    "group_id": string,"id": string,"membership_id": string,"revision": number,"session_id": string,"submitted_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "group_id": string,"id"?: string,"membership_id": string,"revision"?: number,"session_id": string,"submitted_at"?: string
+                  }
+                  Update: {
+                    "group_id"?: string,"id"?: string,"membership_id"?: string,"revision"?: number,"session_id"?: string,"submitted_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "ballots_parent"
+      columns: ["group_id","session_id"]
+isOneToOne: false
+      referencedRelation: "sessions"
+      referencedColumns: ["group_id","id"]
+    },{
+      foreignKeyName: "session_ballots_group_id_membership_id_fkey"
+      columns: ["group_id","membership_id"]
+isOneToOne: false
+      referencedRelation: "memberships"
+      referencedColumns: ["group_id","id"]
+    }
+                  ]
+                },"session_rsvps": {
+                  Row: {
+                    "group_id": string,"membership_epoch": number,"membership_id": string,"response": string,"revision": number,"session_id": string,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "group_id": string,"membership_epoch": number,"membership_id": string,"response": string,"revision"?: number,"session_id": string,"updated_at"?: string
+                  }
+                  Update: {
+                    "group_id"?: string,"membership_epoch"?: number,"membership_id"?: string,"response"?: string,"revision"?: number,"session_id"?: string,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "rsvps_parent"
+      columns: ["group_id","session_id"]
+isOneToOne: false
+      referencedRelation: "sessions"
+      referencedColumns: ["group_id","id"]
+    },{
+      foreignKeyName: "session_rsvps_group_id_membership_id_fkey"
+      columns: ["group_id","membership_id"]
+isOneToOne: false
+      referencedRelation: "memberships"
+      referencedColumns: ["group_id","id"]
+    }
+                  ]
+                },"session_slots": {
+                  Row: {
+                    "ends_at": string,"group_id": string,"id": string,"session_id": string,"starts_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "ends_at": string,"group_id": string,"id"?: string,"session_id": string,"starts_at": string
+                  }
+                  Update: {
+                    "ends_at"?: string,"group_id"?: string,"id"?: string,"session_id"?: string,"starts_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "session_slots_parent"
+      columns: ["group_id","session_id"]
+isOneToOne: false
+      referencedRelation: "sessions"
+      referencedColumns: ["group_id","id"]
+    }
+                  ]
+                },"session_votes": {
+                  Row: {
+                    "ballot_id": string,"group_id": string,"session_id": string,"slot_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "ballot_id": string,"group_id": string,"session_id": string,"slot_id": string
+                  }
+                  Update: {
+                    "ballot_id"?: string,"group_id"?: string,"session_id"?: string,"slot_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "session_votes_group_id_session_id_slot_id_fkey"
+      columns: ["group_id","session_id","slot_id"]
+isOneToOne: false
+      referencedRelation: "session_slots"
+      referencedColumns: ["group_id","session_id","id"]
+    },{
+      foreignKeyName: "votes_ballot"
+      columns: ["group_id","session_id","ballot_id"]
+isOneToOne: false
+      referencedRelation: "session_ballots"
+      referencedColumns: ["group_id","session_id","id"]
+    }
+                  ]
+                },"sessions": {
+                  Row: {
+                    "confirmed_slot_id": string | null,"created_at": string,"created_by": string,"description": string,"game_id": string | null,"group_id": string,"id": string,"idempotency_key": string,"minimum_players": number,"published_at": string | null,"revision": number,"status": string,"title": string,"vote_deadline": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "confirmed_slot_id"?: string | null,"created_at"?: string,"created_by": string,"description"?: string,"game_id"?: string | null,"group_id": string,"id"?: string,"idempotency_key": string,"minimum_players"?: number,"published_at"?: string | null,"revision"?: number,"status"?: string,"title": string,"vote_deadline"?: string | null
+                  }
+                  Update: {
+                    "confirmed_slot_id"?: string | null,"created_at"?: string,"created_by"?: string,"description"?: string,"game_id"?: string | null,"group_id"?: string,"id"?: string,"idempotency_key"?: string,"minimum_players"?: number,"published_at"?: string | null,"revision"?: number,"status"?: string,"title"?: string,"vote_deadline"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "sessions_confirmed_slot"
+      columns: ["group_id","id","confirmed_slot_id"]
+isOneToOne: false
+      referencedRelation: "session_slots"
+      referencedColumns: ["group_id","session_id","id"]
+    },{
+      foreignKeyName: "sessions_group_id_created_by_fkey"
+      columns: ["group_id","created_by"]
+isOneToOne: false
+      referencedRelation: "memberships"
+      referencedColumns: ["group_id","id"]
+    },{
+      foreignKeyName: "sessions_group_id_fkey"
+      columns: ["group_id"]
+isOneToOne: false
+      referencedRelation: "groups"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "sessions_group_id_game_id_fkey"
+      columns: ["group_id","game_id"]
+isOneToOne: false
+      referencedRelation: "games"
+      referencedColumns: ["group_id","id"]
+    }
+                  ]
                 }
           }
           Views: {
@@ -173,6 +309,9 @@ isOneToOne: false
           Functions: {
             "accept_invitation":
 { Args: { "display_name": string }; Returns: string
+                           },
+"advance_sessions":
+{ Args: { "batch_size"?: number }; Returns: number
                            },
 "archive_game":
 { Args: { "expected_revision": number,"target_id": string }; Returns: undefined
@@ -192,8 +331,16 @@ isOneToOne: false
 "create_invitation":
 { Args: { "email": string,"request_id": string }; Returns: string
                            },
+"create_session":
+{ Args: { "candidate_slots": Json,"deadline": string,"player_threshold": number,"request_id": string,"selected_game": string,"session_description": string,"session_title": string }; Returns: string
+                           },
 "provisioning_context":
 { Args: { "actor_id": string,"invitation_id": string }; Returns: Json
+                           },
+"read_confirmed_commitments":
+{ Args: { "member_ids": (string)[],"period_end": string,"period_start": string }; Returns: {
+              "ends_at": string,"membership_id": string,"starts_at": string
+            }[]
                            },
 "record_invitation_delivery":
 { Args: { "actor_id": string,"delivered": boolean,"invitation_id": string }; Returns: undefined
@@ -203,6 +350,12 @@ isOneToOne: false
                            },
 "save_availability":
 { Args: { "changes": Json,"sources"?: Json }; Returns: undefined
+                           },
+"session_clock":
+{ Args: Record<PropertyKey, never>; Returns: string
+                           },
+"session_command":
+{ Args: { "command": string,"expected_revision": number,"payload"?: Json,"target_id": string }; Returns: undefined
                            },
 "set_game_favorite":
 { Args: { "expected_favorite": boolean,"favorite": boolean,"target_id": string }; Returns: undefined

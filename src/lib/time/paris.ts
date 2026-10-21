@@ -43,6 +43,15 @@ export function localParts(instant: string) {
   return { date: z.toPlainDate().toString(), time: z.toPlainTime().toString({ smallestUnit: "minute" }), offset: z.offset, occurrence };
 }
 export function dayLabel(value: string) { return date(value).toLocaleString("fr-FR", { weekday: "long", day: "numeric", month: "long" }); }
+export function dateTimeLabel(value:string) {
+  const p=localParts(value);
+  return `${date(p.date).toLocaleString("fr-FR",{weekday:"long",day:"numeric",month:"long",year:"numeric"})} à ${p.time}${p.occurrence?` (UTC${p.offset})`:""}`;
+}
+export function slotLabel(start:string,end:string) {
+  const a=localParts(start),b=localParts(end);
+  const offsets=a.occurrence||b.occurrence||a.offset!==b.offset ? ` (UTC${a.offset} → UTC${b.offset})` : "";
+  return `${dayLabel(a.date)} · ${a.time}–${a.date===b.date?b.time:`${dayLabel(b.date)} à ${b.time}`}${offsets}`;
+}
 export function intervalLabel(start: string, end: string, day: string) {
   const a = localParts(start); const b = localParts(end);
   const offset = a.offset !== b.offset ? ` (UTC${a.offset} → UTC${b.offset})` : a.occurrence || b.occurrence ? ` (UTC${a.offset})` : "";

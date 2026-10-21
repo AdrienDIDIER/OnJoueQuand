@@ -1,6 +1,6 @@
 # ADR 005 — Matching déterministe
 
-- Statut : Implémentée en J4 ; branchement des RSVP persistés prévu en J5. Voir les [preuves J4](../j4-validation.md).
+- Statut : Implémentée en J4 ; branchement réel des RSVP livré en J5. Voir les preuves [J4](../j4-validation.md) et [J5](../j5-validation.md).
 - Date : 2026-10-15.
 - Portée : J4–J5 ; PR-06, PR-07, PR-09.
 
