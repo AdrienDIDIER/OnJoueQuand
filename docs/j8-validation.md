@@ -25,6 +25,16 @@ Date : 2026-10-21. **J8 en cours, pilote non lancé.** J7 est commité dans `098
 - Incident de préparation des copies de recette : un premier essai SMTP a brièvement arrêté/redémarré le Mailpit local principal au lieu de celui de J8Validation. Le `finally` l’a rétabli ; aucun envoi réel ni modification de sa base. Le nom a été corrigé et la suite entière a ensuite réussi sur la stack isolée.
 - Vérification documentaire finale : 34 documents, 250 liens locaux valides ; `git diff --check` réussi. Les compléments de conservation sont inclus dans le commit de conservation J8.
 
+## Présentation des e-mails de connexion
+
+Le modèle local `supabase/templates/code.html` utilise désormais une carte sombre, des accents violets, un code bien distinct et un bouton de retour vers l’application. Mise en page par tableaux, styles essentiels intégrés, aucune image ni police distante. Les variables `{{ .Token }}` et `{{ .SiteURL }}` sont conservées. Aperçus Chromium à 820, 375 et 320 pixels vérifiés avec un code de démonstration : aucun débordement horizontal. Aucun e-mail envoyé ; le rendu Gmail/Outlook/Apple Mail et la mise à jour des deux modèles hébergés restent à vérifier lors de la recette SMTP. `git diff --check` réussi.
+
+## Configuration de la préproduction distante
+
+Le projet Supabase de préproduction `catspvwwtoyhwgnjhrix` est lié au dépôt. Vérification CLI en lecture : les douze migrations locales sont présentes à distance, PostgreSQL 17.11. La configuration Auth privée (inscriptions publiques et anonymes désactivées, confirmation e-mail, OTP dix minutes) et les deux modèles français sont déclarés enregistrés par l’exploitant. Le domaine Resend `goriseup.eu` est vérifié dans son tableau de bord ; le SMTP est déclaré configuré. Aucun code réel ni clé n’est consigné ici.
+
+L’usage personnel entre amis a été confirmé pour Vercel Hobby. Le projet Vercel créé s’appelle `on-joue-quand` et cible uniquement la préproduction Supabase. L’exploitant déclare les six variables configurées pour l’environnement Vercel Production ; leurs valeurs secrètes n’ont pas été lues ni vérifiées. L’origine prévue est `https://onjouequand-preprod.goriseup.eu`, dont le raccordement DNS reste à effectuer. Le premier déploiement, la connexion OTP réelle, le bootstrap administrateur et les contrôles du site restent à valider. Le cron reste inactif ; aucun groupe réel n’est invité.
+
 ## Limites et portes restantes après cette suite
 
 Le test de restauration partage les rôles système du cluster synthétique et utilise son superutilisateur pour charger les schémas. Il ne démontre ni restauration dans Supabase hébergé, ni OTP après récupération, ni copie des clés racines, ni bascule Vercel. Le schéma de cron et les secrets Vault sont volontairement exclus de l’archive ; leur reconstitution est une étape distincte.
