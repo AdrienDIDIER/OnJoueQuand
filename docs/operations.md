@@ -24,6 +24,12 @@ Séquence de livraison à effectuer après configuration et autorisation :
 
 Retour arrière : remettre le déploiement Vercel précédent connu et compatible. Ne pas annuler automatiquement les migrations ; vérifier que ce déploiement accepte le schéma actuel. Si ce n’est pas le cas, passer en maintenance et corriger par migration progressive. Désactiver temporairement le cron si des notifications sont incorrectes ; ne pas rejouer l’outbox à l’aveugle. Une répétition Vercel effective et son compte rendu restent requis avant le pilote.
 
+## Premier administrateur de préproduction
+
+Le projet de recette lié est `catspvwwtoyhwgnjhrix`, accessible par `https://onjouequand.goriseup.eu`. Depuis la racine du dépôt, avec Node 24 et la CLI Supabase connectée, lancer `npm run bootstrap:preprod`. Saisir son adresse e-mail et son nom uniquement dans le terminal local. Ne transmettre ni clé, ni code, ni adresse dans un compte rendu public.
+
+La commande refuse un autre projet lié et ne modifie rien si une adhésion existe déjà. La clé serveur est lue via la CLI en mémoire uniquement, sans fichier intermédiaire ni affichage. Le compte Auth est créé sans mot de passe et sans confirmation artificielle de l’adresse ; la RPC transactionnelle existante attribue le premier rôle administrateur. Aucun e-mail n’est envoyé par cette commande. Après réussite, demander un code sur la page de connexion pour vérifier l’adresse et le SMTP. En cas d’interruption après création Auth, relancer avec la même adresse réutilise le compte. Le contrôle `npm run bootstrap:preprod -- --check` est exclusivement en lecture.
+
 ## Sauvegarde chiffrée
 
 Prérequis : Node 24, client PostgreSQL de même version majeure que la base ou plus récent compatible, `age` et `age-keygen`. La recette locale utilise PostgreSQL 17.11 et age 1.3.2 officiel, téléchargé avec vérification SHA-256. Les outils système du workflow sont fournis par son image PostgreSQL et les dépôts Debian ; contrôler leurs versions lors de son premier essai privé.
