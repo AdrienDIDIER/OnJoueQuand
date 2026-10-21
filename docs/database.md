@@ -1,6 +1,6 @@
 # Données, états et sécurité — OnJoueQuand
 
-Statut : modèle logique approuvé en J0. Groupe/identité sont implémentés dans la [migration J2](../supabase/migrations/202610190001_identity.sql) ; journées et intervalles dans la [migration J3](../supabase/migrations/202610200001_availability.sql), vérifiées localement. Les autres entités restent un modèle cible. Les [types générés](../src/lib/supabase/database.types.ts) reflètent uniquement le schéma livré. Références : [PRD](product-requirements.md), [architecture](architecture.md), [roadmap](roadmap.md), preuves [J2](j2-validation.md) et [J3](j3-validation.md).
+Statut : modèle logique approuvé en J0. Les migrations [J2](../supabase/migrations/202610190001_identity.sql), [J3](../supabase/migrations/202610200001_availability.sql) et [J4](../supabase/migrations/202610210001_games.sql) livrent identité, disponibilités, jeux et favoris. Les autres entités restent un modèle cible. Les [types générés](../src/lib/supabase/database.types.ts) reflètent uniquement le schéma livré. Références : [PRD](product-requirements.md), [architecture](architecture.md), [roadmap](roadmap.md), preuves [J2](j2-validation.md), [J3](j3-validation.md) et [J4](j4-validation.md).
 
 ## Conventions et relations
 
@@ -62,10 +62,12 @@ L'adresse d'invitation normalisée utilise une règle commune cohérente avec Au
 | --- | --- | --- |
 | `availability_days` | `id`, `group_id`, `membership_id`, `local_date`, `status`, `mode`, `revision` | Unique `(membership_id, local_date)` ; `unanswered/unavailable/available` ; `quick/detailed` seulement si disponible. |
 | `availability_intervals` | `id`, `group_id`, `membership_id`, `day_id`, `starts_at`, `ends_at` | Parent cohérent par FK composite ; début < fin ; intervalle inclus dans la journée locale du parent, fin au minuit suivant autorisée. |
-| `games` | `id`, `group_id`, `name`, `description` facultative, `created_by`, `archived_at`, `revision` | Nom non vide ; appartient au groupe. Archivage plutôt que suppression s'il est référencé par une session. |
+| `games` | `id`, `group_id`, `name`, `description` facultative, `created_by`, `archived_at`, `revision`, `idempotency_key`, `created_at` | Nom de 1 à 80 caractères ; description jusqu'à 1 000 caractères, vide par défaut. Créateur référencé par FK composite d'adhésion ; clé de création idempotente unique. Archivage plutôt que suppression. |
 | `game_favorites` | `group_id`, `membership_id`, `game_id` | PK membre/jeu ; FK des deux côtés dans le même groupe. |
 
 Une contrainte d'exclusion GiST sur le membre et `tstzrange(starts_at, ends_at, '[)')` empêche les chevauchements persistés. Utiliser l'extension PostgreSQL adaptée (`btree_gist`) via migration. Un trigger de contrainte différé vérifie l'accord état/intervalles à la fin de la transaction : disponible implique au moins un intervalle ; les deux autres états impliquent zéro intervalle. Une contrainte `CHECK` seule ne peut pas compter des lignes enfants.
+
+J4 ajoute les RPC `create_game`, `update_game`, `archive_game` et `set_game_favorite`, sous verrou groupe puis adhésion, avec contrôles du JWT, de l'activité et des relations. L'édition/archivage vérifie la révision et le rôle créateur/admin ; un jeu archivé reste lisible mais n'est plus modifiable ni ajoutable aux favoris. Le retrait d'un favori archivé reste possible. Le favori est un état binaire propriétaire : la commande compare son état attendu avant de le remplacer ; deux ajouts concurrents avec le même état initial ne passent pas tous deux. Les clients ordinaires n'ont aucun droit DML direct sur ces tables.
 
 ### Sessions et participation
 

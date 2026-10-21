@@ -2,7 +2,7 @@
 
 ## État et ordre de livraison
 
-Le plan est approuvé. **J0 à J3 sont commités séparément ; J2 et J3 sont vérifiés localement, avec les réserves consignées dans les rapports [J2](j2-validation.md) et [J3](j3-validation.md). J4 à J9 ne sont pas implémentés.** Le démarrage de J3 a été explicitement autorisé. Aucun provisionnement distant, push Git ou déploiement n'est inclus dans cette livraison. La CI GitHub reste à exécuter après publication du code ; son succès n'est pas présumé.
+Le plan est approuvé. **J0 à J3 sont commités séparément ; J4 est implémenté et vérifié localement, avec les preuves du [rapport J4](j4-validation.md). J5 à J9 ne sont pas implémentés.** Le démarrage de J4 a été explicitement autorisé. Aucun provisionnement distant, push Git ou déploiement n'est inclus dans cette livraison. La CI GitHub reste à exécuter après publication du code ; son succès n'est pas présumé.
 
 Les critères ci-dessous sont des portes de sortie : un jalon n'est livré que lorsque ses critères et tests sont vérifiés. Les résultats réels, versions, environnements et limites seront consignés au fur et à mesure. Aucune estimation calendaire ne vaut engagement.
 
@@ -75,6 +75,8 @@ Les interfaces d'engagements occupés sont définies en J4 et exercées avec des
 **Tests :** T-AVAIL, T-COPY, T-TIME et T-RLS ; jeux de données à quinze membres ; échec sur une journée d'une transaction multi-journées ; borne de semaine et d'horizon ; modifications source/cible après aperçu ; création concurrente d'une journée absente ; fuseau serveur différent de Paris.
 
 ### J4 — Catalogue et matching
+
+**État :** réalisé localement : catalogue, favoris, suggestions expliquées et filtres ; [preuves J4](j4-validation.md). Le calcul soustrait les engagements fournis par contrat ; l'adaptateur des RSVP persistés reste à brancher en J5.
 
 **Dépendances :** J3 ; contrat de lecture des engagements occupés défini, fixtures disponibles avant J5.
 

@@ -1,6 +1,6 @@
 # Architecture — OnJoueQuand
 
-Statut : conception approuvée en J0 ; socle J1, identité/groupe privé J2 et disponibilités/calendrier J3 implémentés. Le reste de l'architecture métier demeure cible. Versions et vérifications sont dans les rapports [J1](j1-validation.md), [J2](j2-validation.md) et [J3](j3-validation.md). Les règles produit sont dans le [PRD](product-requirements.md), les contraintes persistées dans le [modèle de données](database.md) et les contrôles de livraison dans la [feuille de route](roadmap.md).
+Statut : socle J1, identité J2, disponibilités J3 et jeux/matching J4 implémentés. Le reste de l'architecture métier demeure cible. Versions et vérifications sont dans les rapports [J1](j1-validation.md), [J2](j2-validation.md), [J3](j3-validation.md) et [J4](j4-validation.md). Les règles produit sont dans le [PRD](product-requirements.md), les contraintes persistées dans le [modèle de données](database.md) et les contrôles de livraison dans la [feuille de route](roadmap.md).
 
 ## Vue d'ensemble
 
@@ -154,9 +154,13 @@ Un compte authentifié sans invitation valide reste sans accès. Une invitation 
 
 L'adaptateur temporel central convertit date locale + heure + occurrence éventuelle en instant. Il utilise Europe/Paris indépendamment du serveur ou de l'appareil. Une journée locale peut durer 23 ou 25 heures. La base garde les bornes UTC et la date locale de rattachement ; l'UI utilise les mêmes règles de conversion.
 
-J3 livre cet adaptateur dans `src/lib/time/paris.ts`, le domaine pur dans `features/availability/domain.ts`, les lectures et Server Actions dans le module disponibilité, et la RPC transactionnelle `save_availability` en SQL. Les aperçus signés durent dix minutes ; chaque confirmation recontrôle session, adhésion, horizon et révisions. Une correction explicite résout les heures inexistantes de copie ; une occurrence est choisie par borne répétée. Voir [ADR 011](decisions/011-disponibilites-et-apercus.md). Le matching décrit ci-dessous reste à réaliser en J4.
+J3 livre cet adaptateur dans `src/lib/time/paris.ts`, le domaine pur dans `features/availability/domain.ts`, les lectures et Server Actions dans le module disponibilité, et la RPC transactionnelle `save_availability` en SQL. Les aperçus signés durent dix minutes ; chaque confirmation recontrôle session, adhésion, horizon et révisions. Une correction explicite résout les heures inexistantes de copie ; une occurrence est choisie par borne répétée. Voir [ADR 011](decisions/011-disponibilites-et-apercus.md).
 
 Le matching reçoit un instant `now`, les intervalles normalisés, les engagements et les favoris ; il ne lit ni base ni horloge globale. Le cas d'usage charge ces données et appelle le calcul pur.
+
+J4 implémente ce calcul dans `features/matching/domain.ts`. Les lectures passent par les contrats publics `availability/queries.ts` et `games/queries.ts`. `matching/contracts.ts` définit la lecture des engagements ; son adaptateur actuel retourne un ensemble vide, car aucune session n'est encore persistée. J5 devra le brancher aux seuls RSVP positifs de sessions confirmées et de membres actifs. La soustraction est déjà testée dans le domaine avec des engagements de référence.
+
+Les jeux et favoris sont dans `features/games`, avec validation de saisie, lectures RLS, Server Actions et RPC transactionnelles. Tout membre peut créer un jeu ; créateur ou administrateur peut le modifier/archiver. L'archivage conserve la ligne et les favoris historiques, tout en excluant le jeu des nouvelles recherches. Les suggestions ne sont jamais persistées ni confirmées automatiquement.
 
 1. Limiter la recherche à la période demandée et aux instants futurs ; filtrer les membres actifs sélectionnés.
 2. Soustraire à chaque disponibilité les intervalles de sessions confirmées portant un RSVP positif pour ce membre.

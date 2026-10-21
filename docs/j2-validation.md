@@ -1,6 +1,6 @@
 # J2 — Identité et groupe privé
 
-État au 20 octobre 2026. J1 est commité dans `6b1af70`. J2 est dans le répertoire de travail, sans push, déploiement ni envoi réel. Les comptes et e-mails de recette utilisent exclusivement `example.test` et la boîte locale Mailpit.
+Rapport de validation du 20 octobre 2026. J1 est commité dans `6b1af70` ; J2 a ensuite été commité séparément dans `5cac4e7`. Aucun push, déploiement ni envoi réel. Les comptes et e-mails de recette utilisent exclusivement `example.test` et la boîte locale Mailpit.
 
 ## Fonctionnalités livrées
 

@@ -11,6 +11,19 @@ export function addDays(value: string, days: number) { return date(value).add({ 
 export function monday(value: string) { const d = date(value); return d.subtract({ days: d.dayOfWeek - 1 }).toString(); }
 export function today(now: string) { return Temporal.Instant.from(now).toZonedDateTimeISO(TIMEZONE).toPlainDate().toString(); }
 export function compareInstant(a: string, b: string) { return Temporal.Instant.compare(a, b); }
+export function instantMillis(value: string) { return Temporal.Instant.from(value).epochMilliseconds; }
+export function instantISO(milliseconds: number) { return Temporal.Instant.fromEpochMilliseconds(milliseconds).toString(); }
+export function quarterStarts(start: string, end: string): number[] {
+  const first = Temporal.Instant.from(start); const z = first.toZonedDateTimeISO(TIMEZONE);
+  // Paris : les transitions modernes sont des multiples de quinze minutes.
+  // Avancer sur la ligne des instants énumère les deux occurrences d'automne et saute les heures inexistantes.
+  const lower = first.epochMilliseconds; const upper = instantMillis(end);
+  let cursor = lower - z.second * 1000 - z.millisecond + ((15 - z.minute % 15) % 15) * 60_000;
+  if (Temporal.Instant.compare(Temporal.Instant.fromEpochMilliseconds(cursor), first) < 0) cursor += 15 * 60_000;
+  const result: number[] = [];
+  for (; cursor < upper; cursor += 15 * 60_000) result.push(cursor);
+  return result;
+}
 export function localInstant(day: string, time: string, occurrence?: Occurrence): string {
   if (time === "24:00") return localInstant(addDays(day, 1), "00:00", occurrence);
   if (!/^([01]\d|2[0-3]):(00|15|30|45)$/.test(time)) throw new Error("Choisissez un horaire par pas de quinze minutes.");

@@ -2,7 +2,7 @@
 
 Application web progressive privée pour aider un groupe de 6 à 15 amis et collègues à organiser ses sessions de jeu.
 
-**J0 à J3 sont livrés en commits distincts. J2 ajoute l'accès privé ; J3 livre les disponibilités, leur copie et le calendrier collectif.** Sessions reste un écran d'attente. Voir les rapports [J2](docs/j2-validation.md) et [J3](docs/j3-validation.md) pour les vérifications et limites. Les rapports décrivent les contrôles effectués avant chaque commit.
+**J2 est commité dans `5cac4e7`, J3 dans `b62d4b7`. J4 ajoute les jeux, favoris et suggestions de créneaux communs ; ses changements ne sont pas encore commités.** Sessions reste un écran d'attente. Voir les rapports [J2](docs/j2-validation.md), [J3](docs/j3-validation.md) et [J4](docs/j4-validation.md) pour les vérifications et limites.
 
 ## Démarrer
 
@@ -50,6 +50,8 @@ Les ports 55320–55324 évitent un conflit constaté avec un autre projet local
 
 Pour mettre à jour une installation J2 existante, lancer `npm run db:migrate` : cette commande applique les migrations locales manquantes en conservant les données. J3 ajoute les journées, intervalles, contraintes et RPC de disponibilités. Ne pas utiliser `db:reset` pour une simple mise à jour.
 
+La migration J4 ajoute les jeux, favoris et commandes sécurisées avec la même procédure, sans supprimer les données existantes.
+
 `npm run db:stop` arrête les services locaux du projet en conservant leurs données. Aucun projet Supabase distant, SMTP réel ou déploiement n'est configuré.
 
 ## Vérifier
@@ -75,6 +77,7 @@ npm run test:e2e
 | `npm run test:e2e` | Navigation, OTP, invitation, profil et révocation sur quatre projets navigateur. |
 | `npm run test:integration` | Auth, RLS, transactions concurrentes et panne SMTP sur Supabase local. |
 | `npm run test:availability` | Scénarios SQL/RLS J3 avec fixtures isolées et nettoyées ; compatible avec une base locale existante. |
+| `npm run test:games` | Droits, archivage, favoris et concurrence J4 avec fixtures isolées et nettoyées. |
 | `npm run db:migrate` | Appliquer les migrations locales manquantes en préservant les données. |
 | `npm run db:types` | Générer les types depuis la base locale ; enregistrer la sortie dans `src/lib/supabase/database.types.ts`. |
 
@@ -86,7 +89,13 @@ Dans **Dispos**, choisir la semaine puis ouvrir une journée. Le mode rapide « 
 
 La semaine courante et les trois suivantes sont modifiables ; les douze semaines précédentes sont consultables et copiables. Pour copier, afficher la semaine cible, choisir une source et prévisualiser : les réponses existantes sont conservées par défaut. Cocher le remplacement pour les écraser explicitement. Les horaires locaux sont conservés à travers les changements d'heure. Une heure inexistante doit être corrigée et une heure répétée désambiguïsée avant confirmation. Un aperçu expiré ou une source/cible modifiée exige un nouvel aperçu.
 
-Le calendrier collectif affiche les réponses des membres actifs. La mise à jour intervient après enregistrement, navigation ou rechargement ; la synchronisation temps réel reste différée. Le matching arrive en J4.
+Le calendrier collectif affiche les réponses des membres actifs. La mise à jour intervient après enregistrement, navigation ou rechargement ; la synchronisation temps réel reste différée.
+
+## Jeux et créneaux communs
+
+Dans **Groupe**, chaque membre peut ajouter un jeu personnalisé et gérer ses favoris. Le créateur ou un administrateur peut modifier ou archiver un jeu ; l'archivage conserve l'historique. Une préférence ne garantit pas la possession du jeu. Les jeux archivés restent consultables via le filtre dédié et sont retirés des nouvelles recherches.
+
+Dans **Dispos**, le lien **Créneaux communs** rejoint la recherche. Valeurs initiales : semaine affichée, membres actifs, deux joueurs, une heure. Ajuster période, durée, seuil, membres et jeu facultatif, puis lancer le calcul. Les critères restent affichés après recherche. Au plus dix propositions sont classées par nombre de joueurs disponibles pendant toute la durée, puis favoris du jeu choisi, puis horaire. Aucune session n'est confirmée automatiquement. Le contrat d'exclusion des engagements est testé avec fixtures ; les RSVP réels seront branchés en J5.
 
 ## Produit et documentation
 
@@ -102,6 +111,7 @@ Quatre onglets : **Accueil**, **Dispos**, **Sessions**, **Groupe**. Fuseau : **E
 | [Validation J1](docs/j1-validation.md) | Versions installées, preuves et réserves. |
 | [Validation J2](docs/j2-validation.md) | Sécurité, tests Auth/RLS, exploitation et limites. |
 | [Validation J3](docs/j3-validation.md) | Disponibilités, temps de Paris, copie, concurrence et preuves. |
+| [Validation J4](docs/j4-validation.md) | Catalogue, favoris, matching, benchmark et sécurité. |
 | [Consignes de contribution](AGENTS.md) | Règles de changement et sécurité. |
 
 La PWA installable, les notifications et la coordination des sessions sont prévues aux jalons suivants. Aucune facturation : « premium » décrit l'expérience. Les statistiques et sondages sont différés après le MVP.

@@ -45,6 +45,58 @@ isOneToOne: false
       referencedColumns: ["group_id","membership_id","id"]
     }
                   ]
+                },"game_favorites": {
+                  Row: {
+                    "game_id": string,"group_id": string,"membership_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "game_id": string,"group_id": string,"membership_id": string
+                  }
+                  Update: {
+                    "game_id"?: string,"group_id"?: string,"membership_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "game_favorites_group_id_game_id_fkey"
+      columns: ["group_id","game_id"]
+isOneToOne: false
+      referencedRelation: "games"
+      referencedColumns: ["group_id","id"]
+    },{
+      foreignKeyName: "game_favorites_group_id_membership_id_fkey"
+      columns: ["group_id","membership_id"]
+isOneToOne: false
+      referencedRelation: "memberships"
+      referencedColumns: ["group_id","id"]
+    }
+                  ]
+                },"games": {
+                  Row: {
+                    "archived_at": string | null,"created_at": string,"created_by": string,"description": string,"group_id": string,"id": string,"idempotency_key": string,"name": string,"revision": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "archived_at"?: string | null,"created_at"?: string,"created_by": string,"description"?: string,"group_id": string,"id"?: string,"idempotency_key": string,"name": string,"revision"?: number
+                  }
+                  Update: {
+                    "archived_at"?: string | null,"created_at"?: string,"created_by"?: string,"description"?: string,"group_id"?: string,"id"?: string,"idempotency_key"?: string,"name"?: string,"revision"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "games_group_id_created_by_fkey"
+      columns: ["group_id","created_by"]
+isOneToOne: false
+      referencedRelation: "memberships"
+      referencedColumns: ["group_id","id"]
+    },{
+      foreignKeyName: "games_group_id_fkey"
+      columns: ["group_id"]
+isOneToOne: false
+      referencedRelation: "groups"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"groups": {
                   Row: {
                     "id": string,"name": string,"quick_end": string,"quick_start": string,"revision": number,"singleton": boolean,"timezone": string
@@ -122,6 +174,9 @@ isOneToOne: false
             "accept_invitation":
 { Args: { "display_name": string }; Returns: string
                            },
+"archive_game":
+{ Args: { "expected_revision": number,"target_id": string }; Returns: undefined
+                           },
 "bootstrap_admin":
 { Args: { "account_id": string,"display_name": string }; Returns: undefined
                            },
@@ -130,6 +185,9 @@ isOneToOne: false
                            },
 "consume_auth_limit":
 { Args: { "key_hash": string,"max_attempts": number }; Returns: boolean
+                           },
+"create_game":
+{ Args: { "game_description": string,"game_name": string,"request_id": string }; Returns: string
                            },
 "create_invitation":
 { Args: { "email": string,"request_id": string }; Returns: string
@@ -145,6 +203,12 @@ isOneToOne: false
                            },
 "save_availability":
 { Args: { "changes": Json,"sources"?: Json }; Returns: undefined
+                           },
+"set_game_favorite":
+{ Args: { "expected_favorite": boolean,"favorite": boolean,"target_id": string }; Returns: undefined
+                           },
+"update_game":
+{ Args: { "expected_revision": number,"game_description": string,"game_name": string,"target_id": string }; Returns: undefined
                            },
 "update_profile":
 { Args: { "display_name": string,"expected_revision": number }; Returns: undefined

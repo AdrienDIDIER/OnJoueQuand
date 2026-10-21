@@ -1,6 +1,6 @@
 # J3 — Disponibilités et calendrier
 
-État au **21 octobre 2026**. J3 est livré dans un commit distinct à la suite de J2 (`5cac4e7`). Aucun push, déploiement, migration distante ni envoi réel n'a été effectué.
+État au **21 octobre 2026**. J3 est commité dans `b62d4b7`, distinctement de J2 (`5cac4e7`). Aucun push, déploiement, migration distante ni envoi réel n'a été effectué.
 
 ## Portée livrée
 
