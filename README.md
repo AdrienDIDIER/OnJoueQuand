@@ -121,6 +121,8 @@ Le dimanche à 18 h vise la semaine suivante ; le lundi à 18 h relance la même
 
 ## Produit et documentation
 
+Une invitation à installer est préparée au démarrage dans le navigateur, y compris avant connexion. Bouton d’installation native si disponible ; étapes Safari sur iPhone. Plus tard reporte la fenêtre de sept jours. Elle ne s’affiche pas en mode application ; l’aide reste dans les réglages. Aucun cache privé supplémentaire : [ADR 021](docs/decisions/021-invitation-installation-au-demarrage.md).
+
 Les quatre onglets sont préchargés en mémoire avec une vérification d’accès avant réutilisation. Une saisie enregistrée invalide les écrans concernés ; le bouton d’actualisation près de la marque récupère aussi les modifications des autres membres. Aucun contenu privé n’est conservé hors connexion. Mesures, limites et essai manuel : [recette de navigation](docs/navigation-validation.md).
 
 Dans **Groupe → Mes réglages**, **Installer OnJoueQuand** fournit l’aide adaptée au navigateur et, lorsqu’il est disponible, un bouton d’installation volontaire. Sur iOS/iPadOS compatible : Safari → partager → Sur l’écran d’accueil. Installer n’active pas le Push.

@@ -138,6 +138,8 @@ Les sondages permettront une question, des choix, un mode simple ou multiple, un
 
 ## Réussite, conservation et contraintes
 
+**Complément PR-12 — Installation au démarrage :** hors mode application, proposer une invitation facultative avec bouton natif si disponible ou étapes adaptées, notamment sur iPhone. Plus tard reporte la proposition de sept jours ; les réglages conservent l’aide. Aucune permission de notification pendant l’installation. Règles et limites : [ADR 021](decisions/021-invitation-installation-au-demarrage.md).
+
 Les déplacements répétés entre les quatre onglets réutilisent un rendu en mémoire, avec contrôle d’accès frais. Les modifications du membre invalident ce rendu ; celles des autres membres sont récupérées au retour depuis l’arrière-plan ou avec Actualiser. Aucune consultation privée hors connexion n’est promise. La [recette de navigation](navigation-validation.md) distingue mesures locales et essai réel sur téléphone.
 
 Le pilote doit permettre de renseigner une semaine en moins de deux minutes et d'accomplir le parcours de proposition à confirmation sans assistance. Les critères bloquants sont : aucune fausse disponibilité dans les suggestions, aucun accès non autorisé et aucun rappel envoyé à une semaine déjà complète au moment du contrôle d'envoi.

@@ -1,4 +1,5 @@
-import { expect, test as anonymousTest } from "@playwright/test";
+import { expect } from "@playwright/test";
+import {test as anonymousTest,postponeInstallation} from "./browser";
 import { randomUUID } from "node:crypto";
 import { test } from "./fixtures";
 import { clients, checked, mailboxCode } from "../../scripts/local-supabase.mjs";
@@ -28,7 +29,7 @@ test("inviter, rejoindre par OTP, modifier son profil puis perdre l’accès", a
   await page.getByRole("button", { name: "Inviter cette personne" }).click();
   await expect(page.getByText("Invitation envoyée.", { exact: false })).toBeVisible();
   const code = await mailboxCode(config.mailUrl, email);
-  const context = await browser.newContext();
+  const context = await browser.newContext();await postponeInstallation(context);
   const invitee = await context.newPage();
   await invitee.goto("http://127.0.0.1:3100/connexion");
   await invitee.getByLabel("Adresse e-mail du code").fill(email);

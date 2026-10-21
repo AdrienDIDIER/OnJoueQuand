@@ -21,6 +21,8 @@ Environnement : Supabase local **OnJoueQuandJ8Validation**, données et comptes 
 
 Le test de Push automatisé vérifie les conditions de déclenchement et les droits ; il ne prouve pas la réception sur l’iPhone réel. Aucun fournisseur externe n’est sollicité pendant cette recette.
 
+Après ajout de l’invitation d’installation de l’[ADR 021](decisions/021-invitation-installation-au-demarrage.md), une passe générale complète réussit : **183 parcours verts**, un test clavier WebKit ignoré sur Windows. Cette passe inclut toutes les attentes renommées, les soirées, les repères quotidiens, le test Push et vingt cas de première installation. La publication de l’ensemble reste en attente de l’accord pour les migrations hébergées.
+
 ## Ordre de livraison
 
 1. Obtenir l’autorisation d’appliquer les migrations additives 011 et 012 au projet hébergé.

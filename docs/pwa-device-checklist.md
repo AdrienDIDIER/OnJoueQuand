@@ -13,8 +13,8 @@ Utiliser une origine HTTPS autorisée et un groupe synthétique, avec les secret
 Pour chaque plateforme, renseigner résultat et anomalie éventuelle :
 
 1. Ouvrir l’application et vérifier français, thème, zoom texte, contraste et lisibilité en portrait/paysage. Le contenu et les actions restent accessibles autour des zones système.
-2. Installer par la procédure proposée ou le menu du navigateur. Sur iOS/iPadOS, utiliser Safari → partager → Sur l’écran d’accueil. Vérifier icône nette, nom et absence de rognage de la marque.
-3. Lancer depuis l’icône : affichage autonome, bonne page de départ, connexion obligatoire et quatre onglets utilisables. Fermer puis rouvrir ; aucun détail privé ne doit être disponible hors connexion.
+2. À la première ouverture dans le navigateur, vérifier l’invitation d’installation. Plus tard doit reporter la fenêtre tout en gardant l’aide dans les réglages. Si un bouton natif est disponible, vérifier qu’il ne lance l’installation qu’après un clic. Sur iOS/iPadOS : étapes Safari → partager → Sur l’écran d’accueil. Vérifier icône nette, nom et absence de rognage de la marque.
+3. Lancer depuis l’icône : aucune invitation à réinstaller, affichage autonome, bonne page de départ, connexion obligatoire et quatre onglets utilisables. Fermer puis rouvrir ; aucun détail privé ne doit être disponible hors connexion.
 4. Dans Groupe, activer volontairement le Push. Tester aussi un refus : l’application et les notifications internes restent utilisables. Sur iOS/iPadOS, effectuer la demande depuis l’app installée.
 5. Publier/confirmer avec un autre compte. Vérifier réception en premier plan et application fermée, texte générique sur écran verrouillé et clic ouvrant l’état actuel après contrôle d’accès.
 6. Commencer une saisie puis couper le réseau. Tenter l’enregistrement : aucune écriture ou relance différée, saisie conservée dans l’onglet quand la perte de connexion est détectée. Une navigation affiche la page générique. Reconnecter et réessayer volontairement.

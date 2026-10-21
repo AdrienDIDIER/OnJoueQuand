@@ -1,5 +1,6 @@
 import type { Metadata,Viewport } from "next";
 import { getPublicEnv } from "@/lib/env/server";
+import {InstallationProvider} from "@/features/pwa/ui/installation";
 import "./globals.css";
 import "./everyday.css";
 
@@ -19,5 +20,5 @@ export const viewport:Viewport={width:"device-width",initialScale:1,themeColor:"
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   getPublicEnv();
-  return <html lang="fr" className="dark"><body>{children}</body></html>;
+  return <html lang="fr" className="dark"><body><InstallationProvider>{children}</InstallationProvider></body></html>;
 }

@@ -223,6 +223,8 @@ Le cron Vercel Hobby n'est pas retenu : sa fréquence minimale quotidienne ne co
 
 ## PWA, installation et cache
 
+L’[ADR 021](decisions/021-invitation-installation-au-demarrage.md) ajoute une invitation facultative au layout racine, avant ou après connexion : bouton natif quand disponible, étapes iPhone sinon. Le report de sept jours stocke un timestamp public. L’aide des réglages partage cet état ; le worker et ses caches restent inchangés.
+
 J7 réalise cette section ; [ADR 014](decisions/014-pwa-cache-et-mises-a-jour.md) fixe les règles du worker et de ses mises à jour. La liste de cache actuelle contient exactement `/offline.html` et les quatre PNG ; aucun préchargement de HTML privé ou de chunks. Le retour au premier plan utilise `/api/session-status`, puis rafraîchit seulement les pages sans saisie modifiée. Les états restaurés par le navigateur sont aussi détectés. Une panne détectée bloque les soumissions sans les mettre en attente. Voir la [recette appareils encore non exécutée](pwa-device-checklist.md).
 
 Manifest avec `id` stable, `name` OnJoueQuand, `lang: fr`, `display: standalone`, couleurs sombres, icônes 192/512 et variante maskable, icône Apple. Le `start_url` ne contient aucun jeton et conduit vers Accueil ou la connexion selon la session.

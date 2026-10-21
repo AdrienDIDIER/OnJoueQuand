@@ -1,4 +1,5 @@
-import {test,expect} from "@playwright/test";
+import {expect} from "@playwright/test";
+import {test} from "./browser";
 import {createServerClient} from "@supabase/ssr";
 import {randomUUID} from "node:crypto";
 import {execFileSync} from "node:child_process";

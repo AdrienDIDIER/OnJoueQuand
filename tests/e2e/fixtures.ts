@@ -1,4 +1,4 @@
-import { test as base } from "@playwright/test";
+import { test as base } from "./browser";
 import { createServerClient } from "@supabase/ssr";
 import { clients, checked } from "../../scripts/local-supabase.mjs";
 

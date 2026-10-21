@@ -1,4 +1,5 @@
-import {test,expect} from "@playwright/test";
+import {expect} from "@playwright/test";
+import {test,postponeInstallation} from "./browser";
 import {createServerClient} from "@supabase/ssr";
 import {randomUUID} from "node:crypto";
 import {execFileSync} from "node:child_process";
@@ -13,7 +14,7 @@ test("organiser une soirée, répondre à deux comptes puis annuler",async({page
   const week=addDays(monday(today(new Date().toISOString())),7);
   const names=[`Organisateur ${randomUUID().slice(0,6)}`,`Invité ${randomUUID().slice(0,6)}`];
   const title=`Soirée J5 ${randomUUID().slice(0,8)}`;
-  const context=await browser.newContext({baseURL:"http://127.0.0.1:3100"});const other=await context.newPage();
+  const context=await browser.newContext({baseURL:"http://127.0.0.1:3100"});await postponeInstallation(context);const other=await context.newPage();
   other.setDefaultTimeout(10_000);
   try{
     for(let i=0;i<2;i++){
