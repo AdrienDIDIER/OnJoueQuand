@@ -12,9 +12,8 @@ async function presentationTime() { return Date.now(); }
 export default async function Page() {
   const { client, user, member } = await requireMember();
   const now = await presentationTime();
-  const catalog = await loadGames();
-  const notifications=await loadNotificationSettings();
-  const [profiles, members, invitations] = await Promise.all([
+  const [catalog, notifications, profiles, members, invitations] = await Promise.all([
+    loadGames(), loadNotificationSettings(),
     client.from("profiles").select("*"), client.from("memberships").select("*").order("joined_at"),
     member.role === "admin" ? client.from("invitations").select("*").order("created_at", { ascending: false }) : Promise.resolve({ data: [], error: null }),
   ]);

@@ -10,8 +10,7 @@ import {Inbox} from "@/features/notifications/ui/notifications";
 
 export default async function HomePage() {
   await requireMember();
-  const next=await readNextSession();
-  const inbox=await loadInbox();
+  const [next,inbox]=await Promise.all([readNextSession(),loadInbox()]);
   return <>
     <div className="page-heading"><p className="eyebrow">ON SE RETROUVE EN JEU ?</p><h1>Bienvenue chez vous<span className="text-primary">.</span></h1><p>Le point de départ de vos prochaines soirées ensemble.</p></div>
     <section className="hero" aria-labelledby="hero-title">

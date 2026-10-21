@@ -35,9 +35,21 @@ Publication de préparation : `fedb8fd` rassemble les commits J7–J8 et le nouv
 
 Le projet Supabase de préproduction `catspvwwtoyhwgnjhrix` est lié au dépôt. Vérification CLI en lecture : les douze migrations locales sont présentes à distance, PostgreSQL 17.11. La configuration Auth privée (inscriptions publiques et anonymes désactivées, confirmation e-mail, OTP dix minutes) et les deux modèles français sont déclarés enregistrés par l’exploitant. Le domaine Resend `goriseup.eu` est vérifié dans son tableau de bord ; le SMTP est déclaré configuré. Aucun code réel ni clé n’est consigné ici.
 
-L’usage personnel entre amis a été confirmé pour Vercel Hobby. Le projet Vercel créé s’appelle `on-joue-quand` et cible uniquement la préproduction Supabase. L’exploitant déclare les six variables configurées pour l’environnement Vercel Production ; leurs valeurs secrètes n’ont pas été lues ni vérifiées. L’origine prévue est `https://onjouequand-preprod.goriseup.eu`, dont le raccordement DNS reste à effectuer. Le premier déploiement, la connexion OTP réelle, le bootstrap administrateur et les contrôles du site restent à valider. Le cron reste inactif ; aucun groupe réel n’est invité.
+L’usage personnel entre amis a été confirmé pour Vercel Hobby. Le projet Vercel créé s’appelle `on-joue-quand` et cible uniquement la préproduction Supabase. L’exploitant déclare les six variables configurées pour l’environnement Vercel Production ; leurs valeurs secrètes n’ont pas été lues ni vérifiées. L’origine retenue est `https://onjouequand.goriseup.eu` ; la connexion et le manifest répondent HTTP 200. L’exploitant confirme les URLs Vercel et Supabase configurées puis le redéploiement. La connexion OTP réelle et le bootstrap administrateur restent à valider. Le cron reste inactif ; aucun groupe réel n’est invité.
 
-## Limites et portes restantes après cette suite
+La CI du correctif `ecf5af2` est entièrement verte : 53 tests Vitest, 46 tests SQL/Auth/RLS, six tests opérateur et 96 parcours Playwright, avec lint, typage et build. [Exécution distante](https://github.com/AdrienDIDIER/OnJoueQuand/actions/runs/39631149301).
+
+Une commande interactive `npm run bootstrap:preprod` prépare le premier administrateur sans e-mail ni confirmation automatique d’adresse. Elle borne explicitement sa cible au projet de recette, protège la clé serveur en mémoire et réutilise le compte après une interruption. Son contrôle distant `--check` a confirmé en lecture seule l’absence d’adhésion ; aucun compte n’a été créé pendant cette vérification. Les deux tests de garde-fous portent la suite opérateur locale à huit tests réussis. Procédure dans le [guide](operations.md#premier-administrateur-de-préproduction).
+
+## Retour de recette : navigation et activation Push
+
+L’exploitant confirme la connexion OTP sur le site hébergé après alignement de la longueur du code à six chiffres dans Supabase. Sur iPhone installé, il signale une navigation lente et une activation Push sans retour visible. Les clés VAPID n’étaient pas encore configurées dans Vercel.
+
+Correction locale : déduplication des contrôles compte/adhésion dans le seul rendu serveur, lectures Accueil/Groupe parallélisées et frontière de chargement. Aucun cache privé persistant ni contrôle RLS supprimé. L’absence de configuration Push est annoncée dès l’affichage ; l’activation indique sa progression et borne l’attente du service worker à quinze secondes. Les clés VAPID ont été générées dans un fichier local ignoré, sans affichage ni publication ; leur configuration Vercel et la réception réelle sur iPhone restent à faire.
+
+Vérifications : lint, typage, 53 tests métier et build réussis ; 21 parcours Chromium/WebKit réussis sur la stack synthétique J8Validation, dont les quatre onglets, le message Push et le refus des diagnostics après retrait du rôle administrateur. Un scénario clavier WebKit Windows est ignoré comme auparavant et reste couvert en CI Linux. Aucune mesure de latence sur le site hébergé ni réception Push réelle ne résulte de ces tests.
+
+## Portes de lancement encore ouvertes
 
 Le test de restauration partage les rôles système du cluster synthétique et utilise son superutilisateur pour charger les schémas. Il ne démontre ni restauration dans Supabase hébergé, ni OTP après récupération, ni copie des clés racines, ni bascule Vercel. Le schéma de cron et les secrets Vault sont volontairement exclus de l’archive ; leur reconstitution est une étape distincte.
 

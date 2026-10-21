@@ -15,18 +15,22 @@ export function Inbox({view}:{view:Awaited<ReturnType<typeof loadInbox>>}){
   return <section id="notifications" className="group-card" aria-labelledby="notifications-title"><div className="section-heading"><h2 id="notifications-title">Vos notifications</h2><span>{view.unread} non lue(s)</span></div><p>Les vingt dernières informations de votre groupe. Les liens affichent toujours l’état actuel.</p>{view.notes.length?<ul className="notification-list">{view.notes.map(note=><Note key={`${note.id}-${note.revision}`} note={note}/>)}</ul>:<p>Aucune notification pour le moment.</p>}</section>;
 }
 function DevicePush({publicKey}:{publicKey:string}){
-  const [message,setMessage]=useState(""),[pending,setPending]=useState(false);
+  const [message,setMessage]=useState(publicKey?"":"Les notifications sur cet appareil ne sont pas encore configurées par l’administrateur. Vos notifications restent disponibles dans Accueil."),[pending,setPending]=useState(false);
   async function enable(){
     setPending(true);
+    setMessage("Vérification des notifications sur cet appareil…");
     try{
       if(!window.isSecureContext||!("serviceWorker" in navigator)||!("PushManager" in window)||!("Notification" in window)){setMessage("Ce navigateur ne prend pas en charge les notifications Push. Sur iPhone ou iPad compatible, ajoutez d’abord l’application à l’écran d’accueil.");return;}
       if(!publicKey){setMessage("Le Push n’est pas encore configuré. Vos notifications restent disponibles dans Accueil.");return;}
       const permission=await Notification.requestPermission();if(permission!=="granted"){setMessage("Autorisation non accordée. Vous pouvez continuer à consulter vos notifications dans Accueil.");return;}
-      await navigator.serviceWorker.register("/sw.js",{scope:"/"});const registration=await navigator.serviceWorker.ready;
+      setMessage("Préparation des notifications…");
+      await navigator.serviceWorker.register("/sw.js",{scope:"/"});
+      let timer:ReturnType<typeof setTimeout>|undefined;
+      const registration=await Promise.race([navigator.serviceWorker.ready,new Promise<never>((_,reject)=>{timer=setTimeout(()=>reject(new Error("service worker indisponible")),15000);})]).finally(()=>clearTimeout(timer));
       const key=Uint8Array.from(atob(publicKey.replace(/-/g,"+").replace(/_/g,"/")),c=>c.charCodeAt(0));
       const subscription=await registration.pushManager.getSubscription()??await registration.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:key});
       const result=await subscribeDevice(subscription.toJSON());setMessage(result.message);
-    }catch{setMessage("Activation impossible. Vérifiez les autorisations de ce navigateur puis réessayez.");}finally{setPending(false);}
+    }catch{setMessage("Activation impossible. Vérifiez votre connexion et les autorisations de ce navigateur puis réessayez.");}finally{setPending(false);}
   }
   async function disable(){
     setPending(true);try{const registration=await navigator.serviceWorker.getRegistration("/");const subscription=await registration?.pushManager.getSubscription();if(subscription)await subscription.unsubscribe();setMessage("Abonnement désactivé dans ce navigateur. Vous pouvez aussi retirer sa ligne dans la liste des appareils.");}catch{setMessage("Désactivation impossible dans ce navigateur.");}finally{setPending(false);}

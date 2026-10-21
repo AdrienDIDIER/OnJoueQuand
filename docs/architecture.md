@@ -101,6 +101,8 @@ Les routes composent les fonctionnalités ; les imports transversaux passent par
 
 Lectures initiales en Server Components ; interactions en Client Components ; mutations en Server Actions avec validation. Après mutation, invalider/recharger les données concernées. À la reprise de focus, recharger les écrans sensibles ; fournir une actualisation manuelle. Pas de Realtime au MVP.
 
+Les contrôles de compte et d’adhésion utilisent `React.cache` pour dédupliquer leurs appels dans un même rendu serveur, conformément au [guide Next.js](https://nextjs.org/docs/app/guides/authentication). Aucun cache partagé entre requêtes ou utilisateurs ; chaque nouvelle requête recontrôle les droits et RLS reste active. Les lectures indépendantes démarrent en parallèle. Une frontière `loading.tsx` fournit un retour de navigation pendant les lectures, sans stocker de données privées.
+
 ## Contrats applicatifs et flux
 
 Les noms suivants décrivent des contrats à implémenter, pas une API disponible. Ils retournent un résultat typé ou une erreur métier traduite en français. Les dates civiles utilisent `YYYY-MM-DD`, les instants un format ISO 8601 avec décalage explicite. Le serveur vérifie l'horizon, les bornes et les relations, même après validation cliente.

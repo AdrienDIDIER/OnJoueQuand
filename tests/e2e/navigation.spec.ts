@@ -36,6 +36,14 @@ test("les quatre onglets sont réellement navigables", async ({ page }) => {
   }
 });
 
+test("le Push non configuré est expliqué avant toute demande d’autorisation", async ({ page }) => {
+  await page.goto("/groupe");
+  const settings = page.getByRole("region", { name: "Mes notifications", exact: true });
+  await expect(settings.getByRole("status").filter({ hasText: "ne sont pas encore configurées par l’administrateur" })).toBeVisible();
+  await settings.getByRole("button", { name: "Activer sur cet appareil" }).click();
+  await expect(settings.getByRole("status").filter({ hasText: /Le Push n’est pas encore configuré|ne prend pas en charge/ })).toBeVisible();
+});
+
 test("le clavier permet de rejoindre directement le contenu", async ({ page, browserName }) => {
   // WinCairo headless ne donne pas le focus au document sous Windows.
   // Ce test reste obligatoire sur WebKit Linux dans la CI, sans contournement du focus.
