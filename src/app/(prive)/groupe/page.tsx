@@ -3,6 +3,8 @@ import { requireMember } from "@/features/auth/server";
 import { InvitationCommands, InviteForm, MemberCommands, ProfileForm } from "@/features/group/ui/forms";
 import { loadGames } from "@/features/games/server";
 import { Catalog } from "@/features/games/ui/catalog";
+import {loadNotificationSettings} from "@/features/notifications/server";
+import {NotificationSettings} from "@/features/notifications/ui/notifications";
 
 // Instant de présentation seulement ; l'expiration opposable est contrôlée en SQL.
 async function presentationTime() { return Date.now(); }
@@ -11,6 +13,7 @@ export default async function Page() {
   const { client, user, member } = await requireMember();
   const now = await presentationTime();
   const catalog = await loadGames();
+  const notifications=await loadNotificationSettings();
   const [profiles, members, invitations] = await Promise.all([
     client.from("profiles").select("*"), client.from("memberships").select("*").order("joined_at"),
     member.role === "admin" ? client.from("invitations").select("*").order("created_at", { ascending: false }) : Promise.resolve({ data: [], error: null }),
@@ -26,6 +29,7 @@ export default async function Page() {
           {member.role === "admin" && m.status === "active" && <MemberCommands id={m.id} revision={m.revision} role={m.role} />}</div></li>;
     })}</ul></section>
     <Catalog games={catalog.games} memberId={member.id} admin={member.role==="admin"} requestId={randomUUID()} />
+    <NotificationSettings view={notifications}/>
     {member.role === "admin" && <section className="group-card"><h2>Invitations</h2><InviteForm requestId={randomUUID()} />
       <ul className="member-list">{invitations.data?.map((i) => <li key={i.id}><div><h3>{i.normalized_email}</h3>
         <p>{i.status === "accepted" ? "Acceptée" : i.status === "revoked" ? "Révoquée" : i.status === "expired" || new Date(i.expires_at).getTime() <= now ? "Expirée" : "En attente"} · {i.delivery_status === "sent" ? "Code envoyé" : "Envoi à réessayer"}</p>

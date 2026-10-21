@@ -1,6 +1,6 @@
 # ADR 007 — Outbox, ordonnanceur et notifications
 
-- Statut : Acceptée, conception non implémentée.
+- Statut : Implémentée localement en J6, précisée par [ADR 013](013-notifications-et-livraison-bornee.md). Cron inactif par défaut et réception réelle à valider ; voir [rapport J6](../j6-validation.md).
 - Date : 2026-10-15.
 - Portée : J6, J8 ; PR-10, PR-11, PR-14, PR-16.
 

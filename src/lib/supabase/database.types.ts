@@ -151,6 +151,46 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"notification_preferences": {
+                  Row: {
+                    "membership_id": string,"push_enabled": boolean,"reminders_enabled": boolean,"revision": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "membership_id": string,"push_enabled"?: boolean,"reminders_enabled"?: boolean,"revision"?: number
+                  }
+                  Update: {
+                    "membership_id"?: string,"push_enabled"?: boolean,"reminders_enabled"?: boolean,"revision"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "notification_preferences_membership_id_fkey"
+      columns: ["membership_id"]
+isOneToOne: true
+      referencedRelation: "memberships"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"notifications": {
+                  Row: {
+                    "created_at": string,"event_key": string,"expires_at": string,"id": string,"membership_epoch": number,"membership_id": string,"payload": NonNullable<Json>,"read_at": string | null,"resource_id": string,"revision": number,"type": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"event_key": string,"expires_at": string,"id"?: string,"membership_epoch": number,"membership_id": string,"payload"?: NonNullable<Json>,"read_at"?: string | null,"resource_id": string,"revision"?: number,"type": string
+                  }
+                  Update: {
+                    "created_at"?: string,"event_key"?: string,"expires_at"?: string,"id"?: string,"membership_epoch"?: number,"membership_id"?: string,"payload"?: NonNullable<Json>,"read_at"?: string | null,"resource_id"?: string,"revision"?: number,"type"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "notifications_membership_id_fkey"
+      columns: ["membership_id"]
+isOneToOne: false
+      referencedRelation: "memberships"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"profiles": {
                   Row: {
                     "display_name": string,"revision": number,"user_id": string
@@ -164,6 +204,26 @@ isOneToOne: false
                   }
                   Relationships: [
 
+                  ]
+                },"push_subscriptions": {
+                  Row: {
+                    "auth": string,"created_at": string,"endpoint": string,"id": string,"membership_id": string,"p256dh": string,"revision": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "auth": string,"created_at"?: string,"endpoint": string,"id"?: string,"membership_id": string,"p256dh": string,"revision"?: number
+                  }
+                  Update: {
+                    "auth"?: string,"created_at"?: string,"endpoint"?: string,"id"?: string,"membership_id"?: string,"p256dh"?: string,"revision"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "push_subscriptions_membership_id_fkey"
+      columns: ["membership_id"]
+isOneToOne: false
+      referencedRelation: "memberships"
+      referencedColumns: ["id"]
+    }
                   ]
                 },"session_ballots": {
                   Row: {
@@ -316,11 +376,19 @@ isOneToOne: false
 "archive_game":
 { Args: { "expected_revision": number,"target_id": string }; Returns: undefined
                            },
+"begin_notification_job":
+{ Args: Record<PropertyKey, never>; Returns: string
+                           },
 "bootstrap_admin":
 { Args: { "account_id": string,"display_name": string }; Returns: undefined
                            },
 "change_membership":
 { Args: { "expected_revision": number,"membership_id": string,"new_role": string,"new_status": string }; Returns: undefined
+                           },
+"claim_notification_deliveries":
+{ Args: { "batch_size"?: number }; Returns: {
+              "id": string,"lease_token": string
+            }[]
                            },
 "consume_auth_limit":
 { Args: { "key_hash": string,"max_attempts": number }; Returns: boolean
@@ -333,6 +401,27 @@ isOneToOne: false
                            },
 "create_session":
 { Args: { "candidate_slots": Json,"deadline": string,"player_threshold": number,"request_id": string,"selected_game": string,"session_description": string,"session_title": string }; Returns: string
+                           },
+"enqueue_availability_reminders":
+{ Args: { "reference_time"?: string }; Returns: number
+                           },
+"finish_notification_delivery":
+{ Args: { "delivery_id": string,"error_code"?: string,"outcome": string,"retry_seconds"?: number,"token": string }; Returns: boolean
+                           },
+"finish_notification_job":
+{ Args: { "counts": Json,"job_id": string,"success": boolean }; Returns: undefined
+                           },
+"materialize_notifications":
+{ Args: { "batch_size"?: number,"reference_time"?: string }; Returns: number
+                           },
+"notification_command":
+{ Args: { "command": string,"expected_revision": number,"payload": Json }; Returns: string
+                           },
+"notification_job_status":
+{ Args: Record<PropertyKey, never>; Returns: Json
+                           },
+"prepare_notification_delivery":
+{ Args: { "delivery_id": string,"reference_time"?: string,"token": string }; Returns: Json
                            },
 "provisioning_context":
 { Args: { "actor_id": string,"invitation_id": string }; Returns: Json

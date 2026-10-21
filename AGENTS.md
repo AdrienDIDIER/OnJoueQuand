@@ -2,7 +2,7 @@
 
 ## État et portée
 
-J0 à J4 sont commités séparément (J2 `5cac4e7`, J3 `b62d4b7`, J4 `55aa56d`). J5 réalise propositions, votes, confirmation et RSVP ; voir le [rapport J5](docs/j5-validation.md). Le matching lit désormais les RSVP positifs de sessions confirmées, pour les adhésions actives et leur époque actuelle. Les notifications restent à réaliser en J6 ; audit et outbox J5 ne sont pas une preuve de livraison. Les changements J5 restent non commités. Chaque page privée et commande vérifie l'identité et l'adhésion ; le nom `(prive)` n'est pas une protection en soi. Le plan approuvé reste décrit dans [le PRD](docs/product-requirements.md), [l'architecture](docs/architecture.md), [le modèle de données](docs/database.md) et [la feuille de route](docs/roadmap.md). Les ADR et rapports distinguent vérifications locales, conception future et CI distante encore à exécuter.
+J0 à J5 sont commités séparément (J5 `52f8c18`). J6 réalise notifications, préférences, abonnements Push, rappels et worker à baux ; voir le [rapport J6](docs/j6-validation.md). J6 reste non commité. Le cron est inactif par défaut ; aucune réception Push sur appareil réel n’est déclarée validée. La configuration est dans le [guide d’exploitation](docs/notifications-operations.md). Le matching utilise les RSVP des adhésions actives à leur époque actuelle. Chaque page et commande vérifie identité/adhésion ; `(prive)` n’est pas une protection. Le plan approuvé est décrit dans le [PRD](docs/product-requirements.md), l’[architecture](docs/architecture.md), le [modèle de données](docs/database.md) et la [feuille de route](docs/roadmap.md). Les rapports distinguent recette locale et CI distante encore à exécuter.
 
 Ne pas démarrer les jalons applicatifs à partir d'une demande documentaire seule. Une demande explicite de réalisation d'un jalon ou d'une fonctionnalité autorise le travail correspondant ; ne pas redemander une autorisation déjà donnée. Ne pas provisionner de services payants, publier, migrer une production ou envoyer des invitations réelles sans autorisation correspondante.
 
@@ -50,6 +50,7 @@ Ne pas démarrer les jalons applicatifs à partir d'une demande documentaire seu
 - Pour une modification documentaire : vérifier les liens locaux, la traçabilité des exigences, la cohérence des valeurs/états et `git diff --check`. Ne pas installer de framework de test pour cela.
 - Pour du domaine : Vitest et cas métier significatifs, avec horloge contrôlée.
 - Pour des règles SQL/RLS : Supabase/PostgreSQL local, comptes anonymes, non membres, membres, administrateurs et révoqués ; tests concurrents lorsque l'invariant l'exige.
+- Exécuter les suites SQL sur une base synthétique dédiée : Auth exige un bootstrap neuf et les tests de rappels simulent l’heure pour tout le groupe. Ne pas les lancer sur une base utilisateur à conserver. Nettoyer uniquement les UUID de fixtures identifiés.
 - Pour les parcours : Playwright ; les tests navigateur ne remplacent pas la validation d'installation et de Push sur appareils iOS/Android réels.
 - Exécuter lint, typage, tests pertinents et build lorsque le socle les fournit. Ne pas annoncer un test exécuté s'il est seulement prévu.
 - Ne pas ajouter des tests qui ne font que recopier l'implémentation. Ne pas lancer une batterie sans rapport pour une modification de texte.

@@ -2,7 +2,7 @@
 
 ## État et ordre de livraison
 
-Le plan est approuvé. **J0 à J4 sont commités séparément ; J4 porte le commit `55aa56d`. J5 est réalisé localement, avec les preuves et limites du [rapport J5](j5-validation.md) ; ses changements ne sont pas encore commités. J6 à J9 ne sont pas implémentés.** J5 a été explicitement autorisé par « commit et go j5 ». Aucun provisionnement distant, push Git ou déploiement n'est inclus dans cette livraison. La CI GitHub reste à exécuter après publication du code ; son succès n'est pas présumé.
+Le plan est approuvé. **J0 à J5 sont commités séparément ; J5 porte le commit `52f8c18`. J6 est réalisé localement, avec preuves et limites dans le [rapport J6](j6-validation.md), et reste non commité. J7 à J9 ne sont pas implémentés.** La poursuite vers J6 a été autorisée par « commit et continue ». Aucun provisionnement distant, push Git ou déploiement n’est inclus. Cron inactif par défaut, appareils Push et CI distante encore à valider.
 
 Les critères ci-dessous sont des portes de sortie : un jalon n'est livré que lorsque ses critères et tests sont vérifiés. Les résultats réels, versions, environnements et limites seront consignés au fur et à mesure. Aucune estimation calendaire ne vaut engagement.
 
@@ -99,6 +99,8 @@ Les interfaces d'engagements occupés sont définies en J4 et exercées avec des
 **Tests :** T-SESSION, T-CONCURRENCY, T-RLS et T-E2E ; liste vide contre absence de bulletin ; confirmation anticipée ou après clôture ; mauvais parent de créneau ; deux confirmations ; vote arrivé après verrou de clôture ; candidat passé ; RSVP concurrents intersessions ; annulation libérant un engagement ; appel direct contournant l'UI. Vérifier le matching avec RSVP PostgreSQL réels.
 
 ### J6 — Notifications et rappels
+
+**État :** code réalisé et vérifié localement ; [rapport J6](j6-validation.md), [ADR 013](decisions/013-notifications-et-livraison-bornee.md), [exploitation](notifications-operations.md). Centre interne, préférences, baux, rappels Paris, route et appel pg_net/Vault de recette vérifiés. Cron installé inactif. Réception Push réelle, configuration distante et CI restent à valider ; ne pas les considérer acquises.
 
 **Dépendances :** J3 et J5 ; secret de job, VAPID et cron configurés dans un environnement de test ; envois réels limités aux appareils de recette.
 

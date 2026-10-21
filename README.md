@@ -2,7 +2,7 @@
 
 Application web progressive privée pour aider un groupe de 6 à 15 amis et collègues à organiser ses sessions de jeu.
 
-**J2, J3 et J4 sont commités séparément (`5cac4e7`, `b62d4b7`, `55aa56d`). J5 ajoute propositions, votes multiples, confirmation et RSVP explicites, reliés au matching et à l’accueil.** Ses changements restent dans le répertoire de travail. Voir les rapports [J2](docs/j2-validation.md), [J3](docs/j3-validation.md), [J4](docs/j4-validation.md) et [J5](docs/j5-validation.md). Notifications et rappels viennent en J6.
+**J0 à J5 sont commités séparément ; J5 porte le commit `52f8c18`. J6 ajoute notifications privées, préférences, Web Push et rappels dimanche/lundi.** J6 reste non commité. Le cron est désactivé par défaut ; les clés et la réception Push sur appareils réels restent à configurer/valider. Voir le [rapport J6](docs/j6-validation.md) et le [guide d’exploitation](docs/notifications-operations.md).
 
 ## Démarrer
 
@@ -52,11 +52,13 @@ Pour mettre à jour une installation J2 existante, lancer `npm run db:migrate` :
 
 La migration J4 ajoute les jeux, favoris et commandes sécurisées avec la même procédure, sans supprimer les données existantes.
 
-Les migrations J5 ajoutent sessions, créneaux, bulletins, votes, RSVP, époque de participation et outbox privée. Appliquer avec `npm run db:migrate`. Le traitement des événements, les rappels et le cron seront raccordés en J6 ; aucune notification n’est encore envoyée. `npm run test:sessions` vérifie les règles SQL avec des comptes synthétiques.
+Les migrations J5 ajoutent sessions, créneaux, bulletins, votes, RSVP, époque de participation et outbox privée. J6 ajoute notifications, préférences, appareils, livraisons et traitement avec bail. Appliquer avec `npm run db:migrate`, sans effacer les données. Le cron créé reste inactif jusqu’à configuration et activation explicites. `npm run test:sessions` et `npm run test:notifications` exigent des comptes et une base de recette synthétiques.
 
 `npm run db:stop` arrête les services locaux du projet en conservant leurs données. Aucun projet Supabase distant, SMTP réel ou déploiement n'est configuré.
 
 ## Vérifier
+
+La suite SQL exige une **base de recette dédiée** : elle initialise Auth et simule des dates de rappel. Les commandes de reset ci-dessous effacent les données de cette base. Ne pas les exécuter sur votre installation utilisateur à conserver. Les rapports de validation décrivent les bases isolées utilisées pour la recette.
 
 ```sh
 npm run check
@@ -105,6 +107,12 @@ Dans **Sessions**, ouvrir **Proposer une session**, choisir de deux à six horai
 
 Après confirmation, répondre dans **Ma participation**. Les réponses restent modifiables jusqu’au début ; un engagement chevauchant une autre participation est refusé. L’accueil affiche la prochaine session du groupe. L’annulation conserve l’historique et libère les engagements. Après révocation puis nouvelle invitation, les anciennes réponses doivent être renouvelées.
 
+## Notifications et rappels
+
+Dans **Accueil**, la boîte affiche les vingt dernières notifications et permet de les marquer comme lues. Dans **Groupe → Mes notifications**, régler rappels et Push, puis activer volontairement les appareils personnels. Les messages Push restent génériques ; leur clic ouvre la boîte privée après connexion. Le service worker J6 ne met aucune donnée en cache et ne constitue pas encore la PWA installable de J7.
+
+Le dimanche à 18 h vise la semaine suivante ; le lundi à 18 h relance la même semaine, uniquement si elle est encore incomplète. Le traitement recontrôle les préférences et réponses avant envoi, déduplique la boîte interne et reprend les baux interrompus. Aucun envoi ne démarre tant que le cron n’est pas activé ou la route interne appelée avec son secret. Sans VAPID, seules les notifications internes sont produites. Configuration et recette : [guide d’exploitation](docs/notifications-operations.md).
+
 ## Produit et documentation
 
 Quatre onglets : **Accueil**, **Dispos**, **Sessions**, **Groupe**. Fuseau : **Europe/Paris**. Le mode rapide correspond à 20 h–23 h. Les suggestions partent de deux joueurs pendant une heure ; vote favorable et RSVP sont distincts.
@@ -121,6 +129,7 @@ Quatre onglets : **Accueil**, **Dispos**, **Sessions**, **Groupe**. Fuseau : **E
 | [Validation J3](docs/j3-validation.md) | Disponibilités, temps de Paris, copie, concurrence et preuves. |
 | [Validation J4](docs/j4-validation.md) | Catalogue, favoris, matching, benchmark et sécurité. |
 | [Validation J5](docs/j5-validation.md) | Sessions, votes, confirmation, RSVP, concurrence et branchement du matching. |
+| [Validation J6](docs/j6-validation.md) | Notifications privées, rappels, baux, transport Push et limites de recette. |
 | [Consignes de contribution](AGENTS.md) | Règles de changement et sécurité. |
 
-La PWA installable et les notifications sont prévues aux jalons suivants. Aucune facturation : « premium » décrit l'expérience. Les statistiques et sondages sont différés après le MVP.
+La PWA installable et la validation des appareils restent en J7. Aucune facturation : « premium » décrit l'expérience. Les statistiques et sondages sont différés après le MVP.

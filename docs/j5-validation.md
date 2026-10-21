@@ -1,6 +1,6 @@
 # J5 — Propositions, votes et participation
 
-État au **21 octobre 2026**. J4 a été commité séparément dans `55aa56d`. J5 est réalisé dans le répertoire de travail et reste non commité. Aucun push, déploiement, service payant, migration distante ni invitation réelle. `.env.local` a été conservé sans modification.
+État au **21 octobre 2026**. J4 a été commité séparément dans `55aa56d`, J5 dans `52f8c18`. Aucun push, déploiement, service payant, migration distante ni invitation réelle. `.env.local` a été conservé sans modification. Ce rapport conserve les résultats au terme de J5 ; la suite est décrite dans le [rapport J6](j6-validation.md).
 
 ## Fonctionnalités livrées
 

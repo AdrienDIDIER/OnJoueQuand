@@ -11,6 +11,7 @@ const child = spawn(process.execPath, args, { stdio: "inherit", env: {
   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: config.key,
   SUPABASE_SECRET_KEY: config.secret,
   AUTH_RATE_LIMIT_SECRET: randomBytes(32).toString("hex"),
+  JOBS_SECRET: randomBytes(32).toString("hex"),
 } });
 child.on("exit", (code) => process.exit(code ?? 1));
 child.on("error", () => { console.error("Impossible de lancer la commande locale."); process.exit(1); });

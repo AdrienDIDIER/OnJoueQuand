@@ -5,10 +5,13 @@ import { Card } from "@/components/ui/card";
 import { requireMember } from "@/features/auth/server";
 import { readNextSession } from "@/features/sessions/queries";
 import { slotLabel } from "@/lib/time/paris";
+import {loadInbox} from "@/features/notifications/server";
+import {Inbox} from "@/features/notifications/ui/notifications";
 
 export default async function HomePage() {
   await requireMember();
   const next=await readNextSession();
+  const inbox=await loadInbox();
   return <>
     <div className="page-heading"><p className="eyebrow">ON SE RETROUVE EN JEU ?</p><h1>Bienvenue chez vous<span className="text-primary">.</span></h1><p>Le point de départ de vos prochaines soirées ensemble.</p></div>
     <section className="hero" aria-labelledby="hero-title">
@@ -22,6 +25,7 @@ export default async function HomePage() {
       { n: "02", icon: Swords, title: "Donnez-vous rendez-vous", text: "Un jeu, plusieurs horaires et l’avis du groupe pour choisir le bon créneau.", href: "/sessions", label: "Les sessions" },
       { n: "03", icon: Users, title: "Retrouvez votre équipe", text: "Vos amis, vos collègues et vos jeux favoris, réunis dans un espace privé.", href: "/groupe", label: "Le groupe" },
     ].map(({ n, icon: Icon, title, text, href, label }) => <Card key={n} className="step-card"><div className="step-top"><span className="step-icon"><Icon size={22} aria-hidden="true" /></span><span className="step-number">{n}</span></div><h3>{title}</h3><p>{text}</p><Link href={href} className="text-link">{label}<ArrowRight size={16} aria-hidden="true" /></Link></Card>)}</div>
+    <Inbox view={inbox}/>
     <div className="welcome-note"><span className="note-line" /><p><strong>À vous de jouer.</strong> Partagez vos disponibilités, proposez une soirée et confirmez votre participation.</p></div>
   </>;
 }

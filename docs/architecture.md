@@ -1,6 +1,6 @@
 # Architecture — OnJoueQuand
 
-Statut : socle J1, identité J2, disponibilités J3, jeux/matching J4 et sessions/votes/RSVP J5 implémentés localement. Notifications, rappels et jalons suivants restent cibles. Versions et vérifications figurent dans les rapports [J1](j1-validation.md), [J2](j2-validation.md), [J3](j3-validation.md), [J4](j4-validation.md) et [J5](j5-validation.md). Les règles produit sont dans le [PRD](product-requirements.md), les contraintes persistées dans le [modèle de données](database.md) et les contrôles de livraison dans la [feuille de route](roadmap.md).
+Statut : socle J1, identité J2, disponibilités J3, jeux/matching J4, sessions/votes/RSVP J5 et notifications/rappels J6 implémentés localement. Installation PWA et jalons suivants restent cibles. Versions et preuves figurent dans les rapports [J1](j1-validation.md), [J2](j2-validation.md), [J3](j3-validation.md), [J4](j4-validation.md), [J5](j5-validation.md) et [J6](j6-validation.md). Cron désactivé par défaut, réception Push réelle encore à valider. Voir le [PRD](product-requirements.md), le [modèle de données](database.md) et la [feuille de route](roadmap.md).
 
 ## Vue d'ensemble
 
@@ -180,6 +180,8 @@ Un balayage des bornes coûte `O(n log n)` ; l'évaluation des fenêtres est bor
 
 ### Production des événements
 
+J6 réalise cette section dans `features/notifications` et `/api/internal/jobs`. Les limites de lots, droits, familles d’endpoints et baux sont précisées par [ADR 013](decisions/013-notifications-et-livraison-bornee.md) ; configuration dans le [guide d’exploitation](notifications-operations.md). Le cron existe mais reste inactif sans activation explicite. Le service worker livré ne traite que Push/clic ; installation et hors connexion restent en J7.
+
 La transaction métier écrit une outbox avec une clé unique d'événement. Le worker produit une notification interne unique par événement/destinataire et des livraisons par appareil autorisé. La création interne précède la tentative Push. Aucun appel réseau n'est effectué pendant la transaction métier.
 
 | Événement | Destinataires | Déduplication |
@@ -258,7 +260,7 @@ Les cas et critères par jalon sont dans la [feuille de route](roadmap.md#catalo
 | Production | Supabase et Vercel dans des régions européennes proches ; Resend SMTP/API | Domaine vérifié, sauvegardes, surveillance, secrets propres. |
 | Preview non fiable | Build avec configuration factice ou isolée | Aucun secret de projet partagé ni migration automatique. |
 
-L'exemple d'environnement J2 comprend URL et clé publiable Supabase, clé secrète serveur, origine de l'application et secret HMAC de limitation. Ajouter la paire VAPID, le sujet de contact et le secret de job en J6. SMTP Auth se configure côté Supabase ; aucune clé API Resend d'invitation n'est nécessaire depuis l'ADR 010. Les clés privées, le token de déploiement et la connexion de sauvegarde restent dans les magasins de secrets ; les clés publiques seules portent un préfixe exposé au client.
+L’exemple d’environnement comprend URL et clé publiable Supabase, clé secrète serveur, origine et secret HMAC de limitation. J6 y ajoute la paire VAPID, le sujet de contact et les secrets de job courant/précédent ; les valeurs restent à configurer hors Git. SMTP Auth se configure côté Supabase ; aucune clé API Resend d’invitation n’est nécessaire depuis l’ADR 010. Les clés privées, le token de déploiement et la connexion de sauvegarde restent dans les magasins de secrets ; les clés publiques seules portent un préfixe exposé au client.
 
 ### CI et livraison
 

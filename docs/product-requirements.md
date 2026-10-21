@@ -1,6 +1,6 @@
 # Exigences produit — OnJoueQuand
 
-Statut : conception approuvée en J0. J1 implémente la navigation et le shell sombre ; J2 réalise identité et groupe privé ; J3 réalise disponibilités, copie et calendrier ; J4 réalise PR-06 et PR-07 : matching, jeux et favoris. J5 réalise PR-08 et PR-09 : propositions, votes, confirmation et RSVP explicites, avec exclusion des engagements réels dans le matching. Voir les preuves [J2](j2-validation.md), [J3](j3-validation.md), [J4](j4-validation.md) et [J5](j5-validation.md). Notifications, rappels et jalons suivants restent à implémenter.
+Statut : conception approuvée en J0. J1–J5 réalisent socle, identité, disponibilités, jeux, matching et sessions/RSVP. J6 réalise PR-10/PR-11 : rappels et notifications, avec preuves et limites dans le [rapport J6](j6-validation.md). Le cron reste désactivé et la réception Push réelle reste à valider. Installation PWA et jalons suivants restent à implémenter. Voir aussi les preuves [J2](j2-validation.md), [J3](j3-validation.md), [J4](j4-validation.md), [J5](j5-validation.md).
 
 ## Vision et utilisateurs
 
