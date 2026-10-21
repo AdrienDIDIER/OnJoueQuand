@@ -6,7 +6,7 @@ import { readGamePreferences } from "@/features/games/queries";
 import { date,addDays,localInstant,monday,today,localParts,dayLabel } from "@/lib/time/paris";
 import { readConfirmedCommitments } from "./infrastructure/commitments";
 import { findMatches } from "./domain";
-export type SearchState = {message:string;results?:{key:string;label:string;names:string[];favoriteCount:number}[];gameName?:string};
+export type SearchState = {message:string;results?:{key:string;day:string;label:string;names:string[];favoriteCount:number}[];gameName?:string};
 const schema=z.object({first:z.string(),last:z.string(),minimum:z.coerce.number().int().positive(),duration:z.coerce.number().int().positive().multipleOf(15),gameId:z.union([z.string().uuid(),z.literal("")]),members:z.array(z.string().uuid()).min(1)});
 export async function searchMatches(_state:SearchState,form:FormData):Promise<SearchState> {
   const {client}=await requireMember();
@@ -33,7 +33,7 @@ export async function searchMatches(_state:SearchState,form:FormData):Promise<Se
     const results=matches.map(c=>{
       const a=localParts(c.starts_at),b=localParts(c.ends_at);
       const offsets=a.occurrence||b.occurrence||a.offset!==b.offset ? ` (UTC${a.offset} → UTC${b.offset})` : "";
-      return {key:c.starts_at,label:`${dayLabel(a.date)} · ${a.time}–${a.date===b.date ? b.time : `${dayLabel(b.date)} à ${b.time}`}${offsets}`,names:c.memberIds.map(id=>{const m=members.find(m=>m.id===id)!; return profiles.find(p=>p.user_id===m.user_id)?.display_name ?? "Membre";}),favoriteCount:c.favoriteCount};
+      return {key:c.starts_at,day:a.date,label:`${dayLabel(a.date)} · ${a.time}–${a.date===b.date ? b.time : `${dayLabel(b.date)} à ${b.time}`}${offsets}`,names:c.memberIds.map(id=>{const m=members.find(m=>m.id===id)!; return profiles.find(p=>p.user_id===m.user_id)?.display_name ?? "Membre";}),favoriteCount:c.favoriteCount};
     });
     return {message:results.length ? `${results.length} créneau${results.length>1?"x":""} proposé${results.length>1?"s":""}. Classement par nombre de joueurs${preferences.name?", puis favoris du jeu choisi":""}, puis horaire.` : "Aucun créneau commun ne respecte ces critères. Essayez une durée plus courte, une autre période ou un autre seuil.",results,gameName:preferences.name};
   } catch(error) { return {message:error instanceof Error && error.constructor===Error ? error.message : "Recherche impossible. Vérifiez les critères puis réessayez."}; }

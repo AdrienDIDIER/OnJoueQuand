@@ -1,5 +1,7 @@
 # Architecture — OnJoueQuand
 
+**Simplification approuvée :** les nouvelles soirées passent directement à l’état confirmé via un RPC transactionnel à horaire unique. Les anciennes propositions restent compatibles. Le test Push est immédiat sur le seul appareil courant, autorisé et limité en base, sans exécuter le worker collectif. Les sept repères de l’accueil utilisent les états réels par date. Voir [ADR 020](decisions/020-soirees-simples-et-test-push.md), avec ordre des migrations avant déploiement.
+
 Statut : J1 à J7 commités, J1–J6 poussés et CI distante réussie pour J6. Preuves PWA dans le [rapport J7](j7-validation.md). J8 prépare sauvegarde chiffrée, restauration et surveillance ; voir le [rapport J8](j8-validation.md). Installation/Push réels et exploitation distante restent à valider. Cron désactivé par défaut. Voir le [PRD](product-requirements.md), les [données](database.md), la [roadmap](roadmap.md) et les rapports historiques [J1](j1-validation.md), [J2](j2-validation.md), [J3](j3-validation.md), [J4](j4-validation.md), [J5](j5-validation.md), [J6](j6-validation.md).
 
 ## Vue d'ensemble

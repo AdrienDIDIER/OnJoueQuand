@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { compareInstant,instantISO,instantMillis,localInstant,type Occurrence } from "../../lib/time/paris";
+import { addDays,compareInstant,instantISO,instantMillis,localInstant,type Occurrence } from "../../lib/time/paris";
 export type SessionStatus = "draft"|"voting"|"closed"|"confirmed"|"completed"|"cancelled"|"expired";
 export type Slot = {id:string;starts_at:string;ends_at:string};
 export type LocalSlot = {start:string;end:string;startOccurrence?:Occurrence;endOccurrence?:Occurrence};
@@ -9,6 +9,15 @@ export function localDateTime(value:string, occurrence?:Occurrence) {
   const match=/^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})$/.exec(value);
   if(!match) throw new Error("Vérifiez la date et l’heure de Paris.");
   return localInstant(match[1]!,match[2]!,occurrence);
+}
+export function prepareEvening(raw:unknown,now:string) {
+  const input=z.object({title:z.string().trim().max(120),gameId:z.union([z.string().uuid(),z.literal("")]),day:z.string(),start:z.string(),end:z.string(),startOccurrence:z.enum(["earlier","later",""]).optional(),endOccurrence:z.enum(["earlier","later",""]).optional()}).parse(raw);
+  const starts_at=localInstant(input.day,input.start,input.startOccurrence||undefined);
+  const end=input.end||"23:00";
+  const ends_at=localInstant(end<=input.start?addDays(input.day,1):input.day,end,input.endOccurrence||undefined);
+  if(compareInstant(starts_at,now)<=0)throw new Error("Choisissez une soirée future.");
+  if(compareInstant(starts_at,ends_at)>=0||instantMillis(ends_at)-instantMillis(starts_at)>25*60*60_000)throw new Error("Vérifiez la fin de la soirée.");
+  return{title:input.title||"Soirée entre potes",game_id:input.gameId||null,starts_at,ends_at};
 }
 export function suggestedDeadline(slots:Pick<Slot,"starts_at">[],now:string) {
   return instantISO(Math.min(instantMillis(now)+48*60*60_000,...slots.map(s=>instantMillis(s.starts_at))));

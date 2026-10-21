@@ -1,6 +1,22 @@
 import { describe,it,expect } from "vitest";
-import { effectiveStatus,prepareProposal,suggestedDeadline } from "./domain";
+import { effectiveStatus,prepareEvening,prepareProposal,suggestedDeadline } from "./domain";
 const now="2026-10-21T10:00:00Z";
+describe("soirée à horaire unique",()=>{
+  const input={title:"",gameId:"",day:"2026-10-22",start:"20:00",end:""};
+  it("prévoit 23 h et un nom facultatif, sans vote",()=>{
+    expect(prepareEvening(input,now)).toEqual({title:"Soirée entre potes",game_id:null,starts_at:"2026-10-22T18:00:00Z",ends_at:"2026-10-22T21:00:00Z"});
+  });
+  it("garde les heures locales après minuit et au changement d’heure",()=>{
+    expect(prepareEvening({...input,day:"2026-10-24",start:"23:30",end:"03:00"},now).ends_at).toBe("2026-10-25T02:00:00Z");
+    expect(()=>prepareEvening({...input,day:"2026-10-25",start:"02:15"},now)).toThrow("deux fois");
+    expect(prepareEvening({...input,day:"2026-10-25",start:"02:15",startOccurrence:"later"},now).starts_at).toBe("2026-10-25T01:15:00Z");
+    expect(()=>prepareEvening({...input,day:"2027-03-28",start:"02:15"},now)).toThrow("n’existe pas");
+  });
+  it("refuse une soirée passée et un horaire hors pas",()=>{
+    expect(()=>prepareEvening({...input,day:"2026-10-20"},now)).toThrow("future");
+    expect(()=>prepareEvening({...input,start:"20:07"},now)).toThrow("quinze");
+  });
+});
 const proposal={title:" Soirée coop ",description:"",gameId:"",minimum:2,deadline:"",slots:[{start:"2026-10-22T20:00",end:"2026-10-22T23:00"},{start:"2026-10-23T20:00",end:"2026-10-23T23:00"}]};
 describe("propositions et temps de Paris",()=>{
   it("convertit les heures locales et laisse le défaut de l’échéance à la base",()=>{

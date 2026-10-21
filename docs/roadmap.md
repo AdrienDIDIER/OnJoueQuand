@@ -1,5 +1,9 @@
 # Feuille de route — OnJoueQuand
 
+## Révision mobile approuvée — Soirées et notifications
+
+Après J5, le besoin quotidien est simplifié selon l’[ADR 020](decisions/020-soirees-simples-et-test-push.md). Dépendances : sessions/RSVP J5, notifications J6, cache et invalidation ADR 019. Acceptation : créer une soirée avec un seul horaire sans scrutin ; répondre explicitement à deux comptes ; garder les anciennes propositions ; afficher chaque état journalier à la bonne date ; tester le Push sur son seul appareil, avec limitation durable. Tests : domaine Paris, intégration SQL et accès directs, parcours multi-utilisateur et quatre profils navigateur. Livraison : appliquer les migrations additives 011/012 sur l’environnement cible avant le déploiement ; accord distant et réception iPhone à obtenir. Les jalons ci-dessous conservent leurs preuves historiques.
+
 ## État et ordre de livraison
 
 Préparation initiale J8 commitée dans `40f6abb`. Suite locale : conservation appliquée par lots et liens de sessions sélectionnées, avec régression SQL J2–J8 et parcours ciblés vérifiés ; [ADR 016](decisions/016-conservation-et-purges-bornees.md), [preuves J8](j8-validation.md). Le pilote reste soumis aux prérequis distants et appareils réels.

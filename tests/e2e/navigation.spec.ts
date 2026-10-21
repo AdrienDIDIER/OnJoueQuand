@@ -4,7 +4,7 @@ import { test } from "./fixtures";
 const routes = [
   { path: "/accueil", label: "Accueil", heading: "On se retrouve ?" },
   { path: "/dispos", label: "Dispos", heading: "Vos disponibilités." },
-  { path: "/sessions", label: "Sessions", heading: "Vos sessions." },
+  { path: "/sessions", label: "Soirées", heading: "Vos soirées." },
   { path: "/groupe", label: "Groupe", heading: "Votre groupe." },
 ];
 

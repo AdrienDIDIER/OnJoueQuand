@@ -24,9 +24,9 @@ test("manifeste, icônes et repli hors connexion sans données privées",async({
   let unavailable=false;const proxy=await appProxy(()=>readFileSync("public/sw.js","utf8"),()=>unavailable);
   try{
   await page.goto(`${proxy.origin}/sessions`);await controlled(page);
-  await page.getByRole("button",{name:"Proposer une session",exact:true}).click();const sentinel=`Brouillon privé ${randomUUID()}`;await page.getByLabel("Titre de la session",{exact:true}).fill(sentinel);
+  await page.getByRole("button",{name:"Organiser une soirée",exact:true}).click();await page.getByText("Jeu et détails facultatifs",{exact:true}).click();const sentinel=`Soirée privée ${randomUUID()}`;await page.getByLabel("Nom de la soirée",{exact:true}).fill(sentinel);
   await page.context().setOffline(true);
-  await page.getByRole("button",{name:"Enregistrer le brouillon",exact:true}).click();await expect(page.getByLabel("Titre de la session",{exact:true})).toHaveValue(sentinel);await expect(page.getByText("Enregistrement impossible hors connexion.",{exact:false})).toBeVisible();
+  await page.getByRole("button",{name:"Organiser la soirée",exact:true}).click();await expect(page.getByLabel("Nom de la soirée",{exact:true})).toHaveValue(sentinel);await expect(page.getByText("Enregistrement impossible hors connexion.",{exact:false})).toBeVisible();
   const apiFallback=await page.evaluate(async()=>{try{const response=await fetch("/api/session-status",{cache:"no-store"});return(response.headers.get("content-type")??"").includes("text/html");}catch{return false;}});expect(apiFallback).toBe(false);
   // La panne du récepteur couvre aussi Firefox, où le mode offline émulé peut laisser le réseau du SW actif.
   unavailable=true;await page.goto(`${proxy.origin}/groupe?source=recette`);await expect(page.getByRole("heading",{level:1})).toHaveText("Vous êtes hors connexion.");await expect(page.locator("body")).not.toContainText(sentinel);await expect(page.getByRole("textbox")).toHaveCount(0);await page.screenshot({path:info.outputPath("hors-connexion.png")});
@@ -40,7 +40,7 @@ test("installation volontaire et report sans bloquer la navigation",async({page}
   await page.evaluate(()=>{document.documentElement.dataset.promptCount="0";const event=new Event("beforeinstallprompt",{cancelable:true});Object.defineProperties(event,{prompt:{value:async()=>{document.documentElement.dataset.promptCount="1";}},userChoice:{value:Promise.resolve({outcome:"dismissed"})}});window.dispatchEvent(event);});
   await expect(page.locator("html")).toHaveAttribute("data-prompt-count","0");
   await page.getByRole("button",{name:"Installer l’application",exact:true}).click();await expect(page.getByText("Installation reportée.",{exact:false})).toBeVisible();await expect(page.locator("html")).toHaveAttribute("data-prompt-count","1");
-  await page.getByRole("navigation").getByRole("link",{name:"Sessions",exact:true}).click();await expect(page.getByRole("heading",{level:1})).toHaveText("Vos sessions.");
+  await page.getByRole("navigation").getByRole("link",{name:"Soirées",exact:true}).click();await expect(page.getByRole("heading",{level:1})).toHaveText("Vos soirées.");
 });
 test("reprise de focus : saisie conservée et accès révoqué recontrôlé",async({page,request})=>{
   expect((await request.get("/api/session-status")).status()).toBe(401);

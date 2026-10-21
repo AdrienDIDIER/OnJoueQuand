@@ -49,7 +49,9 @@ body { background:var(--background); color:var(--foreground); font-family:ui-san
 .availability-shortcut span > span { margin-top:5px; font-size:13px; color:#bbb8ab; }
 .availability-shortcut .week-progress { display:flex; gap:5px; margin-top:10px; }
 .week-progress i { display:block; height:3px; width:22px; border-radius:2px; background:#46493c; }
-.week-progress i[data-filled=true] { background:#c2cfa8; }
+.week-progress i[data-status=available] { background:#a7c78d; }
+.week-progress i[data-status=unavailable] { background:#d28a7f; }
+.week-progress i[data-status=unanswered] { background:transparent; border:1px dashed #858775; }
 .day-today > .sheet-trigger strong { color:#d8e2c5; }
 .day-today > .sheet-trigger strong::after { content:""; display:inline-block; width:5px; height:5px; margin:0 0 3px 7px; border-radius:50%; background:#c2cfa8; }
 .daily-home #notifications { border:0; padding:6px 0; background:transparent; margin-top:24px; }

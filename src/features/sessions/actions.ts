@@ -2,10 +2,20 @@
 import { z } from "zod";
 import {revalidatePrivateViews} from "@/lib/navigation/revalidate";
 import { requireMember } from "@/features/auth/server";
-import { prepareProposal } from "./domain";
+import { prepareEvening,prepareProposal } from "./domain";
 export type SessionActionState={message:string;done?:boolean};
 function refreshed() {revalidatePrivateViews();}
 function failure(error:unknown):SessionActionState {return{message:error instanceof Error && error.constructor===Error ? error.message : "Vérifiez le titre, les horaires et l’échéance de la proposition."};}
+export async function organizeEvening(_state:SessionActionState,form:FormData):Promise<SessionActionState> {
+  const {client}=await requireMember();
+  try {
+    const clock=await client.rpc("session_clock");if(clock.error)throw new Error("La soirée ne peut pas être enregistrée pour le moment.");
+    const evening=prepareEvening(Object.fromEntries(form),clock.data);
+    const result=await client.rpc("create_evening",{evening_title:evening.title,selected_game:evening.game_id!,starts_at:evening.starts_at,ends_at:evening.ends_at,request_id:z.string().uuid().parse(form.get("requestId"))});
+    if(result.error)return{message:"Soirée non enregistrée. Vérifiez vos droits, le jeu et les horaires, puis réessayez."};
+    refreshed();return{message:"Soirée organisée. Chacun peut maintenant répondre.",done:true};
+  }catch(error){return failure(error);}
+}
 export async function saveProposal(_state:SessionActionState,form:FormData):Promise<SessionActionState> {
   const {client}=await requireMember();
   try {

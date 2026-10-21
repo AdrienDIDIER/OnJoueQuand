@@ -3,7 +3,7 @@ import Link from "next/link";
 import {useActionState,useState} from "react";
 import {Button} from "@/components/ui/button";
 import {dateTimeLabel} from "@/lib/time/paris";
-import {notificationAction,subscribeDevice,type NotificationState} from "../actions";
+import {notificationAction,subscribeDevice,testDeviceNotification,type NotificationState} from "../actions";
 import type {loadInbox,loadNotificationSettings} from "../server";
 import {jobHealthSchema,jobHealthAlerts} from "../domain/job-health";
 const initial:NotificationState={message:""};
@@ -35,7 +35,19 @@ function DevicePush({publicKey}:{publicKey:string}){
   async function disable(){
     setPending(true);try{const registration=await navigator.serviceWorker.getRegistration("/");const subscription=await registration?.pushManager.getSubscription();if(subscription)await subscription.unsubscribe();setMessage("Abonnement désactivé dans ce navigateur. Vous pouvez aussi retirer sa ligne dans la liste des appareils.");}catch{setMessage("Désactivation impossible dans ce navigateur.");}finally{setPending(false);}
   }
-  return <div className="device-push"><p>Recevez les rendez-vous et les rappels sur votre téléphone. Sur iPhone, ouvrez l’application depuis l’écran d’accueil.</p><div className="notification-buttons"><Button type="button" disabled={pending} onClick={enable}>{pending?"Activation en cours…":"Activer sur cet appareil"}</Button></div><p role="status">{message}</p><details className="secondary-details"><summary>Désactiver sur cet appareil</summary><Button type="button" variant="outline" disabled={pending} onClick={disable}>Désactiver dans ce navigateur</Button></details></div>;
+  async function testNotification(){
+    setPending(true);setMessage("Envoi du test…");
+    try{
+      if(!("Notification" in window)||Notification.permission!=="granted"||!("serviceWorker" in navigator)){setMessage("Activez d’abord les notifications sur cet appareil.");return;}
+      const registration=await navigator.serviceWorker.getRegistration("/");
+      const subscription=await registration?.pushManager.getSubscription();
+      if(!subscription){setMessage("Activez d’abord les notifications sur cet appareil.");return;}
+      const result=await testDeviceNotification(subscription.endpoint);
+      if(result.resetDevice)await subscription.unsubscribe();
+      setMessage(result.message);
+    }catch{setMessage("Test impossible. Vérifiez votre connexion et réessayez.");}finally{setPending(false);}
+  }
+  return <div className="device-push"><p>Recevez les rendez-vous et les rappels sur votre téléphone. Sur iPhone, ouvrez l’application depuis l’écran d’accueil.</p><div className="notification-buttons"><Button type="button" disabled={pending} onClick={enable}>{pending?"Patientez…":"Activer sur cet appareil"}</Button><Button type="button" variant="outline" disabled={pending} onClick={testNotification}>Tester les notifications</Button></div><p role="status">{message}</p><details className="secondary-details"><summary>Désactiver sur cet appareil</summary><Button type="button" variant="outline" disabled={pending} onClick={disable}>Désactiver dans ce navigateur</Button></details></div>;
 }
 function Device({device}:{device:Awaited<ReturnType<typeof loadNotificationSettings>>["subscriptions"][number]}){
   const [state,action,pending]=useActionState(notificationAction,initial);

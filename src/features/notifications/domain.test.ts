@@ -49,6 +49,6 @@ describe("livraison Push bornée et sans détails privés",()=>{
   });
   it("produit des liens internes et des messages français",()=>{
     expect(notificationContent("availability.reminder",{week:"2026-10-26"},"id").url).toBe("/dispos?semaine=2026-10-26");
-    expect(notificationContent("session.cancelled",{},"id").title).toBe("Une session a été annulée");
+    expect(notificationContent("session.cancelled",{},"id").title).toBe("Une soirée a été annulée");
   });
 });

@@ -10,7 +10,7 @@ import { usePrivateNavigation } from "@/features/navigation/client";
 const items = [
   { href: "/accueil", label: "Accueil", icon: House },
   { href: "/dispos", label: "Dispos", icon: CalendarDays },
-  { href: "/sessions", label: "Sessions", icon: CalendarCheck2 },
+  { href: "/sessions", label: "Soirées", icon: CalendarCheck2 },
   { href: "/groupe", label: "Groupe", icon: Users },
 ];
 

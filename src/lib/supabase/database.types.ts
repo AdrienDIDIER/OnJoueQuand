@@ -393,6 +393,9 @@ isOneToOne: false
 "consume_auth_limit":
 { Args: { "key_hash": string,"max_attempts": number }; Returns: boolean
                            },
+"create_evening":
+{ Args: { "ends_at": string,"evening_title": string,"request_id": string,"selected_game": string,"starts_at": string }; Returns: string
+                           },
 "create_game":
 { Args: { "game_description": string,"game_name": string,"request_id": string }; Returns: string
                            },
@@ -436,6 +439,9 @@ isOneToOne: false
                            },
 "record_invitation_delivery":
 { Args: { "actor_id": string,"delivered": boolean,"invitation_id": string }; Returns: undefined
+                           },
+"reserve_push_test":
+{ Args: { "target_endpoint": string }; Returns: Json
                            },
 "revoke_invitation":
 { Args: { "expected_revision": number,"invitation_id": string }; Returns: undefined

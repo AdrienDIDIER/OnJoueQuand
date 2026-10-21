@@ -11,7 +11,7 @@ Ne pas démarrer les jalons applicatifs à partir d'une demande documentaire seu
 ## Produit et langue
 
 - Toute interface, erreur utilisateur, notification, instruction d'installation et communication e-mail est en français. Les identifiants techniques peuvent être en anglais.
-- Préserver les quatre onglets : Accueil, Dispos, Sessions, Groupe.
+- Préserver les quatre onglets : Accueil, Dispos, Soirées, Groupe. `/sessions` reste stable. Les nouvelles soirées sont directement confirmées avec un horaire unique ; les anciennes propositions restent compatibles. Voir [ADR 020](docs/decisions/020-soirees-simples-et-test-push.md).
 - Un groupe privé unique ; 6 à 15 personnes est la cible, pas un quota métier.
 - Utiliser Europe/Paris comme fuseau métier et la date locale du lundi comme identité de semaine.
 - Ne jamais assimiler absence de réponse à indisponibilité, vote favorable à RSVP, ni RSVP à présence réelle.

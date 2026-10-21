@@ -21,7 +21,7 @@ test("les onglets préchargés réutilisent leur page avec une vérification fra
   let contents=0,checks=0;
   page.on("request",request=>{const url=new URL(request.url());if(url.searchParams.has("_rsc")&&!request.headers()["next-router-prefetch"])contents++;if(url.pathname==="/api/session-status")checks++;});
   const nav=page.getByRole("navigation",{name:"Navigation principale"});
-  for(const name of ["Dispos","Sessions","Groupe","Accueil","Dispos"]){
+  for(const name of ["Dispos","Soirées","Groupe","Accueil","Dispos"]){
     const checkedAccess=page.waitForResponse(response=>response.url().endsWith("/api/session-status")&&response.status()===200);
     await nav.getByRole("link",{name,exact:true}).click();await checkedAccess;
     await expect(nav.getByRole("link",{name,exact:true})).toHaveAttribute("aria-current","page");
@@ -35,10 +35,20 @@ test("une modification invalide aussi l’accueil préchargé",async({page,authC
     await page.goto("/accueil");await page.waitForLoadState("networkidle");
     await expect(page.getByRole("link",{name:/Vos soirées cette semaine/})).toContainText("0/7");
     await page.getByRole("navigation",{name:"Navigation principale"}).getByRole("link",{name:"Dispos",exact:true}).click();
-    await page.locator(".day-editor").first().getByRole("button",{name:"Dispo 20:00–23:00",exact:true}).click();
+    await page.locator(".day-editor").nth(4).getByRole("button",{name:"Dispo 20:00–23:00",exact:true}).click();
     await expect(page.getByRole("heading",{name:"Mes réponses · 1/7"})).toBeVisible();
     await page.getByRole("navigation",{name:"Navigation principale"}).getByRole("link",{name:"Accueil",exact:true}).click();
     await expect(page.getByRole("link",{name:/Vos soirées cette semaine/})).toContainText("1/7");
+    const marks=page.locator(".week-progress i");
+    await expect(marks).toHaveCount(7);
+    await expect(marks.nth(0)).toHaveAttribute("data-status","unanswered");
+    await expect(marks.nth(4)).toHaveAttribute("data-status","available");
+    await page.getByRole("navigation",{name:"Navigation principale"}).getByRole("link",{name:"Dispos",exact:true}).click();
+    await page.locator(".day-editor").nth(1).getByRole("button",{name:"Indispo",exact:true}).click();
+    await expect(page.getByRole("heading",{name:"Mes réponses · 2/7"})).toBeVisible();
+    await page.getByRole("navigation",{name:"Navigation principale"}).getByRole("link",{name:"Accueil",exact:true}).click();
+    await expect(marks.nth(1)).toHaveAttribute("data-status","unavailable");
+    await expect(marks.nth(4)).toHaveAttribute("data-status","available");
   } finally {checked(await admin.from("availability_days").delete().eq("membership_id",member.id));}
 });
 

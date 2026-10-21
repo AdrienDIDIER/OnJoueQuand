@@ -5,7 +5,7 @@ import {execFileSync} from "node:child_process";
 import {clients,checked} from "../../scripts/local-supabase.mjs";
 import {addDays,localInstant,monday,today} from "../../src/lib/time/paris";
 
-test("proposer, voter à deux comptes, confirmer puis répondre et libérer un créneau",async({page,browser},info)=>{
+test("organiser une soirée, répondre à deux comptes puis annuler",async({page,browser},info)=>{
   test.setTimeout(90_000);
   page.setDefaultTimeout(10_000);
   const {admin,config}=clients();const users:string[]=[],members:string[]=[];
@@ -27,27 +27,22 @@ test("proposer, voter à deux comptes, confirmer puis répondre et libérer un c
       await (i===0?page:other).context().addCookies([...values].map(([name,value])=>({name,value,domain:"127.0.0.1",path:"/"})));
       checked(await actor.rpc("save_availability",{changes:[{local_date:week,status:"available",mode:"detailed",expected_revision:null,intervals:[{starts_at:localInstant(week,"20:00"),ends_at:localInstant(week,"21:00")}]}]}));
     }
-    await page.goto("/sessions");await page.getByRole("button",{name:"Proposer une session",exact:true}).click();
-    const form=page.getByRole("button",{name:"Enregistrer le brouillon",exact:true}).locator("..");
-    await form.getByLabel("Titre de la session",{exact:true}).fill(title);
-    for(let i=1;i<=2;i++){const day=addDays(week,i-1);await form.getByLabel(`Début du créneau ${i}`,{exact:true}).fill(`${day}T20:00`);await form.getByLabel(`Fin du créneau ${i}`,{exact:true}).fill(`${day}T21:00`);}
-    await form.getByRole("button",{name:"Enregistrer le brouillon",exact:true}).click();
+    await page.goto("/sessions");await page.getByRole("button",{name:"Organiser une soirée",exact:true}).click();
+    const form=page.getByRole("button",{name:"Organiser la soirée",exact:true}).locator("..");
+    await form.getByLabel("Quel soir ?",{exact:true}).fill(week);
+    await form.getByLabel("On commence à quelle heure ?",{exact:true}).fill("20:00");
+    await form.getByText("Jeu et détails facultatifs",{exact:true}).click();
+    await form.getByLabel("Nom de la soirée",{exact:true}).fill(title);
+    await form.getByLabel("Fin prévue",{exact:true}).fill("21:00");
+    await form.getByRole("button",{name:"Organiser la soirée",exact:true}).click();
     const card=page.getByRole("article",{name:title,exact:true});const otherCard=other.getByRole("article",{name:title,exact:true});
-    await expect(card.getByText("Brouillon",{exact:true})).toBeVisible();
-    await other.goto("/sessions");await expect(otherCard).toHaveCount(0);
-    await card.getByRole("button",{name:"Publier la proposition"}).click();await expect(card.getByText("Vote ouvert",{exact:true})).toBeVisible();
-    await other.reload();await expect(otherCard.getByText("Vous n’avez pas encore répondu.",{exact:true})).toBeVisible();
-    for(const check of await otherCard.getByRole("checkbox").all())await check.check();
-    await otherCard.getByRole("button",{name:"Enregistrer mon vote"}).click();await expect(otherCard.getByText("Votre bulletin est enregistré ; vous pouvez le modifier.",{exact:true})).toBeVisible();
-    for(const check of await otherCard.getByRole("checkbox").all())await check.uncheck();
-    await otherCard.getByRole("button",{name:"Enregistrer mon vote"}).click();await expect(otherCard.getByText("Votre réponse : aucun créneau ne me convient.",{exact:true})).toBeVisible();
-    await otherCard.getByRole("checkbox").first().check();await otherCard.getByRole("button",{name:"Enregistrer mon vote"}).click();await expect(otherCard.getByText("Votre bulletin est enregistré ; vous pouvez le modifier.",{exact:true})).toBeVisible();
-    await page.reload();await card.getByText("Organiser cette session",{exact:true}).click();await card.getByRole("button",{name:"Clore le vote maintenant"}).click();await expect(card.getByText("Vote clos",{exact:true})).toBeVisible();
-    await card.getByText("Organiser cette session",{exact:true}).click();await card.getByRole("button",{name:"Confirmer ce créneau"}).click();await expect(card.getByText("Confirmée",{exact:true})).toBeVisible();
+    await expect(card.getByText("Confirmée",{exact:true})).toBeVisible();
+    await expect(card.getByText("Échéance du vote",{exact:false})).toHaveCount(0);
+    await other.goto("/sessions");
     await expect(card.getByText("Vous n’avez pas encore confirmé votre participation.",{exact:true})).toBeVisible();
-    await other.reload();await expect(otherCard.getByText("Vous n’avez pas encore confirmé votre participation.",{exact:true})).toBeVisible();
-    await test.step("RSVP du second compte",async()=>{await otherCard.getByRole("button",{name:"Je participe",exact:true}).click();await expect(otherCard.getByText("Votre réponse : je participe.",{exact:true})).toBeVisible();});
-    await card.getByRole("button",{name:"Je participe",exact:true}).click();await expect(card.getByText("Votre réponse : je participe.",{exact:true})).toBeVisible();
+    await expect(otherCard.getByText("Vous n’avez pas encore confirmé votre participation.",{exact:true})).toBeVisible();
+    await test.step("RSVP du second compte",async()=>{await otherCard.getByRole("button",{name:"Je viens",exact:true}).click();await expect(otherCard.getByText("Votre réponse : je participe.",{exact:true})).toBeVisible();});
+    await card.getByRole("button",{name:"Je viens",exact:true}).click();await expect(card.getByText("Votre réponse : je participe.",{exact:true})).toBeVisible();
     await card.screenshot({path:info.outputPath("session-confirmee.png")});
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
     // L’accueil est collectif : un autre scénario parallèle peut proposer un créneau aussi tôt.
@@ -56,7 +51,7 @@ test("proposer, voter à deux comptes, confirmer puis répondre et libérer un c
     await search.getByText("Affiner la recherche",{exact:true}).click();
     for(const check of await search.getByRole("checkbox").all())await check.uncheck();for(const name of names)await search.getByLabel(name,{exact:true}).check();
     await search.getByRole("button",{name:"Rechercher des créneaux"}).click();await expect(search.getByText("Aucun créneau commun",{exact:false})).toBeVisible();
-    await page.goto("/sessions");await card.getByText("Annuler cette session",{exact:true}).click();await card.getByRole("button",{name:"Annuler définitivement"}).click();await page.getByText(/Sessions passées et annulées ·/).click();await expect(card.getByText("Annulée",{exact:true})).toBeVisible();
+    await page.goto("/sessions");await card.getByText("Annuler cette soirée",{exact:true}).click();await card.getByRole("button",{name:"Annuler définitivement"}).click();await page.getByText(/Soirées passées et annulées ·/).click();await expect(card.getByText("Annulée",{exact:true})).toBeVisible();
     await page.goto(`/dispos/trouver?semaine=${week}`);await search.getByText("Affiner la recherche",{exact:true}).click();for(const check of await search.getByRole("checkbox").all())await check.uncheck();for(const name of names)await search.getByLabel(name,{exact:true}).check();
     await search.getByRole("button",{name:"Rechercher des créneaux"}).click();await expect(search.getByRole("listitem")).toHaveCount(1);
   }finally{

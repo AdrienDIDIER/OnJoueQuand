@@ -1,5 +1,7 @@
 # Exigences produit — OnJoueQuand
 
+**Révision produit du 21 octobre 2026 :** les nouvelles soirées utilisent un seul rendez-vous directement organisé, sans vote ni brouillon ; onglet **Soirées**, réponses **Je viens / Sans moi**. Nom et jeu facultatifs, fin prévue affichée et modifiable. Les anciennes propositions restent compatibles. Cette révision approuvée remplace les exigences de création multihoraire ci-dessous, conservées comme historique de J5. L’accueil représente les sept états journaliers et les réglages proposent un test Push sur son appareil. Règles et livraison : [ADR 020](decisions/020-soirees-simples-et-test-push.md).
+
 Statut : J1–J6 réalisent socle, identité, disponibilités, jeux, sessions/RSVP et notifications. J7 réalise le code PR-12 et les contrôles ciblés PR-13 : PWA, repli public, installation contextuelle et mises à jour volontaires ; [preuves J7](j7-validation.md). Le cron reste désactivé ; installation/Push et accessibilité sur appareils réels restent à valider. J8 prépare exploitation et pilote. Voir aussi les preuves [J2](j2-validation.md), [J3](j3-validation.md), [J4](j4-validation.md), [J5](j5-validation.md), [J6](j6-validation.md).
 
 ## Vision et utilisateurs

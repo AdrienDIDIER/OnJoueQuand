@@ -17,14 +17,14 @@ test("mesurer douze déplacements avec 120 ms de délai réseau",async({page})=>
   await page.goto("/accueil");
   await expect(page.getByRole("link",{name:/Vos soirées cette semaine/})).toBeVisible();
   await page.waitForLoadState("networkidle");
-  const tabs=[{name:"Dispos",path:"/dispos"},{name:"Sessions",path:"/sessions"},{name:"Groupe",path:"/groupe"},{name:"Accueil",path:"/accueil"}];
+  const tabs=[{name:"Dispos",path:"/dispos"},{name:"Soirées",path:"/sessions"},{name:"Groupe",path:"/groupe"},{name:"Accueil",path:"/accueil"}];
   for(let cycle=0;cycle<3;cycle++)for(const tab of tabs){
     const beforeDocs=documents,beforeChecks=checks,start=Date.now();
     await page.getByRole("navigation",{name:"Navigation principale"}).getByRole("link",{name:tab.name,exact:true}).click();
     await expect(page).toHaveURL(new RegExp(`${tab.path}$`));
     if(tab.name==="Accueil")await expect(page.getByRole("link",{name:/Vos soirées cette semaine/})).toBeVisible();
     else if(tab.name==="Dispos")await expect(page.locator(".day-editor")).toHaveCount(7);
-    else if(tab.name==="Sessions")await expect(page.getByRole("button",{name:"Proposer une session",exact:true})).toBeVisible();
+    else if(tab.name==="Soirées")await expect(page.getByRole("button",{name:"Organiser une soirée",exact:true})).toBeVisible();
     else await expect(page.getByRole("heading",{name:"Les membres",exact:true})).toBeVisible();
     observations.push({route:tab.path,ms:Date.now()-start,documents:documents-beforeDocs,checks:checks-beforeChecks});
     await page.waitForLoadState("networkidle");

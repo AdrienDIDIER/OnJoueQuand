@@ -1,5 +1,6 @@
 "use client";
 import { startTransition,useActionState,useState } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { searchMatches,type SearchState } from "../actions";
 export function MatchingSearch({week,last,firstEditable,lastEditable,members,games}:{week:string;last:string;firstEditable:string;lastEditable:string;members:{id:string;name:string}[];games:{id:string;name:string}[]}) {
@@ -21,7 +22,7 @@ export function MatchingSearch({week,last,firstEditable,lastEditable,members,gam
     </form>
     {!dirty && !pending && <div aria-live="polite"><p role="status">{state.message}</p>
       {state.gameName && <p>Jeu : {state.gameName}. Un favori indique une préférence, sans garantir la possession du jeu.</p>}
-      <ol className="matching-results">{state.results?.map(r=><li key={r.key}><h3>{r.label}</h3><p>{r.names.length} joueur{r.names.length>1?"s":""} disponible{r.names.length>1?"s":""} sur toute la durée{state.gameName?` · ${r.favoriteCount} favori${r.favoriteCount>1?"s":""} pour ce jeu`:""}.</p><p>{r.names.join(", ")}</p></li>)}</ol>
+      <ol className="matching-results">{state.results?.map(r=><li key={r.key}><h3>{r.label}</h3><p>{r.names.length} joueur{r.names.length>1?"s":""} disponible{r.names.length>1?"s":""} sur toute la durée{state.gameName?` · ${r.favoriteCount} favori${r.favoriteCount>1?"s":""} pour ce jeu`:""}.</p><p>{r.names.join(", ")}</p><Link className="text-link" href={`/sessions?soir=${r.day}`}>Organiser une soirée ce jour-là →</Link></li>)}</ol>
     </div>}
   </section>;
 }
