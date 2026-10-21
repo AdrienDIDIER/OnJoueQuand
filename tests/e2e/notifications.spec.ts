@@ -25,8 +25,8 @@ test("notifications privées, préférences et job HTTP authentifié",async({pag
     await page.reload();await expect(settings.getByRole("checkbox",{name:"Rappels de disponibilités le dimanche et le lundi"})).not.toBeChecked();
     await settings.getByRole("button",{name:"Activer sur cet appareil"}).click();await expect(settings.getByRole("status").filter({hasText:/Le Push n’est pas encore configuré|ne prend pas en charge/})).toBeVisible();
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
-    // Le worker Push n’installe aucun cache ni interception des requêtes privées.
-    const sw=await request.get("/sw.js");expect(sw.status()).toBe(200);expect(sw.headers()["cache-control"]).toContain("no-store");expect(await sw.text()).not.toContain('addEventListener("fetch"');
+    // Le worker ne met jamais les requêtes privées en cache.
+    const sw=await request.get("/sw.js");expect(sw.status()).toBe(200);expect(sw.headers()["cache-control"]).toContain("no-store");expect(await sw.text()).not.toContain("cache.put(request");
   }finally{
     if(session){checked(await admin.from("sessions").delete().eq("id",session));execFileSync("docker",["exec","supabase_db_OnJoueQuand","psql","-U","postgres","-d","postgres","-Atc",`delete from private.notification_outbox where resource_id='${session}';delete from private.audit_events where resource_id='${session}'`],{stdio:"pipe"});}
     if(members.length){checked(await admin.from("notifications").delete().in("membership_id",members));checked(await admin.from("memberships").delete().in("id",members));checked(await admin.from("profiles").delete().in("user_id",people.map(p=>p.user.id)));}

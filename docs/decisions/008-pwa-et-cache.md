@@ -1,6 +1,6 @@
 # ADR 008 — PWA installable et cache limité
 
-- Statut : Acceptée, conception non implémentée.
+- Statut : Code implémenté localement en J7, précisé par [ADR 014](014-pwa-cache-et-mises-a-jour.md). Installation/Push réels encore à valider ; [rapport J7](../j7-validation.md).
 - Date : 2026-10-15.
 - Portée : J7 ; PR-11, PR-12, PR-13, PR-15.
 

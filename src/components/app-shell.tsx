@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { Gamepad2, LockKeyhole, Sparkles } from "lucide-react";
 import { AppNavigation } from "./app-navigation";
+import {PwaExperience} from "@/features/pwa/ui/experience";
 
 export function AppShell({ children }: { children: ReactNode }) {
   return <div className="app-shell">
@@ -17,7 +18,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     </aside>
     <div className="workspace">
       <header className="topbar"><span>Un rendez-vous avec votre équipe.</span><span className="status-pill"><Sparkles size={13} aria-hidden="true" />En préparation</span></header>
-      <main id="contenu" tabIndex={-1}>{children}</main>
+      <main id="contenu" tabIndex={-1}>{children}<PwaExperience/></main>
       <footer className="footer"><span>Moins d’organisation. Plus de bons moments.</span><span>Horaires de Paris</span></footer>
     </div>
   </div>;

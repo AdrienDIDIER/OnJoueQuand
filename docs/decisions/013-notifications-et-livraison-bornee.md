@@ -4,6 +4,8 @@
 - Date : 2026-10-21.
 - Portée : PR-10, PR-11, PR-14, PR-16.
 
+Le worker décrit ici correspond à J6 ; son cache public et ses mises à jour sont ensuite complétés par [ADR 014](014-pwa-cache-et-mises-a-jour.md), sans changer la livraison transactionnelle des notifications.
+
 ## Contexte
 
 Une notification interne doit rester fiable même si un appareil, un fournisseur ou le processus HTTP est indisponible. Les traitements et endpoints Push ne doivent pas ouvrir un accès réseau arbitraire. La révocation et les préférences peuvent changer pendant une tentative.

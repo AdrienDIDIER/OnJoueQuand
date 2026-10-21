@@ -1,6 +1,6 @@
 # J6 — Notifications, rappels et traitement
 
-État au **21 octobre 2026**. J5 a été commité dans `52f8c18`. J6 est réalisé localement et reste non commité. Aucun déploiement, push Git, migration distante, service payant ou envoi Push externe. `.env.local` n’a pas été modifié. Le cron livré reste **désactivé** et aucune réception sur appareil réel n’est revendiquée.
+État au **21 octobre 2026**. J5 est commité dans `52f8c18`, J6 dans `19b6ce2`, puis poussés après confirmation explicite du dépôt public par l’utilisateur. La [CI distante J6 a réussi](https://github.com/AdrienDIDIER/OnJoueQuand/actions/runs/39583064447). Aucun déploiement, migration distante, service payant ou envoi Push externe. `.env.local` n’a pas été modifié. Le cron reste **désactivé** ; aucune réception réelle revendiquée. Ce rapport conserve la portée au terme de J6 ; les extensions PWA sont décrites dans le [rapport J7](j7-validation.md).
 
 ## Portée réalisée
 
@@ -48,6 +48,6 @@ La recette HTTP pg_net/Vault utilise un récepteur temporaire local, distinct de
 
 Configurer dans l’environnement autorisé les secrets de job, la paire VAPID, son contact et Vault, puis activer explicitement le cron. Valider la réception, le clic et le retrait sur iPhone/iPad, Android et bureau réels ; le transport simulé et WebKit émulé ne prouvent pas cette réception. Un crash après envoi peut produire un doublon externe malgré le tag stable.
 
-La CI distante n’a pas été exécutée. La réserve ESLint/dépendances de développement déjà documentée en J1/J3 demeure ; aucun correctif forcé ou changement de framework n’a été appliqué. Purges générales, sauvegardes restaurées et alertes externes restent des conditions J8. La limite technique de dix appareils par compte, les familles Push prises en charge et les étapes d’activation sont explicites dans ADR 013.
+La CI distante a depuis réussi au commit J6, comme indiqué en tête du rapport. La réserve ESLint/dépendances de développement déjà documentée en J1/J3 demeure ; aucun correctif forcé ou changement de framework n’a été appliqué. Purges générales, sauvegardes restaurées et alertes externes restent des conditions J8. La limite technique de dix appareils par compte, les familles Push prises en charge et les étapes d’activation sont explicites dans ADR 013.
 
 La suite est **J7 : PWA installable, manifeste et icônes, hors connexion générique, mise à jour du service worker et qualité transversale**, avec validation sur appareils réels. Ce jalon n’a pas été démarré dans cette livraison.

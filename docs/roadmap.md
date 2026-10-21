@@ -2,7 +2,7 @@
 
 ## État et ordre de livraison
 
-Le plan est approuvé. **J0 à J5 sont commités séparément ; J5 porte le commit `52f8c18`. J6 est réalisé localement, avec preuves et limites dans le [rapport J6](j6-validation.md), et reste non commité. J7 à J9 ne sont pas implémentés.** La poursuite vers J6 a été autorisée par « commit et continue ». Aucun provisionnement distant, push Git ou déploiement n’est inclus. Cron inactif par défaut, appareils Push et CI distante encore à valider.
+Le plan est approuvé. **J0 à J6 sont commités et poussés ; J6 porte le commit `19b6ce2` et sa CI distante a réussi. J7 est réalisé localement et reste non commité ; [rapport J7](j7-validation.md). J8–J9 ne sont pas implémentés.** « Push et continue » autorise J7 ; le caractère public du dépôt GitHub a été confirmé avant publication. Aucun déploiement ni migration de production. Cron inactif ; installation/Push réels restent des portes de lancement.
 
 Les critères ci-dessous sont des portes de sortie : un jalon n'est livré que lorsque ses critères et tests sont vérifiés. Les résultats réels, versions, environnements et limites seront consignés au fur et à mesure. Aucune estimation calendaire ne vaut engagement.
 
@@ -40,7 +40,7 @@ Les interfaces d'engagements occupés sont définies en J4 et exercées avec des
 
 ### J1 — Fondation
 
-**État :** socle réalisé et vérifié sous Windows et Linux, y compris le focus clavier WebKit ; preuves et limites dans le [rapport de validation](j1-validation.md). La porte CI distante reste à vérifier après publication du code sur GitHub.
+**État :** socle réalisé et vérifié sous Windows et Linux, y compris le focus clavier WebKit ; preuves et limites dans le [rapport de validation](j1-validation.md). La CI distante a ensuite réussi au commit J6 ; J7 reste vérifié localement.
 
 **Dépendances :** J0 et demande distincte d'implémenter le socle.
 
@@ -111,6 +111,8 @@ Les interfaces d'engagements occupés sont définies en J4 et exercées avec des
 **Tests :** T-JOBS, T-NOTIFY, T-TIME et T-RLS ; exécutions doubles, jobs en retard, dimanche sauté puis lundi rattrapé sans double rappel ; bail expiré ; crash après envoi avant acquittement ; `404/410/429/5xx` ; désabonnement/révocation entre mise en file et traitement ; endpoint privé malveillant ; route sans mauvais/bon secret ; aucun secret dans les logs.
 
 ### J7 — PWA et qualité transversale
+
+**État :** code réalisé localement, avec [ADR 014](decisions/014-pwa-cache-et-mises-a-jour.md). Manifeste/icônes, vrai worker, repli, mises à jour multi-onglets et contrôles d’accès au premier plan vérifiés dans le [rapport J7](j7-validation.md). La [recette sur appareils réels](pwa-device-checklist.md) n’est pas exécutée : elle reste une condition avant clôture complète de la porte J7 et lancement J8.
 
 **Dépendances :** J5 et J6 ; accès à iPhone/iPad compatible, Android et navigateur de bureau de recette.
 

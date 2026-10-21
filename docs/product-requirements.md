@@ -1,6 +1,6 @@
 # Exigences produit — OnJoueQuand
 
-Statut : conception approuvée en J0. J1–J5 réalisent socle, identité, disponibilités, jeux, matching et sessions/RSVP. J6 réalise PR-10/PR-11 : rappels et notifications, avec preuves et limites dans le [rapport J6](j6-validation.md). Le cron reste désactivé et la réception Push réelle reste à valider. Installation PWA et jalons suivants restent à implémenter. Voir aussi les preuves [J2](j2-validation.md), [J3](j3-validation.md), [J4](j4-validation.md), [J5](j5-validation.md).
+Statut : J1–J6 réalisent socle, identité, disponibilités, jeux, sessions/RSVP et notifications. J7 réalise le code PR-12 et les contrôles ciblés PR-13 : PWA, repli public, installation contextuelle et mises à jour volontaires ; [preuves J7](j7-validation.md). Le cron reste désactivé ; installation/Push et accessibilité sur appareils réels restent à valider. J8 prépare exploitation et pilote. Voir aussi les preuves [J2](j2-validation.md), [J3](j3-validation.md), [J4](j4-validation.md), [J5](j5-validation.md), [J6](j6-validation.md).
 
 ## Vision et utilisateurs
 

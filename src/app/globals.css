@@ -141,3 +141,20 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--primary); outli
 .notification-buttons { display: flex; flex-wrap: wrap; gap: .75rem; margin-block: 1rem; }
 .device-push { margin-block: 1.5rem; }
 #notifications { scroll-margin-top: 2rem; margin-top: 1.5rem; }
+.pwa-panel { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border); font-size: .95rem; }
+.pwa-panel summary { cursor: pointer; color: #c3b1ff; padding-block: .75rem; }
+.pwa-panel summary:focus-visible { outline: 2px solid #c3b1ff; outline-offset: 4px; }
+.pwa-panel h2 { font-weight: 650; font-size: 1.1rem; }
+.pwa-panel p,.pwa-panel ol { margin-block: .75rem; }
+.pwa-panel ol { padding-left: 1.5rem; list-style: decimal; }
+.pwa-panel li { margin-block: .4rem; }
+.pwa-notice,.pwa-update { border: 1px solid #80649b; background: #211c2c; border-radius: .75rem; padding: 1rem; }
+.pwa-confirm { display: flex; align-items: flex-start; gap: .7rem; margin-block: 1rem; }
+.pwa-confirm input { width: 1.2rem; height: 1.2rem; flex-shrink: 0; margin-top: .15rem; accent-color: #a38af9; }
+@supports(padding:max(0px)) {
+  .app-shell { padding-top: env(safe-area-inset-top); }
+  @media(max-width:760px) {
+    .app-shell { padding-bottom: calc(82px + env(safe-area-inset-bottom)); }
+    #contenu { padding-left: max(22px,env(safe-area-inset-left)); padding-right: max(22px,env(safe-area-inset-right)); }
+  }
+}

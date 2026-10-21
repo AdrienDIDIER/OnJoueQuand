@@ -1,6 +1,6 @@
 # Architecture — OnJoueQuand
 
-Statut : socle J1, identité J2, disponibilités J3, jeux/matching J4, sessions/votes/RSVP J5 et notifications/rappels J6 implémentés localement. Installation PWA et jalons suivants restent cibles. Versions et preuves figurent dans les rapports [J1](j1-validation.md), [J2](j2-validation.md), [J3](j3-validation.md), [J4](j4-validation.md), [J5](j5-validation.md) et [J6](j6-validation.md). Cron désactivé par défaut, réception Push réelle encore à valider. Voir le [PRD](product-requirements.md), le [modèle de données](database.md) et la [feuille de route](roadmap.md).
+Statut : J1 à J6 commités et poussés, CI distante réussie pour J6. Le code PWA J7 est réalisé localement ; preuves dans le [rapport J7](j7-validation.md). Installation/Push réels et exploitation J8 restent à valider. Cron désactivé par défaut. Voir le [PRD](product-requirements.md), les [données](database.md), la [roadmap](roadmap.md) et les rapports historiques [J1](j1-validation.md), [J2](j2-validation.md), [J3](j3-validation.md), [J4](j4-validation.md), [J5](j5-validation.md), [J6](j6-validation.md).
 
 ## Vue d'ensemble
 
@@ -180,7 +180,7 @@ Un balayage des bornes coûte `O(n log n)` ; l'évaluation des fenêtres est bor
 
 ### Production des événements
 
-J6 réalise cette section dans `features/notifications` et `/api/internal/jobs`. Les limites de lots, droits, familles d’endpoints et baux sont précisées par [ADR 013](decisions/013-notifications-et-livraison-bornee.md) ; configuration dans le [guide d’exploitation](notifications-operations.md). Le cron existe mais reste inactif sans activation explicite. Le service worker livré ne traite que Push/clic ; installation et hors connexion restent en J7.
+J6 réalise cette section dans `features/notifications` et `/api/internal/jobs`. Les limites de lots, droits, familles d’endpoints et baux sont précisées par [ADR 013](decisions/013-notifications-et-livraison-bornee.md) ; configuration dans le [guide d’exploitation](notifications-operations.md). Le cron existe mais reste inactif sans activation explicite. J7 étend le worker Push/clic avec le repli public et les mises à jour volontaires.
 
 La transaction métier écrit une outbox avec une clé unique d'événement. Le worker produit une notification interne unique par événement/destinataire et des livraisons par appareil autorisé. La création interne précède la tentative Push. Aucun appel réseau n'est effectué pendant la transaction métier.
 
@@ -212,6 +212,8 @@ Le job exige un secret constant-time vérifié côté serveur, applique une limi
 Le cron Vercel Hobby n'est pas retenu : sa fréquence minimale quotidienne ne convient pas à ce traitement. Voir les [limites officielles](https://vercel.com/docs/cron-jobs/usage-and-pricing). Aucun Edge Function supplémentaire n'est nécessaire.
 
 ## PWA, installation et cache
+
+J7 réalise cette section ; [ADR 014](decisions/014-pwa-cache-et-mises-a-jour.md) fixe les règles du worker et de ses mises à jour. La liste de cache actuelle contient exactement `/offline.html` et les quatre PNG ; aucun préchargement de HTML privé ou de chunks. Le retour au premier plan utilise `/api/session-status`, puis rafraîchit seulement les pages sans saisie modifiée. Les états restaurés par le navigateur sont aussi détectés. Une panne détectée bloque les soumissions sans les mettre en attente. Voir la [recette appareils encore non exécutée](pwa-device-checklist.md).
 
 Manifest avec `id` stable, `name` OnJoueQuand, `lang: fr`, `display: standalone`, couleurs sombres, icônes 192/512 et variante maskable, icône Apple. Le `start_url` ne contient aucun jeton et conduit vers Accueil ou la connexion selon la session.
 
@@ -264,7 +266,7 @@ L’exemple d’environnement comprend URL et clé publiable Supabase, clé secr
 
 ### CI et livraison
 
-Le workflow GitHub Actions configure `npm ci`, lint, typage strict, Vitest, build, Supabase local, réinitialisation, tests Auth/RLS puis Playwright contre l'application construite. Les tests des domaines suivants seront ajoutés à leur livraison. Les scripts sont documentés dans le [README](../README.md) ; les exécutions locales sont consignées dans le [rapport J2](j2-validation.md). Dépendances et actions sont verrouillées, permissions de workflow minimales. Le workflow distant n'a pas encore été exécuté.
+Le workflow GitHub Actions configure `npm ci`, lint, typage strict, Vitest, build, Supabase local synthétique, réinitialisation, tests SQL/RLS puis Playwright contre l’application construite avec la configuration locale. Les scripts sont documentés dans le [README](../README.md) ; les rapports de jalon consignent les exécutions réelles. Dépendances et actions sont verrouillées, permissions minimales. La [CI distante du commit J6](https://github.com/AdrienDIDIER/OnJoueQuand/actions/runs/39583064447) a réussi ; les changements J7 non publiés n’ont pas encore de résultat distant.
 
 Les PR produisent une preview isolée. La production utilise un environnement GitHub protégé : migration additive testée, déploiement compatible puis smoke tests. Une évolution destructive attend une phase distincte après migration des usages. Un rollback Vercel ne restaure pas la base, Auth, Vault ou cron ; ces composants ont leur procédure propre. Préférer une migration corrective à une suppression de données.
 

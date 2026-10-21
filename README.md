@@ -2,7 +2,7 @@
 
 Application web progressive privée pour aider un groupe de 6 à 15 amis et collègues à organiser ses sessions de jeu.
 
-**J0 à J5 sont commités séparément ; J5 porte le commit `52f8c18`. J6 ajoute notifications privées, préférences, Web Push et rappels dimanche/lundi.** J6 reste non commité. Le cron est désactivé par défaut ; les clés et la réception Push sur appareils réels restent à configurer/valider. Voir le [rapport J6](docs/j6-validation.md) et le [guide d’exploitation](docs/notifications-operations.md).
+**J0 à J6 sont commités et poussés ; J6 porte le commit `19b6ce2`, avec [CI GitHub réussie](https://github.com/AdrienDIDIER/OnJoueQuand/actions/runs/39583064447). J7 réalise la PWA et reste non commité.** Installation, réception Push et zones système sur appareils réels restent à valider ; le cron reste désactivé par défaut. Voir les rapports [J6](docs/j6-validation.md), [J7](docs/j7-validation.md) et le [guide notifications](docs/notifications-operations.md).
 
 ## Démarrer
 
@@ -109,11 +109,15 @@ Après confirmation, répondre dans **Ma participation**. Les réponses restent 
 
 ## Notifications et rappels
 
-Dans **Accueil**, la boîte affiche les vingt dernières notifications et permet de les marquer comme lues. Dans **Groupe → Mes notifications**, régler rappels et Push, puis activer volontairement les appareils personnels. Les messages Push restent génériques ; leur clic ouvre la boîte privée après connexion. Le service worker J6 ne met aucune donnée en cache et ne constitue pas encore la PWA installable de J7.
+Dans **Accueil**, la boîte affiche les vingt dernières notifications et permet de les marquer comme lues. Dans **Groupe → Mes notifications**, régler rappels et Push, puis activer volontairement les appareils personnels. Les messages Push restent génériques ; leur clic ouvre la boîte privée après connexion. Le worker J7 ne conserve que la page hors connexion générique et quatre icônes publiques.
 
 Le dimanche à 18 h vise la semaine suivante ; le lundi à 18 h relance la même semaine, uniquement si elle est encore incomplète. Le traitement recontrôle les préférences et réponses avant envoi, déduplique la boîte interne et reprend les baux interrompus. Aucun envoi ne démarre tant que le cron n’est pas activé ou la route interne appelée avec son secret. Sans VAPID, seules les notifications internes sont produites. Configuration et recette : [guide d’exploitation](docs/notifications-operations.md).
 
 ## Produit et documentation
+
+Dans le bas des pages privées, **Installer OnJoueQuand** fournit l’aide adaptée au navigateur et, lorsqu’il est disponible, un bouton d’installation volontaire. Sur iOS/iPadOS compatible : Safari → partager → Sur l’écran d’accueil. Installer n’active pas le Push.
+
+Sans réseau, une navigation affiche une page générique sans donnée privée. Une saisie reste seulement en mémoire dans l’onglet ; aucune écriture n’est mise en attente. Les nouvelles versions attendent une actualisation volontaire, séparée sur chaque onglet. La [fiche appareils](docs/pwa-device-checklist.md) reste à exécuter avant lancement.
 
 Quatre onglets : **Accueil**, **Dispos**, **Sessions**, **Groupe**. Fuseau : **Europe/Paris**. Le mode rapide correspond à 20 h–23 h. Les suggestions partent de deux joueurs pendant une heure ; vote favorable et RSVP sont distincts.
 
@@ -130,6 +134,8 @@ Quatre onglets : **Accueil**, **Dispos**, **Sessions**, **Groupe**. Fuseau : **E
 | [Validation J4](docs/j4-validation.md) | Catalogue, favoris, matching, benchmark et sécurité. |
 | [Validation J5](docs/j5-validation.md) | Sessions, votes, confirmation, RSVP, concurrence et branchement du matching. |
 | [Validation J6](docs/j6-validation.md) | Notifications privées, rappels, baux, transport Push et limites de recette. |
+| [Validation J7](docs/j7-validation.md) | PWA, cache public, mises à jour, contrôles d’accès et qualité ciblée. |
+| [Recette appareils](docs/pwa-device-checklist.md) | Installation, Push et accessibilité réels restant à valider. |
 | [Consignes de contribution](AGENTS.md) | Règles de changement et sécurité. |
 
-La PWA installable et la validation des appareils restent en J7. Aucune facturation : « premium » décrit l'expérience. Les statistiques et sondages sont différés après le MVP.
+Le code PWA est réalisé localement ; la validation des appareils reste une porte de lancement. Aucune facturation : « premium » décrit l’expérience. Statistiques et sondages sont différés après le MVP ; J8 prépare le pilote et l’exploitation.
