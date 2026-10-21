@@ -1,4 +1,5 @@
-import { expect, test } from "@playwright/test";
+import { expect } from "@playwright/test";
+import { test } from "./fixtures";
 
 const routes = [
   { path: "/accueil", label: "Accueil", heading: "Bienvenue chez vous." },
@@ -8,11 +9,12 @@ const routes = [
 ];
 
 for (const route of routes) {
-  test(`${route.label} : route française, navigation et affichage responsive`, async ({ page }) => {
+  test(`${route.label} : route française, navigation et affichage responsive`, async ({ page }, testInfo) => {
     const errors: string[] = [];
     page.on("pageerror", (error) => errors.push(error.message));
     const response = await page.goto(route.path);
     expect(response?.status()).toBe(200);
+    expect(response?.headers()["cache-control"]).toContain("no-store");
     await expect(page.locator("html")).toHaveAttribute("lang", "fr");
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(route.heading);
     const nav = page.getByRole("navigation", { name: "Navigation principale" });
@@ -20,6 +22,7 @@ for (const route of routes) {
     await expect(nav.getByRole("link", { name: route.label, exact: true })).toHaveAttribute("aria-current", "page");
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
     expect(errors).toEqual([]);
+    if (route.path === "/groupe") await page.screenshot({ path: testInfo.outputPath("groupe.png"), fullPage: true });
   });
 }
 

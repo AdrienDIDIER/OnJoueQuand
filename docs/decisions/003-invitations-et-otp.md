@@ -1,6 +1,6 @@
 # ADR 003 — Invitations nominatives et OTP e-mail
 
-- Statut : Acceptée, conception non implémentée.
+- Statut : Implémentée en J2, transport et premier code précisés par [ADR 010](010-premier-code-et-invitation-smtp.md).
 - Date : 2026-10-15.
 - Portée : J2, J8 ; PR-01, PR-02.
 
@@ -12,7 +12,7 @@ Les membres veulent un compte individuel sans gérer de mot de passe. L'accès r
 
 Utiliser Supabase Auth avec code e-mail expirant après dix minutes. Désactiver les inscriptions publiques et utiliser `shouldCreateUser: false`. Un administrateur crée une invitation valable sept jours ; le serveur provisionne au besoin un compte sans mot de passe et sans confirmer artificiellement l'adresse.
 
-Envoyer l'invitation française via l'API Resend et les codes Auth via le SMTP Resend configuré dans Supabase. Le lien d'invitation n'accorde aucun accès à lui seul. Après vérification OTP, une transaction compare l'adresse Auth confirmée à l'invitation, contrôle validité et révocation, puis crée l'adhésion et consomme l'invitation.
+Envoyer l'invitation française et les codes via le SMTP Auth, conformément à l'ADR 010 qui remplace la séparation API Resend/SMTP initialement prévue. Le lien d'invitation n'accorde aucun accès à lui seul. Après vérification OTP, une transaction compare l'adresse Auth confirmée à l'invitation, contrôle validité et révocation, puis crée l'adhésion et consomme l'invitation.
 
 Séparer états d'invitation, provisionnement et livraison pour reprendre les erreurs sans compte ni adhésion dupliqués. Le premier administrateur suit une procédure d'exploitation contrôlée ; les demandes de code sont limitées et leur réponse n'énumère pas les comptes.
 

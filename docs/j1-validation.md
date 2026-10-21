@@ -1,6 +1,6 @@
 # J1 — Socle et preuves de validation
 
-État au **19 octobre 2026**. J0 est enregistré dans le commit `1841203`. J1 est implémenté dans le répertoire de travail ; aucun push, déploiement, projet distant ou invitation réelle n'a été effectué.
+Rapport historique de J1 au **19 octobre 2026**. J0 est enregistré dans le commit `1841203`, J1 dans `6b1af70`. Aucun push, déploiement, projet distant ou invitation réelle n'a été effectué. Les évolutions ultérieures de l'authentification sont décrites dans le [rapport J2](j2-validation.md).
 
 ## Ce qui est livré
 

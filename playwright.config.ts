@@ -5,9 +5,10 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 2 : undefined,
+  workers: 2,
   reporter: [["list"], ["html", { open: "never" }]],
-  use: { baseURL: "http://127.0.0.1:3100", trace: "retain-on-failure" },
+  // Les parcours OTP manipulent des secrets éphémères : aucune trace réseau persistée.
+  use: { baseURL: "http://127.0.0.1:3100", trace: "off" },
   projects: [
     { name: "chromium", use: { ...devices["Desktop Chrome"] } },
     { name: "firefox", use: { ...devices["Desktop Firefox"] } },
@@ -19,6 +20,6 @@ export default defineConfig({
     url: "http://127.0.0.1:3100/accueil",
     reuseExistingServer: false,
     timeout: 60_000,
-    env: { NEXT_PUBLIC_APP_URL: "http://127.0.0.1:3100", NEXT_PUBLIC_SUPABASE_URL: "", NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: "" },
+    env: { NEXT_PUBLIC_APP_URL: "http://127.0.0.1:3100" },
   },
 });

@@ -1,5 +1,22 @@
 @import "tailwindcss";
 
+.auth-page { max-width: 800px; margin: 8vh auto; padding: 24px; }
+.auth-page h1, .group-page h1 { font-size: clamp(2rem, 5vw, 3rem); font-weight: 700; margin-bottom: 20px; }
+.auth-page h2, .group-page h2 { font-size: 1.3rem; font-weight: 650; margin-bottom: 16px; }
+.auth-forms { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 32px; margin-top: 32px; }
+.form-stack { display: grid; gap: 12px; max-width: 440px; }
+.form-stack label { display: grid; gap: 8px; }
+.form-stack input:not([type=hidden]) { border: 1px solid #555166; border-radius: 8px; padding: 12px; background: #181621; color: #f5f3ff; width: 100%; }
+.form-stack input:focus-visible { outline: 2px solid #b8a0ff; outline-offset: 3px; }
+.form-stack p[role=status] { min-height: 1.4em; font-size: .9rem; }
+.group-card { padding: 24px; margin: 24px 0; border: 1px solid #35313f; border-radius: 16px; background: #181621; }
+.member-list { display: grid; gap: 24px; margin-top: 24px; overflow-wrap: anywhere; }
+.member-list li { display: flex; gap: 16px; }
+.member-list h3 { font-weight: 650; }
+.avatar { display: grid; place-items: center; width: 42px; height: 42px; flex-shrink: 0; background: #32244c; border-radius: 50%; }
+.command-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px; }
+.signout { margin-top: 40px; }
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

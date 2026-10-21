@@ -43,11 +43,25 @@ enable_signup = false
 enable_anonymous_sign_ins = false
 
 [auth.email]
-enable_signup = false
+# Ce champ active le fournisseur e-mail ; auth.enable_signup=false interdit les inscriptions.
+enable_signup = true
 enable_confirmations = true
 double_confirm_changes = true
 otp_length = 6
 otp_expiry = 600
+
+[auth.email.template.magic_link]
+subject = "Votre code de connexion OnJoueQuand"
+content_path = "./supabase/templates/code.html"
+
+[auth.email.template.confirmation]
+subject = "Votre accès à OnJoueQuand"
+content_path = "./supabase/templates/code.html"
+
+[auth.rate_limit]
+email_sent = 100
+sign_in_sign_ups = 30
+token_verifications = 30
 
 [realtime]
 enabled = false

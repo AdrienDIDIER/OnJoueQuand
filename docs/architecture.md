@@ -1,6 +1,6 @@
 # Architecture — OnJoueQuand
 
-Statut : conception approuvée en J0 ; socle J1 implémenté, architecture métier encore cible. Les versions installées et vérifications sont dans le [rapport J1](j1-validation.md). Les règles produit sont dans le [PRD](product-requirements.md), les contraintes persistées dans le [modèle de données](database.md) et les contrôles de livraison dans la [feuille de route](roadmap.md).
+Statut : conception approuvée en J0 ; socle J1 et identité/groupe privé J2 implémentés. Le reste de l'architecture métier demeure cible. Vérifications dans les rapports [J1](j1-validation.md) et [J2](j2-validation.md).
 
 ## Vue d'ensemble
 
@@ -12,7 +12,6 @@ flowchart LR
     NEXT --> AUTH["Supabase Auth"]
     NEXT --> DB["PostgreSQL : RLS et RPC"]
     AUTH --> SMTP["SMTP Resend"]
-    NEXT --> MAIL["API Resend : invitations"]
     CRON["Supabase Cron + pg_net"] --> JOBS["Route interne Next.js"]
     VAULT["Supabase Vault"] --> CRON
     JOBS --> DB
@@ -136,8 +135,8 @@ L'authentification est confiée à Supabase Auth ; l'autorisation au groupe rest
 
 1. Un administrateur actif crée une invitation valable sept jours. Une adresse est normalisée sans règles propres à Gmail ou à un fournisseur particulier.
 2. Un traitement serveur idempotent provisionne un compte Auth sans mot de passe et sans marquer l'adresse confirmée. Une erreur externe ne crée aucune adhésion.
-3. Une invitation française est envoyée via l'API Resend ; elle pointe vers l'application, mais son lien n'est pas une preuve d'identité. Le destinataire peut demander un nouveau code pendant la validité de l'invitation.
-4. Supabase envoie un code via SMTP Resend, configuré pour expirer après dix minutes. `shouldCreateUser: false` et inscriptions publiques désactivées empêchent la création ouverte de comptes.
+3. Une invitation française avec code est envoyée via SMTP Auth ; elle pointe vers l'application, mais son lien n'est pas une preuve d'identité. Le destinataire peut demander un nouveau code pendant la validité de l'invitation.
+4. Le code expire après dix minutes. `shouldCreateUser: false` et inscriptions publiques désactivées empêchent la création ouverte de comptes. Pour un compte non confirmé, le renvoi de confirmation prend le relais sur `signup_disabled`, conformément à [ADR 010](decisions/010-premier-code-et-invitation-smtp.md). Mailpit reçoit les e-mails locaux ; SMTP Resend reste à configurer avant production.
 5. Après vérification du code, une RPC d'acceptation verrouille l'invitation et vérifie `auth.uid()`, l'adresse confirmée dans Auth, l'expiration et le statut. Elle crée/active l'adhésion et le profil puis consomme l'invitation dans une seule transaction.
 6. Les connexions suivantes réutilisent l'OTP ; chaque requête protégée contrôle encore l'adhésion active.
 
@@ -154,6 +153,7 @@ Un compte authentifié sans invitation valide reste sans accès. Une invitation 
 ## Modèle temporel et matching
 
 L'adaptateur temporel central convertit date locale + heure + occurrence éventuelle en instant. Il utilise Europe/Paris indépendamment du serveur ou de l'appareil. Une journée locale peut durer 23 ou 25 heures. La base garde les bornes UTC et la date locale de rattachement ; l'UI utilise les mêmes règles de conversion.
+
 
 Le matching reçoit un instant `now`, les intervalles normalisés, les engagements et les favoris ; il ne lit ni base ni horloge globale. Le cas d'usage charge ces données et appelle le calcul pur.
 
@@ -253,11 +253,11 @@ Les cas et critères par jalon sont dans la [feuille de route](roadmap.md#catalo
 | Production | Supabase et Vercel dans des régions européennes proches ; Resend SMTP/API | Domaine vérifié, sauvegardes, surveillance, secrets propres. |
 | Preview non fiable | Build avec configuration factice ou isolée | Aucun secret de projet partagé ni migration automatique. |
 
-Prévoir dans le futur exemple d'environnement : URL et clé publiable Supabase, clé secrète serveur, origine de l'application, paire VAPID et sujet de contact, secret de job et clé Resend d'invitation. SMTP Auth se configure côté Supabase. Les clés privées, le token de déploiement et la connexion de sauvegarde restent dans les magasins de secrets ; les clés publiques seules portent un préfixe exposé au client.
+L'exemple d'environnement J2 comprend URL et clé publiable Supabase, clé secrète serveur, origine de l'application et secret HMAC de limitation. Ajouter la paire VAPID, le sujet de contact et le secret de job en J6. SMTP Auth se configure côté Supabase ; aucune clé API Resend d'invitation n'est nécessaire depuis l'ADR 010. Les clés privées, le token de déploiement et la connexion de sauvegarde restent dans les magasins de secrets ; les clés publiques seules portent un préfixe exposé au client.
 
 ### CI et livraison
 
-Le workflow GitHub Actions de J1 configure `npm ci`, lint explicite, typage strict, Vitest, build et Playwright contre l'application construite, ainsi qu'un job Supabase local avec réinitialisation et contrôle PostgreSQL. Les tests de migrations métier et RLS seront ajoutés en J2. Les scripts sont documentés dans le [README](../README.md) ; les exécutions locales sont consignées dans le [rapport J1](j1-validation.md). Dépendances et actions sont verrouillées, permissions de workflow minimales. Le workflow distant n'a pas encore été exécuté.
+Le workflow GitHub Actions configure `npm ci`, lint, typage strict, Vitest, build, Supabase local, réinitialisation, tests Auth/RLS puis Playwright contre l'application construite. Les tests des domaines suivants seront ajoutés à leur livraison. Les scripts sont documentés dans le [README](../README.md) ; les exécutions locales sont consignées dans le [rapport J2](j2-validation.md). Dépendances et actions sont verrouillées, permissions de workflow minimales. Le workflow distant n'a pas encore été exécuté.
 
 Les PR produisent une preview isolée. La production utilise un environnement GitHub protégé : migration additive testée, déploiement compatible puis smoke tests. Une évolution destructive attend une phase distincte après migration des usages. Un rollback Vercel ne restaure pas la base, Auth, Vault ou cron ; ces composants ont leur procédure propre. Préférer une migration corrective à une suppression de données.
 

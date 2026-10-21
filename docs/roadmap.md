@@ -2,7 +2,7 @@
 
 ## État et ordre de livraison
 
-Le plan est approuvé. **J0 est commité ; J1 est implémenté et vérifié localement, avec les réserves consignées dans le [rapport J1](j1-validation.md). J2 à J9 ne sont pas implémentés.** Le démarrage de J1 a été explicitement autorisé. Aucun provisionnement distant, push Git ou déploiement n'est inclus dans cette livraison. La CI GitHub reste à exécuter après publication du code ; son succès n'est pas présumé.
+Le plan est approuvé. **J0 et J1 sont commités ; J2 est implémenté et vérifié localement, avec les réserves du [rapport J2](j2-validation.md). J3 à J9 ne sont pas implémentés.** Aucun push ni déploiement inclus ; la CI distante reste à exécuter.
 
 Les critères ci-dessous sont des portes de sortie : un jalon n'est livré que lorsque ses critères et tests sont vérifiés. Les résultats réels, versions, environnements et limites seront consignés au fur et à mesure. Aucune estimation calendaire ne vaut engagement.
 
@@ -52,6 +52,8 @@ Les interfaces d'engagements occupés sont définies en J4 et exercées avec des
 
 ### J2 — Identité et groupe privé
 
+**État :** implémenté localement ; migration, Auth, RLS et parcours vérifiés dans le [rapport J2](j2-validation.md). Le premier code et le transport d'invitation précisent le plan via [ADR 010](decisions/010-premier-code-et-invitation-smtp.md). SMTP de production et exécution GitHub distante restent à valider avant lancement.
+
 **Dépendances :** J1 ; configuration Auth et boîte SMTP locale. Un SMTP de production n'est nécessaire qu'avant les essais réels hors environnement local.
 
 **Livrables :** migrations groupe/profils/adhésions/invitations, OTP, bootstrap administrateur, acceptation, profil, révocation, protections de rôle et RLS. État de provisionnement/envoi réessayable et limitation durable des demandes.
@@ -61,6 +63,7 @@ Les interfaces d'engagements occupés sont définies en J4 et exercées avec des
 **Tests :** T-AUTH et T-RLS ; invitations expirées, révoquées, déjà acceptées ou adresse différente ; OTP invalide/expiré/réutilisé ; création publique désactivée ; compte préexistant ; acceptation concurrente ; timeout après création Auth ; SMTP en échec ; attaques directes sur tables et RPC. Prouver le parcours compte non confirmé + `shouldCreateUser: false` avec les versions retenues.
 
 ### J3 — Disponibilités et calendrier
+
 
 **Dépendances :** J2 ; adaptateur temporel commun.
 

@@ -2,8 +2,10 @@ import Link from "next/link";
 import { ArrowRight, CalendarDays, Check, Gamepad2, Swords, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { requireMember } from "@/features/auth/server";
 
-export default function HomePage() {
+export default async function HomePage() {
+  await requireMember();
   return <>
     <div className="page-heading"><p className="eyebrow">ON SE RETROUVE EN JEU ?</p><h1>Bienvenue chez vous<span className="text-primary">.</span></h1><p>Le point de départ de vos prochaines soirées ensemble.</p></div>
     <section className="hero" aria-labelledby="hero-title">

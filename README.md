@@ -2,7 +2,7 @@
 
 Application web progressive privée pour aider un groupe de 6 à 15 amis et collègues à organiser ses sessions de jeu.
 
-**J0 est commité. Le socle J1 est implémenté : Next.js, quatre onglets en français, thème sombre, environnement Supabase local, tests et CI.** Les écrans de ce socle sont publics et ne contiennent aucune donnée personnelle. L'authentification et les fonctionnalités métier commencent en J2 : ne pas connecter des données privées avant leurs contrôles serveur et RLS.
+**J0 et J1 sont commités (`1841203`, `6b1af70`). J2 ajoute l'accès privé : codes e-mail, invitations, profils, membres, autorisations serveur et RLS.** Dispos et Sessions restent des écrans d'attente. Voir le [rapport J2](docs/j2-validation.md).
 
 ## Démarrer
 
@@ -10,12 +10,24 @@ Prérequis : **Node.js 24 LTS**, **npm 11.21.1** et, pour Supabase uniquement, D
 
 ```sh
 npm ci
+npm run db:start
+npm run env:local
 npm run dev
 ```
 
-Ouvrir [l'application locale](http://127.0.0.1:3000). La racine redirige vers `/accueil`. Les onglets Dispos, Sessions et Groupe présentent les capacités à venir, sans faux membres, statistiques ou actions métier simulées.
+Ouvrir [l'application locale](http://127.0.0.1:3000). Sans session, les quatre onglets redirigent vers `/connexion`. Le script `env:local` crée `.env.local` depuis la configuration locale sans afficher les clés ; il refuse d'écraser un fichier existant.
 
-Le shell fonctionne sans Supabase. Pour personnaliser l'origine ou préparer sa connexion, copier `.env.example` vers `.env.local` (PowerShell : `Copy-Item .env.example .env.local`). Les deux variables publiques Supabase sont facultatives ensemble pour J1, mais une paire partielle ou une clé secrète est refusée. La future couche de données devra appeler `requireSupabaseConfig` pour les exiger.
+Pour initialiser une base locale neuve, définir `BOOTSTRAP_EMAIL` avec une adresse synthétique en `@example.test` et `BOOTSTRAP_NAME`, puis lancer `npm run bootstrap:local`. Exemple PowerShell :
+
+```powershell
+$env:BOOTSTRAP_EMAIL = 'admin@example.test'
+$env:BOOTSTRAP_NAME = 'Administrateur local'
+npm run bootstrap:local
+```
+
+Demander ensuite un code sur `/connexion` et le consulter dans la boîte e-mail locale. Le bootstrap refuse une installation possédant déjà des adhésions. Il ne confirme pas l'adresse et n'envoie aucun message réel. Après des tests d'intégration, la base contient des comptes synthétiques : utiliser une base locale réinitialisée pour ce bootstrap (la réinitialisation efface les données locales).
+
+Les variables serveur `SUPABASE_SECRET_KEY` et `AUTH_RATE_LIMIT_SECRET` ne doivent jamais recevoir de préfixe `NEXT_PUBLIC`. La seconde contient au moins 32 caractères aléatoires. Sans configuration Supabase, seule une page de connexion indisponible est présentée : aucun accès de secours au groupe.
 
 ## Supabase local
 
@@ -33,7 +45,8 @@ npm run db:status
 
 Les ports 55320–55324 évitent un conflit constaté avec un autre projet local utilisant les ports standards. Copier uniquement l'URL locale et la clé **publiable** dans les variables `NEXT_PUBLIC_SUPABASE_*` du fichier ignoré `.env.local`. Ne jamais y mettre la clé secrète ou `service_role`, ni copier la sortie complète de status dans les logs/commits.
 
-`npm run db:reset` réinitialise exclusivement la base locale de ce projet ; cette commande efface ses données locales. Le seed J1 ne crée aucun compte ni table métier. Les inscriptions ouvertes sont désactivées. Les migrations et tests RLS seront ajoutés avec J2.
+`npm run db:reset` réinitialise exclusivement la base locale de ce projet ; cette commande efface ses données locales. La migration J2 crée groupe, profils, adhésions, invitations et fonctions sécurisées ; le seed ne crée aucun compte. Les inscriptions publiques sont désactivées ; le fournisseur e-mail reste actif pour connecter les comptes provisionnés.
+
 
 `npm run db:stop` arrête les services locaux du projet en conservant leurs données. Aucun projet Supabase distant, SMTP réel ou déploiement n'est configuré.
 
@@ -41,11 +54,13 @@ Les ports 55320–55324 évitent un conflit constaté avec un autre projet local
 
 ```sh
 npm run check
+npm run db:reset
+npm run test:integration
 npx playwright install chromium firefox webkit
 npm run test:e2e
 ```
 
-`check` exécute le lint sans avertissement, le typage strict, Vitest et le build de production. Playwright démarre automatiquement ce build sur le port **3100**, puis arrête son serveur ; ce port doit être libre. Sous Linux, installer les dépendances système avec `npx playwright install --with-deps chromium firefox webkit`.
+`check` exécute le lint sans avertissement, le typage strict, Vitest et le build de production. La suite d'intégration exige une base locale neuve et crée des comptes synthétiques ; elle interrompt brièvement puis redémarre le SMTP local pour tester une panne. Playwright réutilise l'administrateur de cette suite, injecte uniquement les clés locales en mémoire et démarre le build sur le port **3100**, puis arrête son serveur. Sous Linux, installer les dépendances système avec `npx playwright install --with-deps chromium firefox webkit`. Aucun de ces scripts de test n'accepte un projet distant.
 
 | Commande | Fonction |
 | --- | --- |
@@ -55,9 +70,11 @@ npm run test:e2e
 | `npm run test:watch` | Vitest interactif. |
 | `npm run build` | Build de production. |
 | `npm run start` | Serveur local de production après build. |
-| `npm run test:e2e` | Navigation, français, responsive, clavier, page 404 et captures. |
+| `npm run test:e2e` | Navigation, OTP, invitation, profil et révocation sur quatre projets navigateur. |
+| `npm run test:integration` | Auth, RLS, transactions concurrentes et panne SMTP sur Supabase local. |
+| `npm run db:types` | Générer les types depuis la base locale ; enregistrer la sortie dans `src/lib/supabase/database.types.ts`. |
 
-La [CI](.github/workflows/ci.yml) sépare qualité/parcours et démarrage/réinitialisation Supabase. Elle ne déploie rien et n'utilise aucun secret de production. Le [rapport J1](docs/j1-validation.md) distingue les vérifications locales de l'exécution GitHub distante, non encore réalisée.
+La [CI](.github/workflows/ci.yml) exécute qualité, démarrage/réinitialisation Supabase, intégration et parcours, puis arrête les services même en cas d'échec. Elle ne déploie rien et n'utilise aucun secret de production. Son exécution distante reste à vérifier après un push autorisé.
 
 ## Produit et documentation
 
@@ -67,10 +84,11 @@ Quatre onglets : **Accueil**, **Dispos**, **Sessions**, **Groupe**. Fuseau : **E
 | --- | --- |
 | [Exigences produit](docs/product-requirements.md) | Parcours, MVP, règles et fonctions différées. |
 | [Architecture](docs/architecture.md) | Organisation, contrats, matching, notifications, PWA et exploitation. |
-| [Modèle de données](docs/database.md) | Relations, contraintes, états et matrice RLS à implémenter. |
+| [Modèle de données](docs/database.md) | Relations, contraintes, états et matrice RLS ; état livré explicite. |
 | [Feuille de route](docs/roadmap.md) | J0–J9, dépendances, acceptation et tests. |
-| [Décisions](docs/decisions/README.md) | Neuf ADR acceptées. |
+| [Décisions](docs/decisions/README.md) | Choix acceptés, dont l'adaptation du premier code en J2. |
 | [Validation J1](docs/j1-validation.md) | Versions installées, preuves et réserves. |
+| [Validation J2](docs/j2-validation.md) | Sécurité, tests Auth/RLS, exploitation et limites. |
 | [Consignes de contribution](AGENTS.md) | Règles de changement et sécurité. |
 
-La PWA installable, les notifications et les données privées sont prévues aux jalons suivants. Aucune facturation : « premium » décrit l'expérience. Les statistiques et sondages sont différés après le MVP.
+La PWA installable, les notifications et la coordination des sessions sont prévues aux jalons suivants. Aucune facturation : « premium » décrit l'expérience. Les statistiques et sondages sont différés après le MVP.

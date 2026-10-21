@@ -1,6 +1,6 @@
 # ADR 002 — Groupe unique et autorisations
 
-- Statut : Acceptée, conception non implémentée.
+- Statut : Implémentée en J2 pour groupe, identité et invitations ; les domaines suivants étendront la même protection.
 - Date : 2026-10-15.
 - Portée : J2–J8 ; PR-01, PR-02, PR-15.
 

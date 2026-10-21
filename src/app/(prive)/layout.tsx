@@ -1,8 +1,10 @@
 import type { ReactNode } from "react";
 import { AppShell } from "@/components/app-shell";
+import { requireMember } from "@/features/auth/server";
+import { signOut } from "@/features/auth/actions";
+import { Button } from "@/components/ui/button";
 
-// J1 : shell public sans données. Le nom du groupe de routes n'est pas
-// une autorisation ; le contrôle Auth/adhésion sera obligatoire en J2.
-export default function Layout({ children }: { children: ReactNode }) {
-  return <AppShell>{children}</AppShell>;
+export default async function Layout({ children }: { children: ReactNode }) {
+  await requireMember();
+  return <AppShell>{children}<form action={signOut} className="signout"><Button variant="outline">Me déconnecter</Button></form></AppShell>;
 }
