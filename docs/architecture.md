@@ -105,6 +105,8 @@ Les contrôles de compte et d’adhésion utilisent `React.cache` pour dédupliq
 
 Les sous-routes `/groupe/jeux`, `/groupe/reglages` et `/groupe/gestion` isolent les tâches occasionnelles des quatre écrans quotidiens. Chacune appelle `requireMember` ; la gestion vérifie également le rôle administrateur avant toute lecture des invitations. Le composant PWA reste monté dans le shell pour protéger les saisies et surveiller la connexion ; seule son aide d’installation est limitée aux réglages et masquée en mode installé. Aucun changement de service worker ni de sa liste de cache.
 
+L’[ADR 018](decisions/018-interface-chaleureuse-et-latence.md) fixe l’exécution Vercel à Dublin, utilise `getClaims` uniquement dans le proxy et conserve `getUser`/adhésion/RLS dans les pages et commandes. Le shell sans données privées peut s’afficher sans attendre ces lectures ; les données de l’accueil arrivent dans des frontières Suspense séparées. Les vues `/dispos/groupe` et `/dispos/trouver` isolent calendrier collectif et matching ; `/dispos` et les commandes personnelles utilisent `loadOwnWeek`, sans charger le catalogue ni les réponses des autres.
+
 ## Contrats applicatifs et flux
 
 Les noms suivants décrivent des contrats à implémenter, pas une API disponible. Ils retournent un résultat typé ou une erreur métier traduite en français. Les dates civiles utilisent `YYYY-MM-DD`, les instants un format ISO 8601 avec décalage explicite. Le serveur vérifie l'horizon, les bornes et les relations, même après validation cliente.

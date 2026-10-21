@@ -1,6 +1,6 @@
 # ADR 017 — Usage mobile et réponses rapides
 
-- Statut : Implémentée ; validation sur iPhone réel encore requise.
+- Statut : Implémentée ; présentation et lectures affinées par l’[ADR 018](018-interface-chaleureuse-et-latence.md). Validation sur iPhone réel encore requise.
 - Date : 2026-10-21.
 - Portée : PR-03 et navigation ; amende l’ADR 011 pour les réponses rapides uniquement.
 

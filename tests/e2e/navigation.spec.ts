@@ -2,7 +2,7 @@ import { expect } from "@playwright/test";
 import { test } from "./fixtures";
 
 const routes = [
-  { path: "/accueil", label: "Accueil", heading: "Bienvenue chez vous." },
+  { path: "/accueil", label: "Accueil", heading: "On se retrouve ?" },
   { path: "/dispos", label: "Dispos", heading: "Vos disponibilités." },
   { path: "/sessions", label: "Sessions", heading: "Vos sessions." },
   { path: "/groupe", label: "Groupe", heading: "Votre groupe." },

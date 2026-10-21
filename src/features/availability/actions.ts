@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { requireMember } from "@/features/auth/server";
 import { addDays, dayLabel, intervalLabel, localInstant, localParts, monday } from "@/lib/time/paris";
 import { copyPlan, savePlan, type Change, type Guard } from "./domain";
-import { loadCalendar } from "./server";
+import { loadOwnWeek } from "./server";
 import { readPreview, signPreview } from "./preview";
 
 export type AvailabilityState = { message: string; token?: string; summary?: string[]; done?: boolean; resolutions?: { key: string; label: string; kind: "occurrence" | "time" }[] };
@@ -23,7 +23,7 @@ export async function saveQuickDay(_state: AvailabilityState, form: FormData): P
     const date = z.string().parse(form.get("date"));
     const expected = form.get("revision") === "" ? null : z.coerce.number().int().positive().parse(form.get("revision"));
     const status = z.enum(["available", "unavailable"]).parse(form.get("status"));
-    const state = await loadCalendar(monday(date));
+    const state = await loadOwnWeek(monday(date));
     const day = state.own.find(d => d.local_date === date);
     if (!day || day.revision !== expected) throw new Error("Disponibilités modifiées. Rechargez la page avant de continuer.");
     if (day.mode === "detailed") throw new Error("Ouvrez les horaires et options pour modifier cette journée détaillée.");
@@ -42,7 +42,7 @@ export async function previewDay(_state: AvailabilityState, form: FormData): Pro
   const { user } = await requireMember();
   try {
     const localDate = z.string().parse(form.get("date"));
-    const state = await loadCalendar(monday(localDate));
+    const state = await loadOwnWeek(monday(localDate));
     const d = state.own.find((x) => x.local_date === localDate)!;
     const next = state.own.find((x) => x.local_date === addDays(localDate, 1)) ?? state.next;
     const revisions = z.array(z.object({ local_date: z.string(), revision: z.number().nullable() })).parse(JSON.parse(String(form.get("revisions"))));
@@ -60,7 +60,7 @@ export async function previewCopy(_state: AvailabilityState, form: FormData): Pr
   try {
     const sourceWeek = z.string().parse(form.get("source")); const targetWeek = z.string().parse(form.get("target"));
     if (sourceWeek === targetWeek) throw new Error("Choisissez une semaine source différente.");
-    const [source, target] = await Promise.all([loadCalendar(sourceWeek), loadCalendar(targetWeek)]);
+    const [source, target] = await Promise.all([loadOwnWeek(sourceWeek), loadOwnWeek(targetWeek)]);
     const occurrences = z.record(z.string(), occurrence).parse(JSON.parse(String(form.get("occurrences") ?? "{}")));
     const corrections = z.record(z.string(), z.string()).parse(JSON.parse(String(form.get("corrections") ?? "{}")));
     const resolutions: NonNullable<AvailabilityState["resolutions"]> = [];

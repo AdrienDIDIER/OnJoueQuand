@@ -24,14 +24,14 @@ test("manifeste, icônes et repli hors connexion sans données privées",async({
   let unavailable=false;const proxy=await appProxy(()=>readFileSync("public/sw.js","utf8"),()=>unavailable);
   try{
   await page.goto(`${proxy.origin}/sessions`);await controlled(page);
-  await page.getByText("Proposer une session",{exact:true}).click();const sentinel=`Brouillon privé ${randomUUID()}`;await page.getByLabel("Titre de la session",{exact:true}).fill(sentinel);
+  await page.getByRole("button",{name:"Proposer une session",exact:true}).click();const sentinel=`Brouillon privé ${randomUUID()}`;await page.getByLabel("Titre de la session",{exact:true}).fill(sentinel);
   await page.context().setOffline(true);
   await page.getByRole("button",{name:"Enregistrer le brouillon",exact:true}).click();await expect(page.getByLabel("Titre de la session",{exact:true})).toHaveValue(sentinel);await expect(page.getByText("Enregistrement impossible hors connexion.",{exact:false})).toBeVisible();
   const apiFallback=await page.evaluate(async()=>{try{const response=await fetch("/api/session-status",{cache:"no-store"});return(response.headers.get("content-type")??"").includes("text/html");}catch{return false;}});expect(apiFallback).toBe(false);
   // La panne du récepteur couvre aussi Firefox, où le mode offline émulé peut laisser le réseau du SW actif.
   unavailable=true;await page.goto(`${proxy.origin}/groupe?source=recette`);await expect(page.getByRole("heading",{level:1})).toHaveText("Vous êtes hors connexion.");await expect(page.locator("body")).not.toContainText(sentinel);await expect(page.getByRole("textbox")).toHaveCount(0);await page.screenshot({path:info.outputPath("hors-connexion.png")});
   const cache=await page.evaluate(async()=>{const names=await caches.keys();const paths:string[]=[];for(const name of names){for(const r of await(await caches.open(name)).keys())paths.push(new URL(r.url).pathname);}return paths.sort();});expect(cache).toEqual(["/icons/apple-touch-icon.png","/icons/icon-192.png","/icons/icon-512.png","/icons/maskable-512.png","/offline.html"]);
-  unavailable=false;await page.context().setOffline(false);await page.getByRole("link",{name:"Réessayer"}).click();await expect(page.getByRole("heading",{level:1})).toHaveText("Bienvenue chez vous.");
+  unavailable=false;await page.context().setOffline(false);await page.getByRole("link",{name:"Réessayer"}).click();await expect(page.getByRole("heading",{level:1})).toHaveText("On se retrouve ?");
   await page.goto(`${proxy.origin}/groupe/reglages`);await page.getByRole("button",{name:"Me déconnecter",exact:true}).click();await expect(page).toHaveURL(/\/connexion$/);await page.goto(`${proxy.origin}/groupe/reglages`);await expect(page).toHaveURL(/\/connexion$/);
   }finally{await page.context().setOffline(false);await page.goto("about:blank");await proxy.close();}
 });

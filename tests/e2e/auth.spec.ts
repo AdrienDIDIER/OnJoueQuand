@@ -5,7 +5,7 @@ import { clients, checked, mailboxCode } from "../../scripts/local-supabase.mjs"
 import { sendEmailCode } from "../../src/features/auth/infrastructure/email-code";
 
 anonymousTest("les quatre pages privées redirigent sans session", async ({ page }, testInfo) => {
-  for (const route of ["accueil", "dispos", "sessions", "groupe", "groupe/reglages", "groupe/jeux", "groupe/gestion"]) {
+  for (const route of ["accueil", "dispos", "sessions", "groupe", "groupe/reglages", "groupe/jeux", "groupe/gestion", "dispos/groupe", "dispos/trouver"]) {
     await page.goto(`/${route}`);
     await expect(page).toHaveURL(/\/connexion$/);
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("Content de vous retrouver.");

@@ -9,10 +9,9 @@ export async function readConfirmedBusy(memberIds:string[],starts_at:string,ends
 }
 export async function readNextSession() {
   const {client,member}=await requireMember();
-  const {data:clock,error:failure}=await client.rpc("session_clock");
-  if(failure) throw new Error("Les sessions sont temporairement indisponibles.");
-  const {data,error}=await client.from("sessions").select("id,title,confirmed_slot_id,slots:session_slots!session_slots_parent(id,starts_at,ends_at),rsvps:session_rsvps!rsvps_parent(membership_id,response,membership_epoch)").eq("status","confirmed");
-  if(error) throw new Error("Les sessions sont temporairement indisponibles.");
+  const [clockResult,sessions]=await Promise.all([client.rpc("session_clock"),client.from("sessions").select("id,title,confirmed_slot_id,slots:session_slots!session_slots_parent(id,starts_at,ends_at),rsvps:session_rsvps!rsvps_parent(membership_id,response,membership_epoch)").eq("status","confirmed")]);
+  if(clockResult.error||sessions.error) throw new Error("Les sessions sont temporairement indisponibles.");
+  const clock=clockResult.data,data=sessions.data;
   return data.flatMap(s=>{const slot=s.slots.find(x=>x.id===s.confirmed_slot_id);if(!slot||compareInstant(slot.starts_at,clock)<=0)return[];
     const own=s.rsvps.find(r=>r.membership_id===member.id&&r.membership_epoch===member.participation_epoch);
     return[{id:s.id,title:s.title,slot,response:own?.response}];}).sort((a,b)=>compareInstant(a.slot.starts_at,b.slot.starts_at))[0]??null;

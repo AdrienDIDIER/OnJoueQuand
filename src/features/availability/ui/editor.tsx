@@ -1,6 +1,8 @@
 "use client";
-import { useActionState, useState } from "react";
+import { useActionState, useOptimistic, useState } from "react";
+import { Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Sheet } from "@/components/ui/sheet";
 import { addDays, dayLabel, intervalLabel, localParts, type Occurrence } from "@/lib/time/paris";
 import type { Day, LocalRange } from "../domain";
 import { applyAvailability, previewCopy, previewDay, saveQuickDay, type AvailabilityState } from "../actions";
@@ -21,13 +23,22 @@ function OccurrenceSelect({ label, value, onChange }: { label: string; value?: O
   </select></label>;
 }
 function QuickReply({day,quick}:{day:Day;quick:{start:string;end:string}}) {
-  const [state,action,pending]=useActionState(saveQuickDay,initial);
+  const [choice,choose]=useOptimistic(day.status,(_old:Day["status"],next:Day["status"])=>next);
+  const [state,action,pending]=useActionState(async(previous:AvailabilityState,form:FormData)=>{choose(form.get("status") as Day["status"]);return saveQuickDay(previous,form);},initial);
   return <form action={action} className="quick-reply"><input type="hidden" name="date" value={day.local_date}/><input type="hidden" name="revision" value={day.revision??""}/><input type="hidden" name="quickStart" value={quick.start}/><input type="hidden" name="quickEnd" value={quick.end}/>
-    <div><Button variant="outline" name="status" value="available" aria-pressed={day.status==="available"} disabled={pending}>Dispo {quick.start}–{quick.end}</Button><Button variant="outline" name="status" value="unavailable" aria-pressed={day.status==="unavailable"} disabled={pending}>Indispo</Button></div>
-    {state.message&&<p role="status">{state.message}</p>}
+    <div><Button variant="outline" name="status" value="available" aria-label={`Dispo ${quick.start}–${quick.end}`} aria-pressed={choice==="available"} disabled={pending}><Check size={16} aria-hidden="true"/>Dispo</Button><Button variant="outline" name="status" value="unavailable" aria-label="Indispo" aria-pressed={choice==="unavailable"} disabled={pending}><X size={16} aria-hidden="true"/>Non</Button></div>
+    {pending?<p className="sr-only" role="status">Enregistrement…</p>:state.message&&<p role="status">{state.message}</p>}
   </form>;
 }
 export function DayEditor({ day, next, editable, quick }: { day: Day; next: Day; editable: boolean; quick: { start: string; end: string } }) {
+  const summary=day.status==="unanswered"?"Sans réponse":day.status==="unavailable"?"Indisponible":day.mode==="detailed"?day.intervals.map(r=>intervalLabel(r.starts_at,r.ends_at,day.local_date)).join(" · "):"Disponible";
+  return <div className="day-editor" role="group" aria-label={dayLabel(day.local_date)}>
+    <Sheet title={`Horaires du ${dayLabel(day.local_date)}`} trigger={<><strong>{dayLabel(day.local_date).split(" ").slice(0,2).join(" ")}</strong><span>{summary}</span><span className="sr-only">{dayLabel(day.local_date)}</span></>}><DetailedDayEditor day={day} next={next} editable={editable} quick={quick}/></Sheet>
+    {editable&&day.mode!=="detailed"&&<QuickReply day={day} quick={quick}/>}
+  </div>;
+}
+
+function DetailedDayEditor({ day, next, editable, quick }: { day: Day; next: Day; editable: boolean; quick: { start: string; end: string } }) {
   const [status, setStatus] = useState<Day["status"]>(day.status);
   const [mode, setMode] = useState<"quick" | "detailed">(day.mode ?? "quick");
   const [ranges, setRanges] = useState<LocalRange[]>(day.intervals.length ? day.intervals.map((r) => {
@@ -37,10 +48,9 @@ export function DayEditor({ day, next, editable, quick }: { day: Day; next: Day;
   const [state, action, pending] = useActionState(previewDay, initial);
   const [dirty, setDirty] = useState(false);
   const setRange = (index: number, patch: Partial<LocalRange>) => { setDirty(true); setRanges(ranges.map((r, i) => i === index ? { ...r, ...patch } : r)); };
-  return <div className="day-editor"><div className="day-heading"><strong>{dayLabel(day.local_date)}</strong><span>{day.status === "unanswered" ? "Sans réponse" : day.status === "unavailable" ? "Indisponible" : "Disponible"}</span></div>
+  return <div className="detailed-editor">
     {day.mode==="detailed"&&<p className="day-ranges">{day.intervals.map(r=>intervalLabel(r.starts_at,r.ends_at,day.local_date)).join(" · ")}</p>}
-    {editable&&day.mode!=="detailed"&&<QuickReply day={day} quick={quick}/>}
-    <details className="day-options"><summary>Horaires et options</summary>
+    <section className="day-options">
     {!editable ? <p>Cette semaine est consultable et copiable, mais ne peut plus être modifiée.</p> : <>
       <form action={(form) => { setDirty(false); action(form); }} className="form-stack availability-form" onChange={() => setDirty(true)}>
         <input type="hidden" name="date" value={day.local_date} />
@@ -69,7 +79,7 @@ export function DayEditor({ day, next, editable, quick }: { day: Day; next: Day;
       </form>
       {!dirty && <Confirmation key={state.token ?? state.message} state={state} />}
     </>}
-  </details></div>;
+  </section></div>;
 }
 
 export function CopyEditor({ week, first, last }: { week: string; first: string; last: string }) {

@@ -51,7 +51,7 @@ test("créer un jeu, gérer ses favoris et trouver un vrai créneau commun",asyn
     await expect(renamed).toBeVisible();
     await renamed.screenshot({path:testInfo.outputPath("catalogue.png")});
 
-    await page.goto(`/dispos?semaine=${week}`);
+    await page.goto(`/dispos/trouver?semaine=${week}`);
     const search=page.getByRole("heading",{name:"Trouver un créneau commun",exact:true}).locator("..");
     await search.getByText("Affiner la recherche",{exact:true}).click();
     const checks=search.getByRole("checkbox");

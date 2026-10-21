@@ -59,7 +59,15 @@ L’[ADR 017](decisions/017-navigation-mobile-et-reponses-rapides.md) documente 
 
 La première suite complète de la réorganisation a réussi : **107 parcours Playwright**, un scénario clavier WebKit Windows ignoré comme auparavant, sur Chromium, Firefox, WebKit et mobile ; uniquement J8Validation. Après ajout des réponses rapides, **16 parcours ciblés supplémentaires** ont réussi sur les quatre profils, notamment l’écriture réelle sous JWT utilisateur, le refus d’une page périmée et les parcours détaillés/copie. La version finale, incluant le regroupement de l’historique, réussit **28 parcours ciblés** (mobile, disponibilités, sessions, notifications et liens manquants). Lint, typage, 53 tests métier et build réussis. Captures WebKit à 390 pixels revues ; aucun secret ni compte réel utilisé. La validation sur iPhone installé et l’appréciation utilisateur restent nécessaires.
 
-## Limites du lancement
+## Seconde revue mobile : chaleur visuelle et latence
+
+La revue initiale reste jugée trop complexe et lente. Le nouveau retour demande également une interface plus naturelle et humaine. L’[ADR 018](decisions/018-interface-chaleureuse-et-latence.md) fixe une palette charbon/crème/sauge/mauve, une marque textuelle et des titres éditoriaux, sans police distante. Sept réponses courtes remplacent les grandes journées empilées ; les horaires s’ouvrent dans un dialogue natif. Calendrier collectif et matching ont leurs propres vues, chargées seulement lorsqu’elles sont ouvertes. Proposition en panneau dédié, options facultatives repliées, RSVP par deux boutons, membres avant les réglages.
+
+Contrôles distants en lecture : Supabase en `eu-west-1`, signatures publiques `ES256`, réponses Vercel `cdg1::iad1`. Sur trois GET publics de connexion : 376, 174 et 182 ms, sans compte ni jeton utilisateur. `vercel.json` cible désormais `dub1` ; cette configuration devra être confirmée après publication. Le proxy utilise `getClaims`, tandis que les pages et commandes conservent `getUser`, adhésion active et RLS. Le shell ne contient aucune donnée privée et ne bloque plus l’affichage du chargement. Les commandes personnelles utilisent `loadOwnWeek` plutôt que le calendrier collectif et son catalogue ; les lectures indépendantes de l’accueil arrivent séparément.
+
+Lint, typage, 53 tests métier et compilation réussis. La première suite complète a réussi 118 parcours sur 120, avec un scénario clavier WebKit Windows ignoré et un défaut de retour du focus sur le nouveau dialogue. Après ajout du retour explicite au bouton déclencheur, **28 parcours finaux réussissent** sur les quatre profils : disponibilité détaillée/copie, semaine compacte, focus des dialogues, réponse rapide et conflit, navigation avec réponse réseau retenue, sessions/votes/RSVP. Les captures à 390 pixels ont été revues, y compris la semaine compacte. Aucun service worker, cache privé, migration ou compte réel n’a été modifié.
+
+## Limites après la seconde revue
 
 Le test de restauration partage les rôles système du cluster synthétique et utilise son superutilisateur pour charger les schémas. Il ne démontre ni restauration dans Supabase hébergé, ni OTP après récupération, ni copie des clés racines, ni bascule Vercel. Le schéma de cron et les secrets Vault sont volontairement exclus de l’archive ; leur reconstitution est une étape distincte.
 

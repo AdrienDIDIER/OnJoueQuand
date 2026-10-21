@@ -17,7 +17,9 @@ export async function proxy(request: NextRequest) {
       },
     },
   });
-  await client.auth.getUser();
+  // Rafraîchir/vérifier le JWT sans requête Auth systématique avec des clés asymétriques.
+  // Les pages et commandes gardent getUser() et le contrôle d’adhésion sous RLS.
+  await client.auth.getClaims();
   response.headers.set("Cache-Control", "private, no-store");
   return response;
 }

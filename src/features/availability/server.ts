@@ -1,7 +1,21 @@
 import "server-only";
+import { cache } from "react";
 import { requireMember } from "@/features/auth/server";
 import { emptyDay, horizon, normalize, weekDays, type Day } from "./domain";
 import { addDays, monday } from "@/lib/time/paris";
+
+export const loadOwnWeek = cache(async function loadOwnWeek(requested?: string) {
+  const {client,member}=await requireMember();
+  const now=new Date().toISOString(),h=horizon(now),week=requested??h.current;
+  if(monday(week)!==week||week<h.first||week>h.last)throw new Error("Cette semaine n’est pas disponible.");
+  const [days,group]=await Promise.all([
+    client.from("availability_days").select("*, availability_intervals(starts_at,ends_at)").eq("membership_id",member.id).gte("local_date",week).lte("local_date",addDays(week,7)),
+    client.from("groups").select("quick_start,quick_end").single(),
+  ]);
+  if(days.error||group.error)throw new Error("Vos disponibilités sont temporairement indisponibles.");
+  const day=(date:string):Day=>{const row=days.data.find(r=>r.local_date===date);return row?{local_date:date,status:row.status as Day["status"],mode:row.mode as Day["mode"],revision:row.revision,intervals:normalize(row.availability_intervals)}:emptyDay(date);};
+  return{now,week,horizon:h,memberId:member.id,own:weekDays(week).map(day),next:day(addDays(week,7)),quick:{start:group.data.quick_start.slice(0,5),end:group.data.quick_end.slice(0,5)}};
+});
 
 export async function loadWeekProgress() {
   const { client, member } = await requireMember();

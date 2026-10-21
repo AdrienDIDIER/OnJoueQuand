@@ -4,6 +4,8 @@ J8 est en préparation locale. Aucun déploiement, sauvegarde réelle, nouveau s
 
 ## Environnements et livraison
 
+La configuration versionnée `vercel.json` cible `dub1` (Dublin), dans la région de la préproduction Supabase `eu-west-1`. Après déploiement, vérifier la région réellement utilisée dans les réponses HTTP ; le contrôle initial de la page publique observait `iad1`, Washington. Ce déplacement ne provisionne aucun service supplémentaire. Les mesures publiques sans session ne remplacent pas une recette de navigation authentifiée sur iPhone.
+
 | Environnement | Données et envois | Secrets et publication |
 | --- | --- | --- |
 | Local et CI | Synthétiques ; e-mails dans Mailpit ; cron désactivé | Aucun secret distant ; tests uniquement |

@@ -1,5 +1,11 @@
 import "server-only";
 import { requireMember } from "@/features/auth/server";
+export async function loadGameChoices() {
+  const {client}=await requireMember();
+  const {data,error}=await client.from("games").select("id,name").is("archived_at",null).order("name");
+  if(error)throw new Error("Les jeux sont temporairement indisponibles.");
+  return data;
+}
 export async function loadGames() {
   const { client, member } = await requireMember();
   const [games,favorites,members] = await Promise.all([

@@ -19,6 +19,8 @@ Ne pas démarrer les jalons applicatifs à partir d'une demande documentaire seu
 
 ## Architecture
 
+La revue mobile utilise un shell sans données privées affichable immédiatement ; chaque page, sous-route et commande vérifie toujours compte et adhésion. Le proxy utilise `getClaims` pour rafraîchir les jetons, les pages/commandes gardent `getUser` et RLS. Vercel cible Dublin (`dub1`) près de Supabase `eu-west-1`. Pour les commandes personnelles de disponibilité, utiliser `loadOwnWeek` ; le catalogue et le calendrier collectif ne doivent pas bloquer `/dispos`. Voir [ADR 018](docs/decisions/018-interface-chaleureuse-et-latence.md).
+
 - Monolithe modulaire, organisation par fonctionnalité. Suivre la structure cible de l'architecture sans créer de dossiers vides inutiles.
 - Domaine pur : pas d'import React, Next.js, Supabase, réseau ou horloge globale. Injecter l'heure dans les règles testables.
 - Les couches application orchestrent ; infrastructure adapte PostgreSQL, Auth et Push ; UI présente et collecte.

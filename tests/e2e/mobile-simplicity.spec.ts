@@ -58,3 +58,23 @@ test("répondre en un geste enregistre la journée et refuse une page périmée"
     checked(await admin.from("availability_days").delete().eq("membership_id",member.id));
   }
 });
+
+test("la semaine tient dans une liste courte et les horaires s’ouvrent au bon endroit", async ({ page }, info) => {
+  await page.setViewportSize({width:390,height:844});
+  await page.goto("/dispos");
+  await expect(page.getByRole("group").filter({has:page.locator(".quick-reply")})).toHaveCount(7);
+  expect(await page.locator(".week-board").evaluate(node=>node.getBoundingClientRect().height)).toBeLessThan(650);
+  await expect(page.getByRole("heading",{name:"Les jeux du groupe",exact:true})).toHaveCount(0);
+  const trigger=page.locator(".day-editor").first().getByRole("button",{name:/Horaires du/});
+  await trigger.click();
+  const dialog=page.getByRole("dialog");
+  await expect(dialog).toBeVisible();
+  await expect(dialog.getByRole("combobox",{name:"Votre réponse",exact:true})).toBeVisible();
+  await dialog.getByRole("button",{name:"Fermer",exact:true}).click();
+  await expect(dialog).not.toBeVisible();
+  await expect(trigger).toBeFocused();
+  await page.screenshot({path:info.outputPath("semaine-compacte.png"),fullPage:true});
+  await page.getByRole("link",{name:"Le groupe",exact:true}).click();
+  await expect(page.getByRole("heading",{level:1})).toHaveText("Les dispos du groupe.");
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});

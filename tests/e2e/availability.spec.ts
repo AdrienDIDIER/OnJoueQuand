@@ -24,14 +24,14 @@ test("saisir, traverser minuit, copier et protéger une confirmation périmée",
     const editor = (n: number) => page.locator(".day-editor").filter({ hasText: dayLabel(addDays(week, n)) });
     await page.goto(`/dispos?semaine=${week}`);
     await expect(page.getByRole("heading", { name: "Mes réponses · 0/7" })).toBeVisible();
-    await editor(0).locator("summary").click();
+    await editor(0).locator(".sheet-trigger").click();
     await editor(0).getByLabel("Votre réponse").selectOption("available");
     await editor(0).getByRole("button", { name: "Prévisualiser cette journée" }).click();
     await expect(editor(0).getByText("Disponible · 20:00–23:00", { exact: false })).toBeVisible();
     await editor(0).getByRole("button", { name: "Confirmer ces disponibilités" }).click();
     await expect(page.getByRole("heading", { name: "Mes réponses · 1/7" })).toBeVisible();
 
-    await editor(1).locator("summary").click();
+    await editor(1).locator(".sheet-trigger").click();
     await editor(1).getByLabel("Votre réponse").selectOption("available");
     await editor(1).getByLabel("Mode de saisie").selectOption("detailed");
     await editor(1).getByLabel("Début 1", { exact: true }).fill("23:00");
@@ -42,7 +42,7 @@ test("saisir, traverser minuit, copier et protéger une confirmation périmée",
     await editor(1).getByRole("button", { name: "Confirmer ces disponibilités" }).click();
     await expect(page.getByRole("heading", { name: "Mes réponses · 3/7" })).toBeVisible();
 
-    await editor(3).locator("summary").click();
+    await editor(3).locator(".sheet-trigger").click();
     await editor(3).getByLabel("Votre réponse").selectOption("unavailable");
     await editor(3).getByRole("button", { name: "Prévisualiser cette journée" }).click();
     await editor(3).getByRole("button", { name: "Confirmer ces disponibilités" }).click();
@@ -54,7 +54,7 @@ test("saisir, traverser minuit, copier et protéger une confirmation périmée",
     const target = addDays(week, 7);
     await page.goto(`/dispos?semaine=${target}`);
     const first = page.locator(".day-editor").first();
-    await first.locator("summary").click();
+    await first.locator(".sheet-trigger").click();
     await first.getByLabel("Votre réponse").selectOption("unavailable");
     await first.getByRole("button", { name: "Prévisualiser cette journée" }).click();
     await first.getByRole("button", { name: "Confirmer ces disponibilités" }).click();
@@ -65,7 +65,7 @@ test("saisir, traverser minuit, copier et protéger une confirmation périmée",
     await expect(copy.getByRole("listitem")).toHaveCount(3);
     await copy.getByRole("button", { name: "Confirmer ces disponibilités" }).click();
     await expect(page.getByRole("heading", { name: "Mes réponses · 4/7" })).toBeVisible();
-    await expect(first.locator(".day-heading")).toContainText("Indisponible");
+    await expect(first.locator(".sheet-trigger")).toContainText("Indisponible");
 
     await copy.getByLabel("Remplacer aussi mes journées déjà renseignées").check();
     await copy.getByRole("button", { name: "Prévisualiser la copie" }).click();

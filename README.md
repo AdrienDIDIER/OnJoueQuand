@@ -2,11 +2,11 @@
 
 Application web progressive privée pour aider un groupe de 6 à 15 amis et collègues à organiser ses sessions de jeu.
 
-**J0 à J7 sont commités ; J7 porte le commit `0980d66`. J0–J6 sont poussés, avec [CI distante J6 réussie](https://github.com/AdrienDIDIER/OnJoueQuand/actions/runs/39583064447). J8 prépare localement sauvegarde chiffrée, restauration et exploitation ; pilote non lancé.** Voir les rapports [J7](docs/j7-validation.md), [J8](docs/j8-validation.md), le [guide d’exploitation](docs/operations.md) et le [guide notifications](docs/notifications-operations.md). Appareils réels, configuration distante, restauration hébergée et alertes restent à valider ; cron inactif par défaut.
+**Le MVP est implémenté et une préproduction est déployée ; le pilote J8 n’est pas lancé.** L’exploitant a confirmé la connexion OTP réelle. La revue mobile adopte une interface chaleureuse, des disponibilités compactes et des vues chargées à la demande ; l’[ADR 018](docs/decisions/018-interface-chaleureuse-et-latence.md) décrit également le rapprochement Vercel/Supabase à Dublin. Voir les rapports [J7](docs/j7-validation.md), [J8](docs/j8-validation.md), le [guide d’exploitation](docs/operations.md) et le [guide notifications](docs/notifications-operations.md). Réception Push sur appareils réels, restauration hébergée et alertes restent à valider ; cron inactif par défaut.
 
 ## Démarrer
 
-La préparation initiale J8 est commitée dans `40f6abb`. La suite locale ajoute les purges de conservation et les liens directs vers les sessions, avec 46 tests SQL et 16 parcours navigateur ciblés réussis sur une stack synthétique. Aucun pilote ni service distant lancé ; voir le [rapport J8](docs/j8-validation.md).
+La préparation initiale J8 est commitée dans `40f6abb`, puis complétée par conservation, liens de sessions, configuration de préproduction et revue mobile. Les tests de purge et les appels HTTP de recette du worker doivent toujours viser une stack synthétique dédiée ; voir le [rapport J8](docs/j8-validation.md).
 
 Prérequis : **Node.js 24 LTS**, **npm 11.21.1** et, pour Supabase uniquement, Docker Desktop avec moteur Linux démarré. La version Node est déclarée dans `.nvmrc` et `package.json`. Les versions exactes et résultats figurent dans le [rapport J1](docs/j1-validation.md).
 

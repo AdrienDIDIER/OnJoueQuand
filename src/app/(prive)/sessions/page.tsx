@@ -3,6 +3,7 @@ import Link from "next/link";
 import { randomUUID } from "node:crypto";
 import { loadSessions } from "@/features/sessions/server";
 import { ProposalForm, SessionCard } from "@/features/sessions/ui/sessions";
+import { Sheet } from "@/components/ui/sheet";
 export const metadata: Metadata = { title: "Sessions" };
 export default async function Page({searchParams}:{searchParams:Promise<{page?:string;session?:string}>}) {
   const params=await searchParams;
@@ -14,8 +15,7 @@ export default async function Page({searchParams}:{searchParams:Promise<{page?:s
   const history=focused?[]:view.sessions.filter(s=>["completed","cancelled","expired"].includes(s.status));
   const current=focused?view.sessions:view.sessions.filter(s=>!["completed","cancelled","expired"].includes(s.status));
   return <>
-    <div className="page-heading"><p className="eyebrow">ON SE DONNE RENDEZ-VOUS</p><h1>Vos sessions<span className="text-primary">.</span></h1><p>Proposez, votez, puis confirmez votre participation.</p></div>
-    <section className="group-card"><h2>Une envie de jouer ?</h2><details><summary>Proposer une session</summary><ProposalForm games={view.games} now={view.now} requestId={randomUUID()}/></details></section>
+    <div className="page-heading page-with-action"><h1>Vos sessions<span className="text-primary">.</span></h1><Sheet title="Proposer une session" trigger={<span className="primary-trigger">+ Proposer une session</span>}><ProposalForm games={view.games} now={view.now} requestId={randomUUID()}/></Sheet></div>
     <div className="session-list">{current.map(s=><SessionCard key={`${s.id}-${s.revision}-${s.ownBallot?.revision??0}-${s.ownRsvp?.revision??0}`} session={s} view={cardView}/>)}</div>
     {history.length>0&&<details className="group-card disclosure"><summary>Sessions passées et annulées · {history.length}</summary><div className="session-list">{history.map(s=><SessionCard key={`${s.id}-${s.revision}`} session={s} view={cardView}/>)}</div></details>}
     {!view.sessions.length&&<p>{focused?"Cette session n’est plus disponible.":"Aucune session sur cette page. Lancez une proposition pour votre groupe."}</p>}
