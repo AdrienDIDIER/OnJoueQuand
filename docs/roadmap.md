@@ -2,7 +2,7 @@
 
 ## État et ordre de livraison
 
-Le plan est approuvé. **J0 et J1 sont commités ; J2 est implémenté et vérifié localement, avec les réserves du [rapport J2](j2-validation.md). J3 à J9 ne sont pas implémentés.** Aucun push ni déploiement inclus ; la CI distante reste à exécuter.
+Le plan est approuvé. **J0 à J3 sont commités séparément ; J2 et J3 sont vérifiés localement, avec les réserves consignées dans les rapports [J2](j2-validation.md) et [J3](j3-validation.md). J4 à J9 ne sont pas implémentés.** Le démarrage de J3 a été explicitement autorisé. Aucun provisionnement distant, push Git ou déploiement n'est inclus dans cette livraison. La CI GitHub reste à exécuter après publication du code ; son succès n'est pas présumé.
 
 Les critères ci-dessous sont des portes de sortie : un jalon n'est livré que lorsque ses critères et tests sont vérifiés. Les résultats réels, versions, environnements et limites seront consignés au fur et à mesure. Aucune estimation calendaire ne vaut engagement.
 
@@ -64,6 +64,7 @@ Les interfaces d'engagements occupés sont définies en J4 et exercées avec des
 
 ### J3 — Disponibilités et calendrier
 
+**État :** réalisé localement ; règles temporelles, transactions/RLS et parcours documentés dans le [rapport J3](j3-validation.md). L'implémentation est précisée par [ADR 011](decisions/011-disponibilites-et-apercus.md).
 
 **Dépendances :** J2 ; adaptateur temporel commun.
 

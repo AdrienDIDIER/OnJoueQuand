@@ -2,7 +2,7 @@
 
 Application web progressive privée pour aider un groupe de 6 à 15 amis et collègues à organiser ses sessions de jeu.
 
-**J0 et J1 sont commités (`1841203`, `6b1af70`). J2 ajoute l'accès privé : codes e-mail, invitations, profils, membres, autorisations serveur et RLS.** Dispos et Sessions restent des écrans d'attente. Voir le [rapport J2](docs/j2-validation.md).
+**J0 à J3 sont livrés en commits distincts. J2 ajoute l'accès privé ; J3 livre les disponibilités, leur copie et le calendrier collectif.** Sessions reste un écran d'attente. Voir les rapports [J2](docs/j2-validation.md) et [J3](docs/j3-validation.md) pour les vérifications et limites. Les rapports décrivent les contrôles effectués avant chaque commit.
 
 ## Démarrer
 
@@ -11,6 +11,7 @@ Prérequis : **Node.js 24 LTS**, **npm 11.21.1** et, pour Supabase uniquement, D
 ```sh
 npm ci
 npm run db:start
+npm run db:migrate
 npm run env:local
 npm run dev
 ```
@@ -47,6 +48,7 @@ Les ports 55320–55324 évitent un conflit constaté avec un autre projet local
 
 `npm run db:reset` réinitialise exclusivement la base locale de ce projet ; cette commande efface ses données locales. La migration J2 crée groupe, profils, adhésions, invitations et fonctions sécurisées ; le seed ne crée aucun compte. Les inscriptions publiques sont désactivées ; le fournisseur e-mail reste actif pour connecter les comptes provisionnés.
 
+Pour mettre à jour une installation J2 existante, lancer `npm run db:migrate` : cette commande applique les migrations locales manquantes en conservant les données. J3 ajoute les journées, intervalles, contraintes et RPC de disponibilités. Ne pas utiliser `db:reset` pour une simple mise à jour.
 
 `npm run db:stop` arrête les services locaux du projet en conservant leurs données. Aucun projet Supabase distant, SMTP réel ou déploiement n'est configuré.
 
@@ -72,9 +74,19 @@ npm run test:e2e
 | `npm run start` | Serveur local de production après build. |
 | `npm run test:e2e` | Navigation, OTP, invitation, profil et révocation sur quatre projets navigateur. |
 | `npm run test:integration` | Auth, RLS, transactions concurrentes et panne SMTP sur Supabase local. |
+| `npm run test:availability` | Scénarios SQL/RLS J3 avec fixtures isolées et nettoyées ; compatible avec une base locale existante. |
+| `npm run db:migrate` | Appliquer les migrations locales manquantes en préservant les données. |
 | `npm run db:types` | Générer les types depuis la base locale ; enregistrer la sortie dans `src/lib/supabase/database.types.ts`. |
 
 La [CI](.github/workflows/ci.yml) exécute qualité, démarrage/réinitialisation Supabase, intégration et parcours, puis arrête les services même en cas d'échec. Elle ne déploie rien et n'utilise aucun secret de production. Son exécution distante reste à vérifier après un push autorisé.
+
+## Renseigner ses disponibilités
+
+Dans **Dispos**, choisir la semaine puis ouvrir une journée. Le mode rapide « Disponible » matérialise **20 h–23 h**, heure de Paris. Le mode détaillé accepte plusieurs intervalles par pas de quinze minutes ; « Fin le lendemain » découpe la nuit sur les deux journées. L'aperçu indique chaque réponse remplacée avant confirmation. Les journées « Indisponible » et « Sans réponse » restent distinctes ; sept réponses explicites rendent la semaine complète.
+
+La semaine courante et les trois suivantes sont modifiables ; les douze semaines précédentes sont consultables et copiables. Pour copier, afficher la semaine cible, choisir une source et prévisualiser : les réponses existantes sont conservées par défaut. Cocher le remplacement pour les écraser explicitement. Les horaires locaux sont conservés à travers les changements d'heure. Une heure inexistante doit être corrigée et une heure répétée désambiguïsée avant confirmation. Un aperçu expiré ou une source/cible modifiée exige un nouvel aperçu.
+
+Le calendrier collectif affiche les réponses des membres actifs. La mise à jour intervient après enregistrement, navigation ou rechargement ; la synchronisation temps réel reste différée. Le matching arrive en J4.
 
 ## Produit et documentation
 
@@ -89,6 +101,7 @@ Quatre onglets : **Accueil**, **Dispos**, **Sessions**, **Groupe**. Fuseau : **E
 | [Décisions](docs/decisions/README.md) | Choix acceptés, dont l'adaptation du premier code en J2. |
 | [Validation J1](docs/j1-validation.md) | Versions installées, preuves et réserves. |
 | [Validation J2](docs/j2-validation.md) | Sécurité, tests Auth/RLS, exploitation et limites. |
+| [Validation J3](docs/j3-validation.md) | Disponibilités, temps de Paris, copie, concurrence et preuves. |
 | [Consignes de contribution](AGENTS.md) | Règles de changement et sécurité. |
 
 La PWA installable, les notifications et la coordination des sessions sont prévues aux jalons suivants. Aucune facturation : « premium » décrit l'expérience. Les statistiques et sondages sont différés après le MVP.

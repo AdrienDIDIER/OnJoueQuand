@@ -1,6 +1,6 @@
 # Données, états et sécurité — OnJoueQuand
 
-Statut : modèle logique approuvé en J0. Groupe/identité, audit et compteurs sont implémentés dans la [migration J2](../supabase/migrations/202610190001_identity.sql). Les autres entités restent un modèle cible. Les [types générés](../src/lib/supabase/database.types.ts) reflètent le schéma livré. Voir les [preuves J2](j2-validation.md).
+Statut : modèle logique approuvé en J0. Groupe/identité sont implémentés dans la [migration J2](../supabase/migrations/202610190001_identity.sql) ; journées et intervalles dans la [migration J3](../supabase/migrations/202610200001_availability.sql), vérifiées localement. Les autres entités restent un modèle cible. Les [types générés](../src/lib/supabase/database.types.ts) reflètent uniquement le schéma livré. Références : [PRD](product-requirements.md), [architecture](architecture.md), [roadmap](roadmap.md), preuves [J2](j2-validation.md) et [J3](j3-validation.md).
 
 ## Conventions et relations
 
@@ -199,7 +199,7 @@ Après le début, le RSVP est figé. L'annulation de la session rend les répons
 | Accepter une invitation | Verrouiller invitation et adhésion existante ; vérifier Auth et expiration ; créer profil/adhésion et consommer l'invitation ensemble. Une seconde acceptation du même acteur retourne le résultat déjà acquis. |
 | Révoquer/changer un rôle | Verrouiller le groupe puis l'adhésion ; ne jamais retirer le dernier admin ; journaliser et désactiver abonnements/livraisons du membre. |
 | Enregistrer des journées | Verrouiller les journées existantes dans l'ordre date/id ; vérifier toutes les révisions ; remplacer état et enfants ensemble. Les créations concurrentes sont arbitrées par l'unicité membre/date. |
-| Copier une semaine | Recharger source et cible sous verrou ordonné ; comparer les révisions de l’aperçu ; tout appliquer ou rien. |
+| Copier une semaine | Calculer les horaires locaux dans un aperçu signé ; sous verrou, vérifier les révisions sources/cibles et toutes les contraintes, puis appliquer le plan entier ou rien. |
 | Publier/remplacer un bulletin/confirmer | Verrouiller la session commune avant toute mutation ; vérifier état et heure base après obtention du verrou. Le bulletin a sa propre révision. |
 | Enregistrer un RSVP | Verrouiller la session puis l'adhésion ; recontrôler début, activité et engagements existants avant insertion/mise à jour. Deux RSVP concurrents à des sessions différentes partagent le verrou d'adhésion. |
 | Annuler une session | Verrouiller la session ; changer état, audit et outbox ensemble. Les engagements deviennent non bloquants par l'état de la session. |
@@ -207,6 +207,7 @@ Après le début, le RSVP est figé. L'annulation de la session rend les répons
 
 Les chemins d'écriture sensibles sont des RPC étroites, authentifiées par le JWT de l'appelant. Les tables ne reçoivent pas de droits DML permettant de modifier directement leurs états ou colonnes protégées. Les fonctions `SECURITY DEFINER` nécessaires à ces commandes reproduisent explicitement les contrôles de membre actif, propriétaire, rôle, parent et état ; elles ne considèrent pas que RLS s'applique automatiquement au propriétaire de la fonction. Préférer `SECURITY INVOKER` lorsque les grants/RLS et invariants le permettent.
 
+En J3, `save_availability(changes, sources)` verrouille d'abord le groupe puis l'adhésion active, et traite les dates dans l'ordre. Ce verrou commun protège aussi les journées absentes et les révocations ; il sérialise brièvement les écritures du petit groupe. Les sources portent les révisions des sept journées, y compris les absences (`null`). Les changements portent uniquement les journées affectées et leur révision attendue. L'aperçu signé contient les instants recalculés par l'adaptateur Temporal ; la RPC vérifie à nouveau horizon, révisions, propriété et contraintes avant de tout appliquer. Aucune identité propriétaire n'est acceptée en entrée.
 
 Les RPC de confirmation et de RSVP doivent utiliser un ordre de verrouillage documenté et identique. Pour une opération multi-membres, ordonner les identifiants. Ne pas étendre une opération de révocation à des verrous de session dans l'ordre inverse. Réessayer les conflits transactionnels réessayables avec borne ; un conflit de révision métier retourne une demande de rechargement, pas une réécriture silencieuse.
 

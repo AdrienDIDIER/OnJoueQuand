@@ -4,7 +4,48 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export type Database = {
 
   "public": {
-          Tables: {"groups": {
+          Tables: {
+            "availability_days": {
+                  Row: {
+                    "group_id": string,"id": string,"local_date": string,"membership_id": string,"mode": string | null,"revision": number,"status": string,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "group_id": string,"id"?: string,"local_date": string,"membership_id": string,"mode"?: string | null,"revision"?: number,"status": string,"updated_at"?: string
+                  }
+                  Update: {
+                    "group_id"?: string,"id"?: string,"local_date"?: string,"membership_id"?: string,"mode"?: string | null,"revision"?: number,"status"?: string,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "availability_days_group_id_membership_id_fkey"
+      columns: ["group_id","membership_id"]
+isOneToOne: false
+      referencedRelation: "memberships"
+      referencedColumns: ["group_id","id"]
+    }
+                  ]
+                },"availability_intervals": {
+                  Row: {
+                    "day_id": string,"ends_at": string,"group_id": string,"id": string,"membership_id": string,"starts_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "day_id": string,"ends_at": string,"group_id": string,"id"?: string,"membership_id": string,"starts_at": string
+                  }
+                  Update: {
+                    "day_id"?: string,"ends_at"?: string,"group_id"?: string,"id"?: string,"membership_id"?: string,"starts_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "availability_intervals_group_id_membership_id_day_id_fkey"
+      columns: ["group_id","membership_id","day_id"]
+isOneToOne: false
+      referencedRelation: "availability_days"
+      referencedColumns: ["group_id","membership_id","id"]
+    }
+                  ]
+                },"groups": {
                   Row: {
                     "id": string,"name": string,"quick_end": string,"quick_start": string,"revision": number,"singleton": boolean,"timezone": string
                   }
@@ -101,6 +142,9 @@ isOneToOne: false
                            },
 "revoke_invitation":
 { Args: { "expected_revision": number,"invitation_id": string }; Returns: undefined
+                           },
+"save_availability":
+{ Args: { "changes": Json,"sources"?: Json }; Returns: undefined
                            },
 "update_profile":
 { Args: { "display_name": string,"expected_revision": number }; Returns: undefined

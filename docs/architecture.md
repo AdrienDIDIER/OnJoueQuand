@@ -1,6 +1,6 @@
 # Architecture — OnJoueQuand
 
-Statut : conception approuvée en J0 ; socle J1 et identité/groupe privé J2 implémentés. Le reste de l'architecture métier demeure cible. Vérifications dans les rapports [J1](j1-validation.md) et [J2](j2-validation.md).
+Statut : conception approuvée en J0 ; socle J1, identité/groupe privé J2 et disponibilités/calendrier J3 implémentés. Le reste de l'architecture métier demeure cible. Versions et vérifications sont dans les rapports [J1](j1-validation.md), [J2](j2-validation.md) et [J3](j3-validation.md). Les règles produit sont dans le [PRD](product-requirements.md), les contraintes persistées dans le [modèle de données](database.md) et les contrôles de livraison dans la [feuille de route](roadmap.md).
 
 ## Vue d'ensemble
 
@@ -154,6 +154,7 @@ Un compte authentifié sans invitation valide reste sans accès. Une invitation 
 
 L'adaptateur temporel central convertit date locale + heure + occurrence éventuelle en instant. Il utilise Europe/Paris indépendamment du serveur ou de l'appareil. Une journée locale peut durer 23 ou 25 heures. La base garde les bornes UTC et la date locale de rattachement ; l'UI utilise les mêmes règles de conversion.
 
+J3 livre cet adaptateur dans `src/lib/time/paris.ts`, le domaine pur dans `features/availability/domain.ts`, les lectures et Server Actions dans le module disponibilité, et la RPC transactionnelle `save_availability` en SQL. Les aperçus signés durent dix minutes ; chaque confirmation recontrôle session, adhésion, horizon et révisions. Une correction explicite résout les heures inexistantes de copie ; une occurrence est choisie par borne répétée. Voir [ADR 011](decisions/011-disponibilites-et-apercus.md). Le matching décrit ci-dessous reste à réaliser en J4.
 
 Le matching reçoit un instant `now`, les intervalles normalisés, les engagements et les favoris ; il ne lit ni base ni horloge globale. Le cas d'usage charge ces données et appelle le calcul pur.
 

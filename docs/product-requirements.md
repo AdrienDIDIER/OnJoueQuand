@@ -1,6 +1,6 @@
 # Exigences produit — OnJoueQuand
 
-Statut : conception approuvée en J0. J1 implémente la navigation française et le shell sombre. J2 réalise identité et groupe privé ; voir les [preuves J2](j2-validation.md). Les disponibilités, jeux, matching et sessions restent à implémenter.
+Statut : conception approuvée en J0. J1 implémente la navigation française et le shell sombre de PR-13. J2 réalise identité et groupe privé ; J3 réalise PR-03, PR-04 et PR-05 : disponibilités, copie et calendrier collectif. Voir les preuves [J2](j2-validation.md) et [J3](j3-validation.md). Jeux, matching, sessions et autres comportements des jalons suivants restent à implémenter.
 
 ## Vision et utilisateurs
 

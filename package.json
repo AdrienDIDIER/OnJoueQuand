@@ -17,7 +17,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "node scripts/with-local-env.mjs node_modules/@playwright/test/cli.js test",
-    "test:integration": "node --test tests/integration/identity.test.mjs",
+    "test:integration": "node --test --test-concurrency=1 tests/integration/identity.test.mjs tests/integration/availability.test.mjs",
+    "test:availability": "node --test tests/integration/availability.test.mjs",
     "bootstrap:local": "node scripts/bootstrap-local.mjs",
     "env:local": "node scripts/configure-local.mjs",
     "check": "npm run lint && npm run typecheck && npm test && npm run build",
@@ -25,9 +26,11 @@
     "db:stop": "supabase stop",
     "db:status": "supabase status",
     "db:reset": "supabase db reset --local",
+    "db:migrate": "supabase migration up --local",
     "db:types": "supabase gen types typescript --local"
   },
   "dependencies": {
+    "@js-temporal/polyfill": "0.5.1",
     "@radix-ui/react-slot": "1.5.0",
     "@supabase/ssr": "0.12.7",
     "@supabase/supabase-js": "2.118.0",

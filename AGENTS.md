@@ -2,7 +2,7 @@
 
 ## État et portée
 
-J0 et J1 sont commités. J2 implémente Auth, invitations, profils et groupe privé ; voir le [rapport J2](docs/j2-validation.md). Chaque page privée et commande vérifie l'identité et l'adhésion ; le nom `(prive)` n'est pas une protection en soi. J3 et les jalons suivants ne sont pas implémentés. Le plan approuvé et les ADR restent la référence de conception ; les rapports distinguent vérifications locales et CI distante encore à exécuter.
+J0 à J3 sont commités séparément. J2 implémente Auth et groupe privé ; J3 implémente disponibilités, copie et calendrier, avec preuves locales dans les rapports [J2](docs/j2-validation.md) et [J3](docs/j3-validation.md). Chaque page privée et commande vérifie l'identité et l'adhésion ; le nom `(prive)` n'est pas une protection en soi. J4 et les jalons suivants ne sont pas implémentés. Le plan approuvé reste décrit dans [le PRD](docs/product-requirements.md), [l'architecture](docs/architecture.md), [le modèle de données](docs/database.md) et [la feuille de route](docs/roadmap.md). Les ADR et rapports distinguent vérifications locales, conception future et CI distante encore à exécuter.
 
 Ne pas démarrer les jalons applicatifs à partir d'une demande documentaire seule. Une demande explicite de réalisation d'un jalon ou d'une fonctionnalité autorise le travail correspondant ; ne pas redemander une autorisation déjà donnée. Ne pas provisionner de services payants, publier, migrer une production ou envoyer des invitations réelles sans autorisation correspondante.
 

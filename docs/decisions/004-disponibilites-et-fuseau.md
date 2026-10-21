@@ -1,6 +1,6 @@
 # ADR 004 — Disponibilités et fuseau Europe/Paris
 
-- Statut : Acceptée, conception non implémentée.
+- Statut : Implémentée en J3 ; détails transactionnels dans [ADR 011](011-disponibilites-et-apercus.md).
 - Date : 2026-10-15.
 - Portée : J3–J6 ; PR-03, PR-04, PR-05, PR-14.
 
