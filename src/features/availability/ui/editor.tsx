@@ -30,9 +30,9 @@ function QuickReply({day,quick}:{day:Day;quick:{start:string;end:string}}) {
     {pending?<p className="sr-only" role="status">Enregistrement…</p>:state.message&&<p role="status">{state.message}</p>}
   </form>;
 }
-export function DayEditor({ day, next, editable, quick }: { day: Day; next: Day; editable: boolean; quick: { start: string; end: string } }) {
+export function DayEditor({ day, next, editable, quick, isToday=false }: { day: Day; next: Day; editable: boolean; quick: { start: string; end: string }; isToday?:boolean }) {
   const summary=day.status==="unanswered"?"Sans réponse":day.status==="unavailable"?"Indisponible":day.mode==="detailed"?day.intervals.map(r=>intervalLabel(r.starts_at,r.ends_at,day.local_date)).join(" · "):"Disponible";
-  return <div className="day-editor" role="group" aria-label={dayLabel(day.local_date)}>
+  return <div className={`day-editor${isToday?" day-today":""}`} role="group" aria-label={dayLabel(day.local_date)}>
     <Sheet title={`Horaires du ${dayLabel(day.local_date)}`} trigger={<><strong>{dayLabel(day.local_date).split(" ").slice(0,2).join(" ")}</strong><span>{summary}</span><span className="sr-only">{dayLabel(day.local_date)}</span></>}><DetailedDayEditor day={day} next={next} editable={editable} quick={quick}/></Sheet>
     {editable&&day.mode!=="detailed"&&<QuickReply day={day} quick={quick}/>}
   </div>;

@@ -20,5 +20,8 @@ Ces ADR consignent le plan approuvé le **15 octobre 2026**. Leur statut « Acce
 | [014](014-pwa-cache-et-mises-a-jour.md) | PWA, cache public, mises à jour et retour au premier plan | Code vérifié localement ; appareils à valider | J7 |
 | [015](015-sauvegardes-privees-et-recette-exploitation.md) | Sauvegardes privées et répétition de récupération | Outils validés localement ; activation distante non effectuée | J8 |
 | [016](016-conservation-et-purges-bornees.md) | Conservation, dates fiables et purges bornées | Vérifiée localement ; aucune purge de production | J8 |
+| [017](017-navigation-mobile-et-reponses-rapides.md) | Écrans mobiles et réponses rapides | Implémentée | Revue mobile |
+| [018](018-interface-chaleureuse-et-latence.md) | Interface chaleureuse et exécution à Dublin | Implémentée ; cache précisé par 019 | Revue mobile |
+| [019](019-cache-navigation-privee.md) | Cache des onglets en mémoire, contrôles frais et invalidation | Implémentée ; voir recette | Revue mobile |
 
 Chaque ADR contient contexte, décision, alternatives, conséquences et vérification. Une modification structurelle crée une nouvelle ADR qui remplace explicitement l'ancienne ; ne pas effacer l'historique d'une décision appliquée. Les détails normatifs évoluent dans le [PRD](../product-requirements.md), l'[architecture](../architecture.md) et le [modèle de données](../database.md) avec la même modification.

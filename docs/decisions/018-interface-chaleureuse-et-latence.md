@@ -1,6 +1,6 @@
 # ADR 018 — Interface chaleureuse et latence de navigation
 
-- Statut : Implémentée ; mesures hébergées après déploiement à consigner.
+- Statut : Implémentée ; cache et contrôle initial du layout remplacés par l’[ADR 019](019-cache-navigation-privee.md). Région Dublin vérifiée après publication.
 - Date : 2026-10-21.
 - Portée : navigation, présentation et coût des lectures ; prolonge l’ADR 017.
 

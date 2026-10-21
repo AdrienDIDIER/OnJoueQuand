@@ -1,8 +1,11 @@
 import type { ReactNode } from "react";
 import { AppShell } from "@/components/app-shell";
+import { requireMember } from "@/features/auth/server";
+import { navigationAccessKey } from "@/features/navigation/access";
+import { NavigationCache } from "@/features/navigation/client";
 
-// Shell sans données privées : il peut s’afficher avant les lectures protégées.
-// Chaque page et Server Action vérifie toujours le compte et l’adhésion.
-export default function Layout({ children }: { children: ReactNode }) {
-  return <AppShell>{children}</AppShell>;
+// Premier document : établir le contexte du cache, en plus des contrôles de chaque page/commande.
+export default async function Layout({ children }: { children: ReactNode }) {
+  const {user,member}=await requireMember();
+  return <NavigationCache accessKey={navigationAccessKey(user.id,member)}><AppShell>{children}</AppShell></NavigationCache>;
 }

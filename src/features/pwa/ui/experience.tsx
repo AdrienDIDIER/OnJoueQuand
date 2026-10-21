@@ -1,8 +1,9 @@
 "use client";
 import {useEffect,useRef,useState,useSyncExternalStore} from "react";
-import {useRouter,usePathname} from "next/navigation";
+import {useRouter,usePathname,useSearchParams} from "next/navigation";
 import {Button} from "@/components/ui/button";
 import {installationMode} from "../domain";
+import {usePrivateNavigation} from "@/features/navigation/client";
 type InstallEvent=Event&{prompt:()=>Promise<void>;userChoice:Promise<{outcome:"accepted"|"dismissed"}>};
 function subscribeConnectivity(changed:()=>void){window.addEventListener("online",changed);window.addEventListener("offline",changed);return()=>{window.removeEventListener("online",changed);window.removeEventListener("offline",changed);};}
 function subscribeDisplay(changed:()=>void){const media=matchMedia("(display-mode: standalone)");media.addEventListener("change",changed);return()=>media.removeEventListener("change",changed);}
@@ -16,41 +17,47 @@ function restoredFormValues(){
   });
 }
 export function PwaExperience(){
+  const {validate}=usePrivateNavigation();
   const pathname=usePathname();
-  const router=useRouter();const dirty=useRef(false),checking=useRef(false),reloadRequested=useRef(false);
+  const search=useSearchParams().toString(),place=pathname+(search?`?${search}`:"");
+  const router=useRouter();const dirty=useRef<string|null>(null),checking=useRef(false),reloadRequested=useRef(false);
   const [installedNow,setInstalledNow]=useState(false);
   const detectedMode=useSyncExternalStore(subscribeDisplay,browserMode,()=>"browser" as const),mode=installedNow?"installed":detectedMode;
   const offline=useSyncExternalStore(subscribeConnectivity,()=>!navigator.onLine,()=>false);
   const [prompt,setPrompt]=useState<InstallEvent|null>(null),[waiting,setWaiting]=useState<ServiceWorker|null>(null);
-  const [changed,setChanged]=useState(false),[acknowledged,setAcknowledged]=useState(false),[edited,setEdited]=useState(false),[message,setMessage]=useState("");
+  const [changed,setChanged]=useState(false),[acknowledged,setAcknowledged]=useState(false),[editedPlace,setEditedPlace]=useState<string|null>(null),[message,setMessage]=useState("");
+  const edited=editedPlace===place;
   useEffect(()=>{
-    let disposed=false,hadController=!!navigator.serviceWorker?.controller;const abort=new AbortController();
-    const rememberEdits=()=>{if(dirty.current||restoredFormValues()){dirty.current=true;setEdited(true);return true;}return false;};
+    let disposed=false,hadController=!!navigator.serviceWorker?.controller;
+    const currentPlace=()=>window.location.pathname+window.location.search;
+    const rememberEdits=()=>{if(dirty.current===currentPlace()||restoredFormValues()){dirty.current=currentPlace();setEditedPlace(currentPlace());return true;}return false;};
     const installed=()=>{setInstalledNow(true);setPrompt(null);setMessage("OnJoueQuand est installé sur cet appareil.");};
     const beforeInstall=(event:Event)=>{event.preventDefault();setPrompt(event as InstallEvent);};
-    const edit=(event:Event)=>{if((event.target as Element)?.closest?.("form")){dirty.current=true;setEdited(true);setAcknowledged(false);}};
-    const onlineEvent=()=>{void verify();};
+    const edit=(event:Event)=>{if((event.target as Element)?.closest?.("form")){dirty.current=currentPlace();setEditedPlace(currentPlace());setAcknowledged(false);}};
+    const onlineEvent=()=>{void verify(true);};
+    const manualRefresh=()=>{void verify(true);};
     const preventOfflineSubmit=(event:Event)=>{if(!navigator.onLine){event.preventDefault();event.stopImmediatePropagation();setMessage("Enregistrement impossible hors connexion. Votre saisie est conservée sur cette page ; réessayez après reconnexion.");}};
     const offlineNavigation=(event:MouseEvent)=>{
       if(navigator.onLine||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;
       const link=(event.target as Element)?.closest?.("a[href]") as HTMLAnchorElement|null;
       if(link&&link.origin===location.origin&&!link.getAttribute("href")?.startsWith("#")){event.preventDefault();event.stopImmediatePropagation();location.assign(link.href);}
     };
-    const verify=async()=>{
+    const verify=async(refreshData=false)=>{
       if(checking.current||!navigator.onLine||document.visibilityState==="hidden")return;checking.current=true;
       try{
-        const response=await fetch("/api/session-status",{cache:"no-store",credentials:"same-origin",signal:abort.signal});
+        const valid=await validate();
         if(disposed)return;
-        // Une navigation document efface aussi la mémoire de route privée du client.
-        if(response.status===401||response.status===403){location.assign(new URL("/connexion",location.origin).href);return;}
-        if(response.ok){if(!rememberEdits())router.refresh();else setMessage("La connexion est disponible. Vos saisies sont conservées ; actualisez après les avoir enregistrées ou abandonnées.");}
-        else setMessage("Le service est temporairement indisponible. Vos saisies restent sur cette page.");
+        if(!valid)return;
+        // Le simple focus (clavier, panneau) ne vide plus le cache de navigation.
+        if(refreshData&&!rememberEdits())router.refresh();
+        else if(rememberEdits())setMessage("La connexion est disponible. Vos saisies sont conservées ; actualisez après les avoir enregistrées ou abandonnées.");
       }catch{if(!disposed)setMessage("Connexion au service impossible. Vos saisies restent sur cette page.");}finally{checking.current=false;}
     };
-    const visibility=()=>{if(document.visibilityState==="visible")void verify();};
+    const visibility=()=>{if(document.visibilityState==="visible")void verify(true);};
+    const focus=()=>{void verify(false);};
     const restored=(event:PageTransitionEvent)=>{if(event.persisted)location.reload();};
     const controllerChanged=()=>{rememberEdits();setWaiting(null);if(reloadRequested.current){location.reload();return;}if(hadController)setChanged(true);hadController=true;};
-    window.addEventListener("beforeinstallprompt",beforeInstall);window.addEventListener("appinstalled",installed);window.addEventListener("online",onlineEvent);window.addEventListener("focus",verify);window.addEventListener("pageshow",restored);
+    window.addEventListener("beforeinstallprompt",beforeInstall);window.addEventListener("appinstalled",installed);window.addEventListener("online",onlineEvent);window.addEventListener("focus",focus);window.addEventListener("ojq:refresh",manualRefresh);window.addEventListener("pageshow",restored);
     document.addEventListener("input",edit,true);document.addEventListener("change",edit,true);document.addEventListener("submit",preventOfflineSubmit,true);document.addEventListener("click",offlineNavigation,true);document.addEventListener("visibilitychange",visibility);
     const workerStates:Array<{worker:ServiceWorker;listener:()=>void}>=[];let registration:ServiceWorkerRegistration|undefined;let updateFound:(()=>void)|undefined;
     if("serviceWorker" in navigator&&window.isSecureContext){
@@ -61,8 +68,8 @@ export function PwaExperience(){
         reg.addEventListener("updatefound",updateFound);if(reg.installing)updateFound();
       }).catch(()=>{if(!disposed)setMessage("L’installation hors connexion est indisponible pour le moment. Vous pouvez continuer en ligne.");});
     }
-    return()=>{disposed=true;abort.abort();window.removeEventListener("beforeinstallprompt",beforeInstall);window.removeEventListener("appinstalled",installed);window.removeEventListener("online",onlineEvent);window.removeEventListener("focus",verify);window.removeEventListener("pageshow",restored);document.removeEventListener("input",edit,true);document.removeEventListener("change",edit,true);document.removeEventListener("submit",preventOfflineSubmit,true);document.removeEventListener("click",offlineNavigation,true);document.removeEventListener("visibilitychange",visibility);navigator.serviceWorker?.removeEventListener("controllerchange",controllerChanged);if(registration&&updateFound)registration.removeEventListener("updatefound",updateFound);for(const {worker,listener} of workerStates)worker.removeEventListener("statechange",listener);};
-  },[router]);
+    return()=>{disposed=true;window.removeEventListener("beforeinstallprompt",beforeInstall);window.removeEventListener("appinstalled",installed);window.removeEventListener("online",onlineEvent);window.removeEventListener("focus",focus);window.removeEventListener("ojq:refresh",manualRefresh);window.removeEventListener("pageshow",restored);document.removeEventListener("input",edit,true);document.removeEventListener("change",edit,true);document.removeEventListener("submit",preventOfflineSubmit,true);document.removeEventListener("click",offlineNavigation,true);document.removeEventListener("visibilitychange",visibility);navigator.serviceWorker?.removeEventListener("controllerchange",controllerChanged);if(registration&&updateFound)registration.removeEventListener("updatefound",updateFound);for(const {worker,listener} of workerStates)worker.removeEventListener("statechange",listener);};
+  },[router,validate]);
   async function install(){
     if(!prompt)return;const request=prompt;setPrompt(null);
     try{await request.prompt();const choice=await request.userChoice;setMessage(choice.outcome==="accepted"?"Installation demandée. Suivez les indications du navigateur.":"Installation reportée. Vous pouvez continuer dans ce navigateur.");}catch{setMessage("Utilisez le menu de votre navigateur pour installer l’application s’il le propose.");}

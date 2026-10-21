@@ -1,10 +1,10 @@
 "use server";
 import { z } from "zod";
-import { revalidatePath } from "next/cache";
+import {revalidatePrivateViews} from "@/lib/navigation/revalidate";
 import { requireMember } from "@/features/auth/server";
 import { prepareProposal } from "./domain";
 export type SessionActionState={message:string;done?:boolean};
-function refreshed() {revalidatePath("/sessions");revalidatePath("/accueil");revalidatePath("/dispos");}
+function refreshed() {revalidatePrivateViews();}
 function failure(error:unknown):SessionActionState {return{message:error instanceof Error && error.constructor===Error ? error.message : "Vérifiez le titre, les horaires et l’échéance de la proposition."};}
 export async function saveProposal(_state:SessionActionState,form:FormData):Promise<SessionActionState> {
   const {client}=await requireMember();

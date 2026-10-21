@@ -136,6 +136,8 @@ Les sondages permettront une question, des choix, un mode simple ou multiple, un
 
 ## Réussite, conservation et contraintes
 
+Les déplacements répétés entre les quatre onglets réutilisent un rendu en mémoire, avec contrôle d’accès frais. Les modifications du membre invalident ce rendu ; celles des autres membres sont récupérées au retour depuis l’arrière-plan ou avec Actualiser. Aucune consultation privée hors connexion n’est promise. La [recette de navigation](navigation-validation.md) distingue mesures locales et essai réel sur téléphone.
+
 Le pilote doit permettre de renseigner une semaine en moins de deux minutes et d'accomplir le parcours de proposition à confirmation sans assistance. Les critères bloquants sont : aucune fausse disponibilité dans les suggestions, aucun accès non autorisé et aucun rappel envoyé à une semaine déjà complète au moment du contrôle d'envoi.
 
 Conservation initiale : disponibilités passées douze semaines, sessions douze mois, notifications et audit métier quatre-vingt-dix jours. Les périmètres exacts de purge et les références historiques sont définis dans [le modèle de données](database.md#conservation-et-suppression). Le produit ne promet pas d'historique au-delà.

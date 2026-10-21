@@ -14,7 +14,7 @@ test("sur téléphone, les écrans quotidiens ne présentent pas les réglages",
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await page.screenshot({ path: info.outputPath(`${route}-telephone.png`), fullPage: true });
   }
-  await expect(page.getByRole("button")).toHaveCount(0);
+  await expect(page.getByRole("main").getByRole("button")).toHaveCount(0);
   await page.getByRole("link", { name: /Mes réglages Notifications et profil/ }).click();
   await expect(page.getByRole("heading", { name: "Mes réglages.", exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Activer sur cet appareil", exact: true })).toBeVisible();

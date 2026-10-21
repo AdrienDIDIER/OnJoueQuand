@@ -117,7 +117,9 @@ Le dimanche à 18 h vise la semaine suivante ; le lundi à 18 h relance la même
 
 ## Produit et documentation
 
-Dans le bas des pages privées, **Installer OnJoueQuand** fournit l’aide adaptée au navigateur et, lorsqu’il est disponible, un bouton d’installation volontaire. Sur iOS/iPadOS compatible : Safari → partager → Sur l’écran d’accueil. Installer n’active pas le Push.
+Les quatre onglets sont préchargés en mémoire avec une vérification d’accès avant réutilisation. Une saisie enregistrée invalide les écrans concernés ; le bouton d’actualisation près de la marque récupère aussi les modifications des autres membres. Aucun contenu privé n’est conservé hors connexion. Mesures, limites et essai manuel : [recette de navigation](docs/navigation-validation.md).
+
+Dans **Groupe → Mes réglages**, **Installer OnJoueQuand** fournit l’aide adaptée au navigateur et, lorsqu’il est disponible, un bouton d’installation volontaire. Sur iOS/iPadOS compatible : Safari → partager → Sur l’écran d’accueil. Installer n’active pas le Push.
 
 Sans réseau, une navigation affiche une page générique sans donnée privée. Une saisie reste seulement en mémoire dans l’onglet ; aucune écriture n’est mise en attente. Les nouvelles versions attendent une actualisation volontaire, séparée sur chaque onglet. La [fiche appareils](docs/pwa-device-checklist.md) reste à exécuter avant lancement.
 

@@ -15,7 +15,7 @@ async function NextSession() {
 }
 async function WeekProgress() {
   const answered=await loadWeekProgress();
-  return <Link className="availability-shortcut" href="/dispos"><CalendarDays size={22} aria-hidden="true"/><span><strong>{answered===7?"Vos dispos sont à jour":"Vos soirées cette semaine"}</strong><span>{answered}/7 journées renseignées · {answered===7?"Modifier":"Compléter"}</span></span><ArrowRight size={20} aria-hidden="true"/></Link>;
+  return <Link className="availability-shortcut" href="/dispos"><CalendarDays size={22} aria-hidden="true"/><span><strong>{answered===7?"Vos dispos sont à jour":"Vos soirées cette semaine"}</strong><span>{answered}/7 journées renseignées · {answered===7?"Modifier":"Compléter"}</span><span className="week-progress" aria-hidden="true">{Array.from({length:7},(_,index)=><i key={index} data-filled={index<answered}/>)}</span></span><ArrowRight size={20} aria-hidden="true"/></Link>;
 }
 async function Notifications(){return <Inbox view={await loadInbox()}/>;}
 export default async function HomePage() {

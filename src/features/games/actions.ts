@@ -1,11 +1,11 @@
 "use server";
 import { z } from "zod";
-import { revalidatePath } from "next/cache";
+import {revalidatePrivateViews} from "@/lib/navigation/revalidate";
 import { requireMember } from "@/features/auth/server";
 import { gameSchema } from "./domain";
 export type GameState = { message:string };
 const conflict = {message:"Opération refusée. Le jeu a changé, est archivé ou vos droits ne permettent pas cette modification. Rechargez la page."};
-function updated() { revalidatePath("/groupe"); revalidatePath("/dispos"); }
+function updated() { revalidatePrivateViews(); }
 export async function createGame(_state:GameState,form:FormData):Promise<GameState> {
   const {client}=await requireMember();
   const input=gameSchema.safeParse(Object.fromEntries(form)); const request=z.string().uuid().safeParse(form.get("requestId"));

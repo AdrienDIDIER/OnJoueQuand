@@ -19,7 +19,7 @@ Ne pas démarrer les jalons applicatifs à partir d'une demande documentaire seu
 
 ## Architecture
 
-La revue mobile utilise un shell sans données privées affichable immédiatement ; chaque page, sous-route et commande vérifie toujours compte et adhésion. Le proxy utilise `getClaims` pour rafraîchir les jetons, les pages/commandes gardent `getUser` et RLS. Vercel cible Dublin (`dub1`) près de Supabase `eu-west-1`. Pour les commandes personnelles de disponibilité, utiliser `loadOwnWeek` ; le catalogue et le calendrier collectif ne doivent pas bloquer `/dispos`. Voir [ADR 018](docs/decisions/018-interface-chaleureuse-et-latence.md).
+La revue mobile précharge les quatre onglets dans le Router Cache en mémoire ; chaque navigation réutilisée recontrôle les droits et tout changement de contexte abandonne les vues. Le layout établit le contexte initial ; chaque page, sous-route et commande vérifie toujours compte et adhésion. Le proxy utilise `getClaims` ; les contrôles positifs gardent `getUser` et RLS. Toute mutation réussie invalide les vues privées via `revalidatePrivateViews`. Aucun stockage persistant privé. Vercel cible Dublin (`dub1`) près de Supabase `eu-west-1`. Utiliser `loadOwnWeek` pour les disponibilités personnelles. Voir [ADR 019](docs/decisions/019-cache-navigation-privee.md) et [recette](docs/navigation-validation.md).
 
 - Monolithe modulaire, organisation par fonctionnalité. Suivre la structure cible de l'architecture sans créer de dossiers vides inutiles.
 - Domaine pur : pas d'import React, Next.js, Supabase, réseau ou horloge globale. Injecter l'heure dans les règles testables.

@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import { CalendarDays, House, CalendarCheck2, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { usePrivateNavigation } from "@/features/navigation/client";
 
 const items = [
   { href: "/accueil", label: "Accueil", icon: House },
@@ -14,7 +15,9 @@ const items = [
 ];
 
 function NavigationContent({label,children}:{label:string;children:ReactNode}) {
-  const {pending}=useLinkStatus();
+  const link=useLinkStatus();
+  const {pendingPath}=usePrivateNavigation();
+  const pending=link.pending||items.some(item=>item.label===label&&pendingPath===item.href);
   return <span className={cn("nav-content",pending&&"nav-pending")} aria-busy={pending}>{children}<span>{label}</span>{pending&&<span className="sr-only" role="status">Chargement de {label}…</span>}</span>;
 }
 
@@ -23,7 +26,7 @@ export function AppNavigation() {
   return <nav aria-label="Navigation principale" className="app-nav">
     {items.map(({ href, label, icon: Icon }) => {
       const active = pathname === href || pathname.startsWith(`${href}/`);
-      return <Link key={href} href={href} aria-current={active ? "page" : undefined} className={cn("nav-item", active && "nav-active")}>
+      return <Link key={href} href={href} prefetch={true} aria-current={active ? "page" : undefined} className={cn("nav-item", active && "nav-active")}>
         <NavigationContent label={label}><Icon size={20} aria-hidden="true" /></NavigationContent><span className="nav-indicator" aria-hidden="true" />
       </Link>;
     })}

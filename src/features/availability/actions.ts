@@ -1,6 +1,6 @@
 "use server";
 import { z } from "zod";
-import { revalidatePath } from "next/cache";
+import {revalidatePrivateViews} from "@/lib/navigation/revalidate";
 import { requireMember } from "@/features/auth/server";
 import { addDays, dayLabel, intervalLabel, localInstant, localParts, monday } from "@/lib/time/paris";
 import { copyPlan, savePlan, type Change, type Guard } from "./domain";
@@ -33,7 +33,7 @@ export async function saveQuickDay(_state: AvailabilityState, form: FormData): P
     if (changes.length !== 1) throw new Error("Utilisez les horaires détaillés pour une réponse sur plusieurs journées.");
     const { error } = await client.rpc("save_availability", { changes });
     if (error) return { message: "Enregistrement refusé. Rechargez la page pour retrouver vos dernières disponibilités." };
-    revalidatePath("/dispos"); revalidatePath("/accueil");
+    revalidatePrivateViews();
     return { message: "Disponibilités enregistrées.", done: true };
   } catch (error) { return failure(error); }
 }
@@ -91,7 +91,7 @@ export async function applyAvailability(_state: AvailabilityState, form: FormDat
     const plan = readPreview(token, user.id, Date.now());
     const { error } = await client.rpc("save_availability", { changes: plan.changes, sources: plan.guards });
     if (error) return { message: "Enregistrement refusé : les disponibilités ont changé ou la période n’est plus modifiable. Rechargez puis refaites l’aperçu." };
-    revalidatePath("/dispos"); revalidatePath("/accueil");
+    revalidatePrivateViews();
     return { message: "Disponibilités enregistrées.", done: true };
   } catch (error) { return failure(error); }
 }

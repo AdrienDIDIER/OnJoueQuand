@@ -1,5 +1,5 @@
 "use server";
-import { revalidatePath } from "next/cache";
+import {revalidatePrivateViews} from "@/lib/navigation/revalidate";
 import { z } from "zod";
 import { requireMember } from "@/features/auth/server";
 import { emailSchema, nameSchema, type ActionState } from "@/features/auth/domain";
@@ -44,7 +44,7 @@ export async function invite(_state: ActionState, form: FormData): Promise<Actio
   if (error || !data) return { message: "Invitation impossible. Cette personne est peut-être déjà membre ; rechargez la page." };
   let delivered = false;
   try { delivered = await deliver(data, user.id); } catch { /* Invitation réessayable. */ }
-  revalidatePath("/groupe");
+  revalidatePrivateViews();
   return { ok: delivered, message: delivered ? "Invitation envoyée. Elle est valable sept jours ; le code reçu est valable dix minutes." : "Invitation enregistrée, mais l’envoi reste à réessayer depuis la liste." };
 }
 
@@ -54,7 +54,7 @@ export async function retryInvitation(_state: ActionState, form: FormData): Prom
   if (member.role !== "admin" || !id.success) return conflict;
   let ok = false;
   try { ok = await deliver(id.data, user.id); } catch { /* Réessai explicite. */ }
-  revalidatePath("/groupe");
+  revalidatePrivateViews();
   return { ok, message: ok ? "Un nouveau code a été envoyé." : "Envoi impossible. Patientez une minute et réessayez." };
 }
 
@@ -65,7 +65,7 @@ export async function revokeInvitation(_state: ActionState, form: FormData): Pro
   if (!id.success || !revision.success) return conflict;
   const { error } = await client.rpc("revoke_invitation", { invitation_id: id.data, expected_revision: revision.data });
   if (error) return conflict;
-  revalidatePath("/groupe");
+  revalidatePrivateViews();
   return { ok: true, message: "Invitation révoquée." };
 }
 
@@ -76,7 +76,7 @@ export async function saveProfile(_state: ActionState, form: FormData): Promise<
   if (!name.success || !revision.success) return { message: "Choisissez un nom de 1 à 60 caractères." };
   const { error } = await client.rpc("update_profile", { display_name: name.data, expected_revision: revision.data });
   if (error) return { message: "Profil modifié ou accès retiré. Rechargez la page." };
-  revalidatePath("/groupe");
+  revalidatePrivateViews();
   return { ok: true, message: "Profil enregistré." };
 }
 
@@ -87,6 +87,6 @@ export async function changeMember(_state: ActionState, form: FormData): Promise
   const { id, revision, role, status } = parsed.data;
   const { error } = await client.rpc("change_membership", { membership_id: id, expected_revision: revision, new_role: role, new_status: status });
   if (error) return conflict;
-  revalidatePath("/groupe");
+  revalidatePrivateViews();
   return { ok: true, message: "Membre mis à jour." };
 }

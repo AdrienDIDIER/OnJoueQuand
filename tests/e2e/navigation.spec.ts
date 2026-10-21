@@ -67,5 +67,7 @@ test("la page introuvable reste en français", async ({ page }) => {
 
 test("aperçu du shell", async ({ page }, testInfo) => {
   await page.goto("/accueil");
+  await expect(page.getByRole("link",{name:/Vos soirées cette semaine/})).toBeVisible();
+  await page.waitForLoadState("networkidle");
   await page.screenshot({ path: testInfo.outputPath("accueil.png"), fullPage: true });
 });

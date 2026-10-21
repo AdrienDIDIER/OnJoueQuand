@@ -1,10 +1,10 @@
 "use server";
 import {z} from "zod";
-import {revalidatePath} from "next/cache";
+import {revalidatePrivateViews} from "@/lib/navigation/revalidate";
 import {requireMember} from "@/features/auth/server";
 import {subscriptionSchema} from "./domain";
 export type NotificationState={message:string;done?:boolean};
-function refresh(){revalidatePath("/accueil");revalidatePath("/groupe");}
+function refresh(){revalidatePrivateViews();}
 export async function notificationAction(_state:NotificationState,form:FormData):Promise<NotificationState>{
   const {client}=await requireMember();
   try{
