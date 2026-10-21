@@ -1,6 +1,6 @@
 # J8 — Préparation de l’exploitation
 
-Date : 2026-10-21. **J8 en cours, pilote non lancé.** J7 est commité dans `0980d66`. Aucun push supplémentaire, déploiement, migration distante, provisionnement ni invitation réelle effectué pendant cette livraison.
+Date : 2026-10-21. **J8 en cours, pilote non lancé.** J7 est commité dans `0980d66` ; la préparation initiale J8 est commitée dans `40f6abb`. La conservation ci-dessous est enregistrée dans le commit de conservation J8. Aucun push supplémentaire, déploiement, migration distante, provisionnement ni invitation réelle effectué pendant cette livraison.
 
 ## Réalisé et vérifié localement
 
@@ -14,10 +14,21 @@ Date : 2026-10-21. **J8 en cours, pilote non lancé.** J7 est commité dans `098
 - Guide de livraison, récupération, configuration privée, surveillance et incidents ; ADR 015 expliquant la séparation du dépôt public et des sauvegardes privées.
 - Quatre workflows validés par actionlint 1.7.12 officiel (SHA-256 vérifié ; shellcheck et pyflakes non exécutés). Liens locaux : 33 documents, 239 liens valides ; `git diff --check` réussi. La stack synthétique a été arrêtée après recette, la base principale conservée.
 
-## Limites et portes restantes
+## Suite locale — conservation et liens de session
+
+- Migration additive `202610210010_retention.sql` : dates serveur de dernière modification/terminalisation, reprise prudente des dates inconnues, RPC de purge réservée au backend, lots bornés et compteurs dans le worker. Les dates historiques non connues commencent à la migration ; les fins de créneaux connues sont conservées.
+- Suppression des disponibilités antérieures à douze semaines complètes, des sessions terminales/brouillons anciens de douze mois et des notifications/journaux/invitations terminales selon quatre-vingt-dix jours. Expiration préalable des travaux et invitations ; préservation des baux vivants, sessions futures, annulations récentes et brouillons modifiés. Aucun compte Auth, profil, membre ou jeu supprimé automatiquement.
+- Liens de notifications vers une session sélectionnée explicitement sous RLS, indépendamment de la pagination ; session supprimée, référence invalide ou accès refusé donnent la même explication française.
+- Toutes les migrations finales appliquées depuis zéro sur une nouvelle stack **J8Validation**, ports 60320–60324. **46 tests SQL/Auth/RLS et de concurrence J2–J8 réussis**. La recette de purge travaille dans des transactions annulées, y compris les deux connexions concurrentes. Elle contrôle les cascades et le lundi parisien après le changement d’heure, même avec une connexion SQL réglée sur Honolulu.
+- **16 parcours Playwright ciblés réussis** : notifications/job HTTP, diagnostic administrateur et session absente/invalide, sur Chromium, Firefox, WebKit et mobile. L’application et les fixtures étaient dirigées vers la stack synthétique : les appels de purge du worker ne visaient pas la base utilisateur. ESLint, typage, **53 tests Vitest** et build réussis.
+- La migration seule est également appliquée à la base locale principale, sans purge ni reset ; types Supabase régénérés. La recette de restauration est rejouée sur le schéma final, puis la stack synthétique est arrêtée et le build local habituel rétabli.
+- Incident de préparation des copies de recette : un premier essai SMTP a brièvement arrêté/redémarré le Mailpit local principal au lieu de celui de J8Validation. Le `finally` l’a rétabli ; aucun envoi réel ni modification de sa base. Le nom a été corrigé et la suite entière a ensuite réussi sur la stack isolée.
+- Vérification documentaire finale : 34 documents, 250 liens locaux valides ; `git diff --check` réussi. Les compléments de conservation sont inclus dans le commit de conservation J8.
+
+## Limites et portes restantes après cette suite
 
 Le test de restauration partage les rôles système du cluster synthétique et utilise son superutilisateur pour charger les schémas. Il ne démontre ni restauration dans Supabase hébergé, ni OTP après récupération, ni copie des clés racines, ni bascule Vercel. Le schéma de cron et les secrets Vault sont volontairement exclus de l’archive ; leur reconstitution est une étape distincte.
 
 Les trois workflows privés, leurs outils Debian et le stockage n’ont pas été exécutés à distance. Le workflow indépendant contrôle toutes les six heures l’âge du dernier export réussi et la présence d’un artefact non expiré, via les métadonnées GitHub sans télécharger de données. Le contrôle des traitements est prévu une fois par heure, en connexion SQL forcée en lecture seule ; ce compromis limite les minutes Actions privées. Ces workflows sont bloqués sur le dépôt public. Leur activation, les quotas et la réception d’alertes restent à valider sur la cible privée. Le panneau administrateur ne vérifie pas les sauvegardes ni la réception réelle du Push.
 
-Restent : comptes/domaine/DNS/SMTP et premier administrateur, environnements séparés, éligibilité économique, secrets, recette réelle iOS/Android/bureau, pipeline de livraison et rollback Vercel répétés, restauration hébergée avec OTP, incidents SMTP/worker, contrôle des purges et pilote multi-utilisateur. Aucun achat ni activation distante n’est implicite dans ce rapport. Voir le [guide](operations.md) et les [conditions de lancement](roadmap.md#conditions-de-lancement-et-points-bloquants).
+Restent : comptes/domaine/DNS/SMTP et premier administrateur, environnements séparés, éligibilité économique, secrets, recette réelle iOS/Android/bureau, pipeline de livraison et rollback Vercel répétés, restauration hébergée avec OTP, alertes reçues lors d’incidents distants, revue des échéances avant activation des purges réelles et pilote multi-utilisateur. Aucun achat ni activation distante n’est implicite dans ce rapport. Voir le [guide](operations.md) et les [conditions de lancement](roadmap.md#conditions-de-lancement-et-points-bloquants).

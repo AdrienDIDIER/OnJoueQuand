@@ -11,7 +11,7 @@ export function notificationContent(kind:string,data:unknown,resourceId:string){
     return{title:"Rappel de disponibilités",body:week?`Semaine du ${date(week).toLocaleString("fr-FR",{day:"numeric",month:"long"})} : consultez vos réponses actuelles.`:"Retrouvez vos disponibilités de la semaine.",url:week?`/dispos?semaine=${week}`:"/dispos"};
   }
   const labels:Record<string,string>={"session.published":"Une proposition de session a été publiée","session.vote_closed":"Un vote s’est terminé","session.confirmed":"Une session a été confirmée","session.cancelled":"Une session a été annulée"};
-  return{title:labels[kind]??"Une nouvelle information pour votre groupe",body:"Consultez la session pour retrouver son état actuel.",url:`/sessions#session-${resourceId}`};
+  return{title:labels[kind]??"Une nouvelle information pour votre groupe",body:"Consultez la session pour retrouver son état actuel.",url:`/sessions?session=${encodeURIComponent(resourceId)}#session-${encodeURIComponent(resourceId)}`};
 }
 // Fenêtre métier, calculée en dates civiles de Paris ; aucune horloge globale.
 export function reminderWindow(now:string){

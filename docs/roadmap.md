@@ -2,6 +2,8 @@
 
 ## État et ordre de livraison
 
+Préparation initiale J8 commitée dans `40f6abb`. Suite locale : conservation appliquée par lots et liens de sessions sélectionnées, avec régression SQL J2–J8 et parcours ciblés vérifiés ; [ADR 016](decisions/016-conservation-et-purges-bornees.md), [preuves J8](j8-validation.md). Le pilote reste soumis aux prérequis distants et appareils réels.
+
 Le plan est approuvé. **J0 à J7 sont commités ; J7 porte le commit `0980d66`. J0–J6 sont poussés, CI J6 réussie. J8 est en préparation locale : sauvegarde chiffrée, restauration synthétique et outils opérateur ; [rapport J8](j8-validation.md), [guide](operations.md). Pilote non lancé ; J9 non implémenté.** « Commit et continue » autorise la préparation J8. Aucun déploiement ni migration de production. Cron inactif ; installation/Push réels, restauration hébergée et configuration des alertes restent des portes de lancement.
 
 Les critères ci-dessous sont des portes de sortie : un jalon n'est livré que lorsque ses critères et tests sont vérifiés. Les résultats réels, versions, environnements et limites seront consignés au fur et à mesure. Aucune estimation calendaire ne vaut engagement.

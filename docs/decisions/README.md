@@ -19,5 +19,6 @@ Ces ADR consignent le plan approuvé le **15 octobre 2026**. Leur statut « Acce
 | [013](013-notifications-et-livraison-bornee.md) | Notifications, baux, endpoints et ordonnancement désactivé par défaut | Implémentée localement ; réception réelle à valider | J6–J8 |
 | [014](014-pwa-cache-et-mises-a-jour.md) | PWA, cache public, mises à jour et retour au premier plan | Code vérifié localement ; appareils à valider | J7 |
 | [015](015-sauvegardes-privees-et-recette-exploitation.md) | Sauvegardes privées et répétition de récupération | Outils validés localement ; activation distante non effectuée | J8 |
+| [016](016-conservation-et-purges-bornees.md) | Conservation, dates fiables et purges bornées | Vérifiée localement ; aucune purge de production | J8 |
 
 Chaque ADR contient contexte, décision, alternatives, conséquences et vérification. Une modification structurelle crée une nouvelle ADR qui remplace explicitement l'ancienne ; ne pas effacer l'historique d'une décision appliquée. Les détails normatifs évoluent dans le [PRD](../product-requirements.md), l'[architecture](../architecture.md) et le [modèle de données](../database.md) avec la même modification.

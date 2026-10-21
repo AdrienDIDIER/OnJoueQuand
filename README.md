@@ -6,6 +6,8 @@ Application web progressive privée pour aider un groupe de 6 à 15 amis et coll
 
 ## Démarrer
 
+La préparation initiale J8 est commitée dans `40f6abb`. La suite locale ajoute les purges de conservation et les liens directs vers les sessions, avec 46 tests SQL et 16 parcours navigateur ciblés réussis sur une stack synthétique. Aucun pilote ni service distant lancé ; voir le [rapport J8](docs/j8-validation.md).
+
 Prérequis : **Node.js 24 LTS**, **npm 11.21.1** et, pour Supabase uniquement, Docker Desktop avec moteur Linux démarré. La version Node est déclarée dans `.nvmrc` et `package.json`. Les versions exactes et résultats figurent dans le [rapport J1](docs/j1-validation.md).
 
 ```sh

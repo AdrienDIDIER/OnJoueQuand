@@ -68,3 +68,9 @@ Le miroir privé peut activer `.github/workflows/worker-monitor.yml` avec `WORKE
 | Fuite de secret | Désactiver l’accès concerné, effectuer la rotation, examiner les accès et restaurer la confiance avant les envois |
 
 Avant lancement, désigner un responsable et un suppléant, tester la réception des alertes, les incidents SMTP/worker et le retour arrière. La fiche [appareils](pwa-device-checklist.md), la purge/conservation et le parcours pilote complet restent des portes de sortie J8 ; aucune n’est déclarée validée par les seuls scripts ci-dessus.
+
+## Conservation appliquée par le worker
+
+La [migration de purge](../supabase/migrations/202610210010_retention.sql) ajoute les dates fiables et une RPC interne. Chaque job traite au plus cent lignes par catégorie après les transitions de sessions ; les passages suivants résorbent le retard. Les compteurs agrégés figurent dans `job_runs.counters.retention`, sans identifiants ni données personnelles. Les durées et la reprise prudente de l’existant sont précisées dans l’[ADR 016](decisions/016-conservation-et-purges-bornees.md).
+
+Avant activation réelle : vérifier les dates de reprise, une sauvegarde restaurable, les lignes arrivant à échéance et le rythme de rattrapage. Les baux vivants restent protégés ; les travaux expirés sont clôturés avant purge. Aucun profil, compte Auth, membre ou jeu n’est supprimé automatiquement. Ne pas appeler la purge avec une date simulée sur une base utilisateur. La migration locale seule n’exécute aucune suppression ; les recettes de purge et les appels HTTP du worker de cette livraison ciblent exclusivement la stack synthétique J8Validation.

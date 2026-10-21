@@ -288,6 +288,8 @@ Objectif pilote, sans SLA : dernière sauvegarde réussie datant de moins de 24 
 
 ### Surveillance et maintenance
 
+La conservation est désormais exécutée par la RPC interne `purge_retained_data`, appelée par le worker après les transitions. Les dates serveur, la reprise prudente de l’existant, les lots bornés et la protection des baux sont détaillés dans l’[ADR 016](decisions/016-conservation-et-purges-bornees.md). Les liens de notifications sélectionnent une session sous RLS, même hors première page ; une ressource absente ou inaccessible donne une explication française uniforme.
+
 Préparation J8 : [guide d’exploitation](operations.md), [rapport local](j8-validation.md) et [ADR 015](decisions/015-sauvegardes-privees-et-recette-exploitation.md). Le dépôt étant public, le workflow de sauvegarde y est bloqué : sa cible doit être un miroir d’exploitation privé. L’export `pg_dump` custom est chiffré directement par age ; il inclut explicitement Auth et l’historique. Une restauration synthétique a réussi, avec contrôle RLS, sans constituer une preuve de restauration Supabase hébergée. L’outil opérateur surveille cron, heartbeat, outbox et échecs Push ; son exécution distante et le contrôle indépendant d’âge des sauvegardes restent à configurer.
 
 Consigner les erreurs serveur, heartbeat du worker, âge du plus ancien événement en attente, échecs de livraison, refus SMTP, quotas et âge de sauvegarde. Exposer un état technique réservé aux administrateurs ; le contrôle d'accès utilisateur ne dépend pas de cette page.

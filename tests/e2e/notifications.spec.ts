@@ -17,7 +17,7 @@ test("notifications privées, préférences et job HTTP authentifié",async({pag
     const secret=process.env.JOBS_SECRET;if(!secret)throw new Error("Le wrapper de recette doit fournir le secret de job.");
     for(let i=0;i<2;i++)expect((await request.post("/api/internal/jobs",{headers:{Authorization:`Bearer ${secret}`}})).status()).toBe(200);
     await expect.poll(async()=>{await request.post("/api/internal/jobs",{headers:{Authorization:`Bearer ${secret}`}});return checked(await actor.from("notifications").select("id").eq("resource_id",session)).length;}).toBe(1);
-    await page.goto("/accueil");const inbox=page.getByRole("region",{name:"Vos notifications",exact:true});const note=inbox.getByRole("listitem").filter({has:page.locator(`a[href="/sessions#session-${session}"]`)});await expect(note).toHaveCount(1);
+    await page.goto("/accueil");const inbox=page.getByRole("region",{name:"Vos notifications",exact:true});const note=inbox.getByRole("listitem").filter({has:page.locator(`a[href="/sessions?session=${session}#session-${session}"]`)});await expect(note).toHaveCount(1);
     await note.getByRole("button",{name:"Marquer comme lue"}).click();await expect(note.getByText("Lue",{exact:true})).toBeVisible();await expect(note.getByRole("button",{name:"Marquer comme lue"})).toHaveCount(0);
     await inbox.screenshot({path:info.outputPath("notifications.png")});
     await note.getByRole("link",{name:"Consulter",exact:true}).click();await expect(page.locator(`#session-${session}`)).toBeVisible();

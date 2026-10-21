@@ -2,6 +2,7 @@ import "server-only";
 import webpush from "web-push";
 import { adminClient } from "@/lib/supabase/admin";
 import { deliver,type Delivery } from "../application/delivery";
+import type { Json } from "@/lib/supabase/database.types";
 
 export function pushConfiguration(){
   const publicKey=process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,privateKey=process.env.VAPID_PRIVATE_KEY,subject=process.env.VAPID_SUBJECT;
@@ -13,9 +14,10 @@ export async function runNotificationJob(){
   const client=adminClient();const started=await client.rpc("begin_notification_job");
   if(started.error)throw new Error("Traitement indisponible.");
   if(!started.data)return{busy:true};
-  const counts={transitions:0,reminders:0,events:0,sent:0,retried:0,skipped:0,failed:0,push_configured:false};
+  const counts={transitions:0,retention:null as Json,reminders:0,events:0,sent:0,retried:0,skipped:0,failed:0,push_configured:false};
   try{
     const transition=await client.rpc("advance_sessions",{batch_size:100});if(transition.error)throw new Error("transitions");counts.transitions=transition.data;
+    const retention=await client.rpc("purge_retained_data",{batch_size:100});if(retention.error)throw new Error("retention");counts.retention=retention.data;
     const reminders=await client.rpc("enqueue_availability_reminders");if(reminders.error)throw new Error("reminders");counts.reminders=reminders.data;
     const events=await client.rpc("materialize_notifications",{batch_size:30});if(events.error)throw new Error("outbox");counts.events=events.data;
     const vapid=pushConfiguration();counts.push_configured=!!vapid;

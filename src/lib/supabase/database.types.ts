@@ -113,14 +113,14 @@ isOneToOne: false
                   ]
                 },"invitations": {
                   Row: {
-                    "accepted_at": string | null,"auth_user_id": string | null,"created_at": string,"delivery_status": string,"expires_at": string,"group_id": string,"id": string,"idempotency_key": string,"invited_by": string,"normalized_email": string,"provisioning_status": string,"revision": number,"status": string
+                    "accepted_at": string | null,"auth_user_id": string | null,"created_at": string,"delivery_status": string,"expires_at": string,"group_id": string,"id": string,"idempotency_key": string,"invited_by": string,"normalized_email": string,"provisioning_status": string,"revision": number,"status": string,"terminal_at": string | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "accepted_at"?: string | null,"auth_user_id"?: string | null,"created_at"?: string,"delivery_status"?: string,"expires_at"?: string,"group_id": string,"id"?: string,"idempotency_key": string,"invited_by": string,"normalized_email": string,"provisioning_status"?: string,"revision"?: number,"status"?: string
+                    "accepted_at"?: string | null,"auth_user_id"?: string | null,"created_at"?: string,"delivery_status"?: string,"expires_at"?: string,"group_id": string,"id"?: string,"idempotency_key": string,"invited_by": string,"normalized_email": string,"provisioning_status"?: string,"revision"?: number,"status"?: string,"terminal_at"?: string | null
                   }
                   Update: {
-                    "accepted_at"?: string | null,"auth_user_id"?: string | null,"created_at"?: string,"delivery_status"?: string,"expires_at"?: string,"group_id"?: string,"id"?: string,"idempotency_key"?: string,"invited_by"?: string,"normalized_email"?: string,"provisioning_status"?: string,"revision"?: number,"status"?: string
+                    "accepted_at"?: string | null,"auth_user_id"?: string | null,"created_at"?: string,"delivery_status"?: string,"expires_at"?: string,"group_id"?: string,"id"?: string,"idempotency_key"?: string,"invited_by"?: string,"normalized_email"?: string,"provisioning_status"?: string,"revision"?: number,"status"?: string,"terminal_at"?: string | null
                   }
                   Relationships: [
                     {
@@ -325,14 +325,14 @@ isOneToOne: false
                   ]
                 },"sessions": {
                   Row: {
-                    "confirmed_slot_id": string | null,"created_at": string,"created_by": string,"description": string,"game_id": string | null,"group_id": string,"id": string,"idempotency_key": string,"minimum_players": number,"published_at": string | null,"revision": number,"status": string,"title": string,"vote_deadline": string | null
+                    "confirmed_slot_id": string | null,"created_at": string,"created_by": string,"description": string,"game_id": string | null,"group_id": string,"id": string,"idempotency_key": string,"minimum_players": number,"published_at": string | null,"revision": number,"status": string,"terminal_at": string | null,"title": string,"updated_at": string,"vote_deadline": string | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "confirmed_slot_id"?: string | null,"created_at"?: string,"created_by": string,"description"?: string,"game_id"?: string | null,"group_id": string,"id"?: string,"idempotency_key": string,"minimum_players"?: number,"published_at"?: string | null,"revision"?: number,"status"?: string,"title": string,"vote_deadline"?: string | null
+                    "confirmed_slot_id"?: string | null,"created_at"?: string,"created_by": string,"description"?: string,"game_id"?: string | null,"group_id": string,"id"?: string,"idempotency_key": string,"minimum_players"?: number,"published_at"?: string | null,"revision"?: number,"status"?: string,"terminal_at"?: string | null,"title": string,"updated_at"?: string,"vote_deadline"?: string | null
                   }
                   Update: {
-                    "confirmed_slot_id"?: string | null,"created_at"?: string,"created_by"?: string,"description"?: string,"game_id"?: string | null,"group_id"?: string,"id"?: string,"idempotency_key"?: string,"minimum_players"?: number,"published_at"?: string | null,"revision"?: number,"status"?: string,"title"?: string,"vote_deadline"?: string | null
+                    "confirmed_slot_id"?: string | null,"created_at"?: string,"created_by"?: string,"description"?: string,"game_id"?: string | null,"group_id"?: string,"id"?: string,"idempotency_key"?: string,"minimum_players"?: number,"published_at"?: string | null,"revision"?: number,"status"?: string,"terminal_at"?: string | null,"title"?: string,"updated_at"?: string,"vote_deadline"?: string | null
                   }
                   Relationships: [
                     {
@@ -425,6 +425,9 @@ isOneToOne: false
                            },
 "provisioning_context":
 { Args: { "actor_id": string,"invitation_id": string }; Returns: Json
+                           },
+"purge_retained_data":
+{ Args: { "batch_size"?: number,"reference_time"?: string }; Returns: Json
                            },
 "read_confirmed_commitments":
 { Args: { "member_ids": (string)[],"period_end": string,"period_start": string }; Returns: {

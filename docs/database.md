@@ -252,6 +252,10 @@ Tester aussi les FK et clés hors groupe avec un jeu de fixture isolé : le sing
 
 ## Conservation et suppression
 
+Implémentation J8 : [migration de conservation](../supabase/migrations/202610210010_retention.sql), [ADR 016](decisions/016-conservation-et-purges-bornees.md). La RPC interne `purge_retained_data` applique ces règles par lots, après les transitions du worker. Seul `service_role` peut l’appeler ; aucun bouton ni paramètre HTTP ne permet à un utilisateur de choisir son horloge. Le cron demeure inactif par défaut.
+
+Les champs serveur `sessions.updated_at`, `sessions.terminal_at` et `invitations.terminal_at` fournissent les points de départ. Les dates historiques inconnues sont reprises à la migration par prudence ; les fins de sessions et acceptations déjà connues sont utilisées. Les quatre-vingt-dix jours correspondent à 2 160 heures écoulées. L’outbox terminale utilise `available_at` ; les jobs terminés utilisent `finished_at`. Les lots préservent tout bail vivant et les notifications ayant encore une livraison.
+
 - **Disponibilités** : conserver les douze semaines complètes précédant la semaine courante et les semaines courante/futures ; purger les journées plus anciennes avec leurs intervalles. La copie respecte cette fenêtre.
 - **Sessions** : conserver douze mois après fin, annulation ou expiration, avec créneaux, bulletins et RSVP. Les brouillons abandonnés sont purgés douze mois après leur dernière modification. Aucune purge de session future active.
 - **Notifications et audit** : quatre-vingt-dix jours après création ; supprimer leurs livraisons associées à expiration. Les jobs terminés et outbox terminées suivent au plus cette durée ; ne pas purger un travail encore vivant sans le marquer expiré/échoué.
