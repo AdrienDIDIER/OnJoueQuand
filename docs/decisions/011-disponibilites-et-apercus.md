@@ -1,6 +1,6 @@
 # ADR 011 — Disponibilités transactionnelles et aperçus signés
 
-- Statut : Acceptée et implémentée en J3.
+- Statut : Acceptée et implémentée en J3 ; amendée pour les réponses rapides par l’[ADR 017](017-navigation-mobile-et-reponses-rapides.md).
 - Date : 2026-10-21.
 - Portée : PR-03, PR-04, PR-05 ; précise ADR 004.
 

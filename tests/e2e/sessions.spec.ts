@@ -42,8 +42,8 @@ test("proposer, voter à deux comptes, confirmer puis répondre et libérer un c
     for(const check of await otherCard.getByRole("checkbox").all())await check.uncheck();
     await otherCard.getByRole("button",{name:"Enregistrer mon vote"}).click();await expect(otherCard.getByText("Votre réponse : aucun créneau ne me convient.",{exact:true})).toBeVisible();
     await otherCard.getByRole("checkbox").first().check();await otherCard.getByRole("button",{name:"Enregistrer mon vote"}).click();await expect(otherCard.getByText("Votre bulletin est enregistré ; vous pouvez le modifier.",{exact:true})).toBeVisible();
-    await page.reload();await card.getByRole("button",{name:"Clore le vote maintenant"}).click();await expect(card.getByText("Vote clos",{exact:true})).toBeVisible();
-    await card.getByRole("button",{name:"Confirmer ce créneau"}).click();await expect(card.getByText("Confirmée",{exact:true})).toBeVisible();
+    await page.reload();await card.getByText("Organiser cette session",{exact:true}).click();await card.getByRole("button",{name:"Clore le vote maintenant"}).click();await expect(card.getByText("Vote clos",{exact:true})).toBeVisible();
+    await card.getByText("Organiser cette session",{exact:true}).click();await card.getByRole("button",{name:"Confirmer ce créneau"}).click();await expect(card.getByText("Confirmée",{exact:true})).toBeVisible();
     await expect(card.getByText("Vous n’avez pas encore confirmé votre participation.",{exact:true})).toBeVisible();
     await other.reload();await expect(otherCard.getByText("Vous n’avez pas encore confirmé votre participation.",{exact:true})).toBeVisible();
     await test.step("RSVP du second compte",async()=>{await otherCard.getByRole("combobox",{name:"Ma participation",exact:true}).selectOption("attending");await otherCard.getByRole("button",{name:"Enregistrer ma participation"}).click();await expect(otherCard.getByText("Votre réponse : je participe.",{exact:true})).toBeVisible();});
@@ -51,12 +51,13 @@ test("proposer, voter à deux comptes, confirmer puis répondre et libérer un c
     await card.screenshot({path:info.outputPath("session-confirmee.png")});
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
     // L’accueil est collectif : un autre scénario parallèle peut proposer un créneau aussi tôt.
-    await page.goto("/accueil");const next=page.getByRole("region",{name:"Prochaine session"});await expect(next).toBeVisible();await expect(next).toContainText("Paris");await expect(next.getByRole("link")).toHaveAttribute("href",/^\/sessions#session-[\da-f-]{36}$/);
+    await page.goto("/accueil");const next=page.getByRole("region",{name:"Prochaine session"});await expect(next).toBeVisible();await expect(next).toContainText("Paris");await expect(next.getByRole("link")).toHaveAttribute("href",/^\/sessions\?session=[\da-f-]{36}#session-[\da-f-]{36}$/);
     await page.goto(`/dispos?semaine=${week}`);const search=page.getByRole("heading",{name:"Trouver un créneau commun",exact:true}).locator("..");
+    await search.getByText("Affiner la recherche",{exact:true}).click();
     for(const check of await search.getByRole("checkbox").all())await check.uncheck();for(const name of names)await search.getByLabel(name,{exact:true}).check();
     await search.getByRole("button",{name:"Rechercher des créneaux"}).click();await expect(search.getByText("Aucun créneau commun",{exact:false})).toBeVisible();
-    await page.goto("/sessions");await card.getByText("Annuler cette session",{exact:true}).click();await card.getByRole("button",{name:"Annuler définitivement"}).click();await expect(card.getByText("Annulée",{exact:true})).toBeVisible();
-    await page.goto(`/dispos?semaine=${week}`);for(const check of await search.getByRole("checkbox").all())await check.uncheck();for(const name of names)await search.getByLabel(name,{exact:true}).check();
+    await page.goto("/sessions");await card.getByText("Annuler cette session",{exact:true}).click();await card.getByRole("button",{name:"Annuler définitivement"}).click();await page.getByText(/Sessions passées et annulées ·/).click();await expect(card.getByText("Annulée",{exact:true})).toBeVisible();
+    await page.goto(`/dispos?semaine=${week}`);await search.getByText("Affiner la recherche",{exact:true}).click();for(const check of await search.getByRole("checkbox").all())await check.uncheck();for(const name of names)await search.getByLabel(name,{exact:true}).check();
     await search.getByRole("button",{name:"Rechercher des créneaux"}).click();await expect(search.getByRole("listitem")).toHaveCount(1);
   }finally{
     await context.close().catch(()=>{});if(members.length){const sessions=checked(await admin.from("sessions").select("id").in("created_by",members));if(sessions.length){checked(await admin.from("sessions").delete().in("id",sessions.map(s=>s.id)));const ids=sessions.map(s=>`'${s.id}'`).join(",");execFileSync("docker",["exec","supabase_db_OnJoueQuand","psql","-U","postgres","-d","postgres","-Atc",`delete from private.notification_outbox where resource_id in (${ids}); delete from private.audit_events where resource_id in (${ids})`],{stdio:"pipe"});}

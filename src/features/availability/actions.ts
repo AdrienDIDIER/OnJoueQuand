@@ -16,6 +16,28 @@ function preview(actor: string, changes: Change[], guards: Guard[]): Availabilit
     summary: changes.map((d) => `${dayLabel(d.local_date)} : ${d.status === "unanswered" ? "Sans réponse" : d.status === "unavailable" ? "Indisponible" : `Disponible · ${d.intervals.map((i) => intervalLabel(i.starts_at, i.ends_at, d.local_date)).join(", ")}`}${d.expected_revision !== null ? " (remplace la réponse enregistrée)" : ""}`) };
 }
 
+// Réponse explicite sur une seule journée ; les saisies détaillées gardent leur aperçu.
+export async function saveQuickDay(_state: AvailabilityState, form: FormData): Promise<AvailabilityState> {
+  const { client } = await requireMember();
+  try {
+    const date = z.string().parse(form.get("date"));
+    const expected = form.get("revision") === "" ? null : z.coerce.number().int().positive().parse(form.get("revision"));
+    const status = z.enum(["available", "unavailable"]).parse(form.get("status"));
+    const state = await loadCalendar(monday(date));
+    const day = state.own.find(d => d.local_date === date);
+    if (!day || day.revision !== expected) throw new Error("Disponibilités modifiées. Rechargez la page avant de continuer.");
+    if (day.mode === "detailed") throw new Error("Ouvrez les horaires et options pour modifier cette journée détaillée.");
+    if (form.get("quickStart") !== state.quick.start || form.get("quickEnd") !== state.quick.end) throw new Error("Les horaires rapides ont changé. Rechargez la page avant de continuer.");
+    const next = state.own.find(d => d.local_date === addDays(date, 1)) ?? state.next;
+    const changes = savePlan(day, next, status, "quick", [], state.now, state.quick);
+    if (changes.length !== 1) throw new Error("Utilisez les horaires détaillés pour une réponse sur plusieurs journées.");
+    const { error } = await client.rpc("save_availability", { changes });
+    if (error) return { message: "Enregistrement refusé. Rechargez la page pour retrouver vos dernières disponibilités." };
+    revalidatePath("/dispos"); revalidatePath("/accueil");
+    return { message: "Disponibilités enregistrées.", done: true };
+  } catch (error) { return failure(error); }
+}
+
 export async function previewDay(_state: AvailabilityState, form: FormData): Promise<AvailabilityState> {
   const { user } = await requireMember();
   try {

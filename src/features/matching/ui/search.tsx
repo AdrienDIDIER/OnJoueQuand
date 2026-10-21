@@ -7,15 +7,17 @@ export function MatchingSearch({week,last,firstEditable,lastEditable,members,gam
   const [dirty,setDirty]=useState(false);
   const [criteria,setCriteria]=useState({first:week,last,minimum:"2",duration:"60",gameId:""});
   const [selected,setSelected]=useState(members.map(m=>m.id));
-  return <section className="group-card" id="creneaux-communs"><h2>Trouver un créneau commun</h2><p>Les mêmes joueurs doivent être disponibles pendant toute la durée. Une suggestion reste à discuter avec le groupe.</p>
+  return <section className="group-card" id="creneaux-communs"><h2>Trouver un créneau commun</h2><p>{criteria.minimum} joueurs minimum · {criteria.duration} minutes</p>
     <form onSubmit={event=>{event.preventDefault();const form=new FormData(event.currentTarget);setDirty(false);startTransition(()=>action(form));}} className="form-stack matching-form" onChange={()=>setDirty(true)}>
+      <Button disabled={pending}>{pending?"Recherche…":"Rechercher des créneaux"}</Button>
+      <details className="secondary-details"><summary>Affiner la recherche</summary><div className="form-stack">
       <label>Du<input type="date" name="first" value={criteria.first} onChange={e=>setCriteria({...criteria,first:e.target.value})} min={firstEditable} max={lastEditable} required /></label>
       <label>Au<input type="date" name="last" value={criteria.last} onChange={e=>setCriteria({...criteria,last:e.target.value})} min={firstEditable} max={lastEditable} required /></label>
       <label>Nombre minimum de joueurs<input type="number" name="minimum" value={criteria.minimum} onChange={e=>setCriteria({...criteria,minimum:e.target.value})} min={1} max={Math.max(2,members.length)} required /></label>
       <label>Durée en minutes<input type="number" name="duration" value={criteria.duration} onChange={e=>setCriteria({...criteria,duration:e.target.value})} min={15} step={15} max={40380} required /></label>
       <label>Jeu facultatif<select name="gameId" value={criteria.gameId} onChange={e=>setCriteria({...criteria,gameId:e.target.value})}><option value="">Tous les jeux</option>{games.map(g=><option key={g.id} value={g.id}>{g.name}</option>)}</select></label>
       <fieldset><legend>Membres recherchés</legend><div className="matching-members">{members.map(m=><label key={m.id}><input type="checkbox" name="members" value={m.id} checked={selected.includes(m.id)} onChange={e=>setSelected(e.target.checked?[...selected,m.id]:selected.filter(id=>id!==m.id))} />{m.name}</label>)}</div></fieldset>
-      <Button disabled={pending}>{pending?"Recherche…":"Rechercher des créneaux"}</Button>
+      </div></details>
     </form>
     {!dirty && !pending && <div aria-live="polite"><p role="status">{state.message}</p>
       {state.gameName && <p>Jeu : {state.gameName}. Un favori indique une préférence, sans garantir la possession du jeu.</p>}

@@ -1,7 +1,7 @@
 import {expect} from "@playwright/test";
 import {test} from "./fixtures";
 test("contrastes ciblés, réduction des animations et aide en français",async({page})=>{
-  await page.emulateMedia({reducedMotion:"reduce"});await page.goto("/groupe");
+  await page.emulateMedia({reducedMotion:"reduce"});await page.goto("/groupe/reglages");
   const ratios=await page.evaluate(()=>{
     const rgb=(value:string)=>value.match(/[\d.]+/g)!.slice(0,3).map(Number);
     const luminance=(value:string)=>rgb(value).map(v=>{const n=v/255;return n<=.04045?n/12.92:((n+.055)/1.055)**2.4;}).reduce((sum,v,i)=>sum+v*[.2126,.7152,.0722][i]!,0);

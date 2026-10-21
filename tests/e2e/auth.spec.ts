@@ -5,7 +5,7 @@ import { clients, checked, mailboxCode } from "../../scripts/local-supabase.mjs"
 import { sendEmailCode } from "../../src/features/auth/infrastructure/email-code";
 
 anonymousTest("les quatre pages privées redirigent sans session", async ({ page }, testInfo) => {
-  for (const route of ["accueil", "dispos", "sessions", "groupe"]) {
+  for (const route of ["accueil", "dispos", "sessions", "groupe", "groupe/reglages", "groupe/jeux", "groupe/gestion"]) {
     await page.goto(`/${route}`);
     await expect(page).toHaveURL(/\/connexion$/);
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("Content de vous retrouver.");
@@ -23,7 +23,7 @@ anonymousTest("adresse inconnue : réponse générique et aucun compte créé", 
 test("inviter, rejoindre par OTP, modifier son profil puis perdre l’accès", async ({ page, browser }) => {
   const email = `parcours-${randomUUID()}@example.test`;
   const { config } = clients();
-  await page.goto("/groupe");
+  await page.goto("/groupe/gestion");
   await page.getByLabel("Adresse e-mail à inviter").fill(email);
   await page.getByRole("button", { name: "Inviter cette personne" }).click();
   await expect(page.getByText("Invitation envoyée.", { exact: false })).toBeVisible();
@@ -39,8 +39,9 @@ test("inviter, rejoindre par OTP, modifier son profil puis perdre l’accès", a
   await invitee.getByLabel("Votre nom dans le groupe").fill(name);
   await invitee.getByRole("button", { name: "Accepter mon invitation" }).click();
   await expect(invitee).toHaveURL(/\/accueil$/);
-  await invitee.goto("http://127.0.0.1:3100/groupe");
+  await invitee.goto("http://127.0.0.1:3100/groupe/reglages");
   await expect(invitee.getByRole("heading", { name: "Invitations", exact: true })).toHaveCount(0);
+  await invitee.getByText("Mon profil",{exact:true}).click();
   await invitee.getByLabel("Votre nom dans le groupe").fill(`${name} bis`);
   await invitee.getByRole("button", { name: "Enregistrer mon profil" }).click();
   await expect(invitee.getByText("Profil enregistré.")).toBeVisible();

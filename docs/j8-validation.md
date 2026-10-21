@@ -49,7 +49,17 @@ Correction locale : déduplication des contrôles compte/adhésion dans le seul 
 
 Vérifications : lint, typage, 53 tests métier et build réussis ; 21 parcours Chromium/WebKit réussis sur la stack synthétique J8Validation, dont les quatre onglets, le message Push et le refus des diagnostics après retrait du rôle administrateur. Un scénario clavier WebKit Windows est ignoré comme auparavant et reste couvert en CI Linux. Aucune mesure de latence sur le site hébergé ni réception Push réelle ne résulte de ces tests.
 
-## Portes de lancement encore ouvertes
+## Simplification de l’usage sur téléphone
+
+Le retour utilisateur demande une interface quotidienne moins chargée. Accueil perd les panneaux promotionnels et présente la prochaine session, l’avancement des disponibilités et les notifications récentes. Groupe devient une liste de membres et de raccourcis : jeux, réglages, gestion administrateur. Chaque nouvelle sous-route vérifie compte et adhésion ; la gestion refuse les non-administrateurs avant lecture des invitations.
+
+Les réglages regroupent profil, notifications, installation et déconnexion. Les alertes hors connexion/mise à jour et la protection des saisies restent montées partout. Le service worker et son cache sont inchangés. Copie et calendrier collectif sont repliés ; sur téléphone, le calendrier affiche des journées plutôt qu’un tableau horizontal. Les filtres de matching et les commandes d’organisation d’une session s’ouvrent à la demande ; les sessions terminales sont regroupées dans l’historique, sauf lorsqu’un lien sélectionne directement une session.
+
+L’[ADR 017](decisions/017-navigation-mobile-et-reponses-rapides.md) documente l’enregistrement en un geste d’une réponse rapide sur une journée. La Server Action recontrôle révision et horaires affichés, refuse les journées détaillées et utilise la RPC existante. Les opérations détaillées et la copie gardent leur aperçu signé.
+
+La première suite complète de la réorganisation a réussi : **107 parcours Playwright**, un scénario clavier WebKit Windows ignoré comme auparavant, sur Chromium, Firefox, WebKit et mobile ; uniquement J8Validation. Après ajout des réponses rapides, **16 parcours ciblés supplémentaires** ont réussi sur les quatre profils, notamment l’écriture réelle sous JWT utilisateur, le refus d’une page périmée et les parcours détaillés/copie. La version finale, incluant le regroupement de l’historique, réussit **28 parcours ciblés** (mobile, disponibilités, sessions, notifications et liens manquants). Lint, typage, 53 tests métier et build réussis. Captures WebKit à 390 pixels revues ; aucun secret ni compte réel utilisé. La validation sur iPhone installé et l’appréciation utilisateur restent nécessaires.
+
+## Limites du lancement
 
 Le test de restauration partage les rôles système du cluster synthétique et utilise son superutilisateur pour charger les schémas. Il ne démontre ni restauration dans Supabase hébergé, ni OTP après récupération, ni copie des clés racines, ni bascule Vercel. Le schéma de cron et les secrets Vault sont volontairement exclus de l’archive ; leur reconstitution est une étape distincte.
 

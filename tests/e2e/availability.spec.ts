@@ -21,7 +21,7 @@ test("saisir, traverser minuit, copier et protéger une confirmation périmée",
     checked(await client.auth.verifyOtp({ token_hash: link.properties.hashed_token, type: "email" }));
     await page.context().addCookies([...cookies].map(([name, value]) => ({ name, value, domain: "127.0.0.1", path: "/" })));
     const week = monday(today(new Date().toISOString()));
-    const editor = (n: number) => page.locator("details").filter({ has: page.locator("summary", { hasText: dayLabel(addDays(week, n)) }) });
+    const editor = (n: number) => page.locator(".day-editor").filter({ hasText: dayLabel(addDays(week, n)) });
     await page.goto(`/dispos?semaine=${week}`);
     await expect(page.getByRole("heading", { name: "Mes réponses · 0/7" })).toBeVisible();
     await editor(0).locator("summary").click();
@@ -53,18 +53,19 @@ test("saisir, traverser minuit, copier et protéger une confirmation périmée",
 
     const target = addDays(week, 7);
     await page.goto(`/dispos?semaine=${target}`);
-    const first = page.locator("details").first();
+    const first = page.locator(".day-editor").first();
     await first.locator("summary").click();
     await first.getByLabel("Votre réponse").selectOption("unavailable");
     await first.getByRole("button", { name: "Prévisualiser cette journée" }).click();
     await first.getByRole("button", { name: "Confirmer ces disponibilités" }).click();
     await expect(page.getByRole("heading", { name: "Mes réponses · 1/7" })).toBeVisible();
+    await page.getByText("Reprendre une semaine précédente",{exact:true}).click();
     const copy = page.getByRole("heading", { name: "Copier une semaine" }).locator("..");
     await copy.getByRole("button", { name: "Prévisualiser la copie" }).click();
     await expect(copy.getByRole("listitem")).toHaveCount(3);
     await copy.getByRole("button", { name: "Confirmer ces disponibilités" }).click();
     await expect(page.getByRole("heading", { name: "Mes réponses · 4/7" })).toBeVisible();
-    await expect(first.locator("summary")).toContainText("Indisponible");
+    await expect(first.locator(".day-heading")).toContainText("Indisponible");
 
     await copy.getByLabel("Remplacer aussi mes journées déjà renseignées").check();
     await copy.getByRole("button", { name: "Prévisualiser la copie" }).click();
@@ -75,6 +76,7 @@ test("saisir, traverser minuit, copier et protéger une confirmation périmée",
     await copy.getByRole("button", { name: "Confirmer ces disponibilités" }).click();
     await expect(copy.getByText("Enregistrement refusé", { exact: false })).toBeVisible();
     await page.reload();
+    await page.getByText("Reprendre une semaine précédente",{exact:true}).click();
     await copy.getByLabel("Remplacer aussi mes journées déjà renseignées").check();
     await copy.getByRole("button", { name: "Prévisualiser la copie" }).click();
     await copy.getByRole("button", { name: "Confirmer ces disponibilités" }).click();

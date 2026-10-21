@@ -103,6 +103,8 @@ Lectures initiales en Server Components ; interactions en Client Components ; mu
 
 Les contrôles de compte et d’adhésion utilisent `React.cache` pour dédupliquer leurs appels dans un même rendu serveur, conformément au [guide Next.js](https://nextjs.org/docs/app/guides/authentication). Aucun cache partagé entre requêtes ou utilisateurs ; chaque nouvelle requête recontrôle les droits et RLS reste active. Les lectures indépendantes démarrent en parallèle. Une frontière `loading.tsx` fournit un retour de navigation pendant les lectures, sans stocker de données privées.
 
+Les sous-routes `/groupe/jeux`, `/groupe/reglages` et `/groupe/gestion` isolent les tâches occasionnelles des quatre écrans quotidiens. Chacune appelle `requireMember` ; la gestion vérifie également le rôle administrateur avant toute lecture des invitations. Le composant PWA reste monté dans le shell pour protéger les saisies et surveiller la connexion ; seule son aide d’installation est limitée aux réglages et masquée en mode installé. Aucun changement de service worker ni de sa liste de cache.
+
 ## Contrats applicatifs et flux
 
 Les noms suivants décrivent des contrats à implémenter, pas une API disponible. Ils retournent un résultat typé ou une erreur métier traduite en français. Les dates civiles utilisent `YYYY-MM-DD`, les instants un format ISO 8601 avec décalage explicite. Le serveur vérifie l'horizon, les bornes et les relations, même après validation cliente.
@@ -157,6 +159,8 @@ Un compte authentifié sans invitation valide reste sans accès. Une invitation 
 L'adaptateur temporel central convertit date locale + heure + occurrence éventuelle en instant. Il utilise Europe/Paris indépendamment du serveur ou de l'appareil. Une journée locale peut durer 23 ou 25 heures. La base garde les bornes UTC et la date locale de rattachement ; l'UI utilise les mêmes règles de conversion.
 
 J3 livre cet adaptateur dans `src/lib/time/paris.ts`, le domaine pur dans `features/availability/domain.ts`, les lectures et Server Actions dans le module disponibilité, et la RPC transactionnelle `save_availability` en SQL. Les aperçus signés durent dix minutes ; chaque confirmation recontrôle session, adhésion, horizon et révisions. Une correction explicite résout les heures inexistantes de copie ; une occurrence est choisie par borne répétée. Voir [ADR 011](decisions/011-disponibilites-et-apercus.md).
+
+L’[ADR 017](decisions/017-navigation-mobile-et-reponses-rapides.md) ajoute `saveQuickDay` : une réponse explicite sur une seule journée, avec révision attendue et horaires rapides affichés, est enregistrée sans aperçu supplémentaire. Cette commande refuse les journées détaillées et les plans sur plusieurs dates ; le domaine et la même RPC assurent les invariants. Les opérations complexes gardent l’aperçu signé.
 
 Le matching reçoit un instant `now`, les intervalles normalisés, les engagements et les favoris ; il ne lit ni base ni horloge globale. Le cas d'usage charge ces données et appelle le calcul pur.
 

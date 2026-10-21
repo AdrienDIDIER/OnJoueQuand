@@ -37,7 +37,7 @@ test("les quatre onglets sont réellement navigables", async ({ page }) => {
 });
 
 test("le Push non configuré est expliqué avant toute demande d’autorisation", async ({ page }) => {
-  await page.goto("/groupe");
+  await page.goto("/groupe/reglages");
   const settings = page.getByRole("region", { name: "Mes notifications", exact: true });
   await expect(settings.getByRole("status").filter({ hasText: "ne sont pas encore configurées par l’administrateur" })).toBeVisible();
   await settings.getByRole("button", { name: "Activer sur cet appareil" }).click();

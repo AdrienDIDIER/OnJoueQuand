@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { Gamepad2, LockKeyhole, Sparkles } from "lucide-react";
+import { Gamepad2, LockKeyhole, Settings } from "lucide-react";
 import { AppNavigation } from "./app-navigation";
 import {PwaExperience} from "@/features/pwa/ui/experience";
 
@@ -17,9 +17,8 @@ export function AppShell({ children }: { children: ReactNode }) {
       <div className="sidebar-note"><LockKeyhole size={17} aria-hidden="true" /><div><p>Entre vous, simplement.</p><span>Un espace pensé pour votre groupe.</span></div></div>
     </aside>
     <div className="workspace">
-      <header className="topbar"><span>Un rendez-vous avec votre équipe.</span><span className="status-pill"><Sparkles size={13} aria-hidden="true" />En préparation</span></header>
+      <header className="topbar"><span>Entre amis, tout simplement.</span><Link href="/groupe/reglages" className="settings-link" aria-label="Mes réglages"><Settings size={20} aria-hidden="true"/></Link></header>
       <main id="contenu" tabIndex={-1}>{children}<PwaExperience/></main>
-      <footer className="footer"><span>Moins d’organisation. Plus de bons moments.</span><span>Horaires de Paris</span></footer>
     </div>
   </div>;
 }

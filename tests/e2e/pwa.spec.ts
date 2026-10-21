@@ -32,11 +32,11 @@ test("manifeste, icônes et repli hors connexion sans données privées",async({
   unavailable=true;await page.goto(`${proxy.origin}/groupe?source=recette`);await expect(page.getByRole("heading",{level:1})).toHaveText("Vous êtes hors connexion.");await expect(page.locator("body")).not.toContainText(sentinel);await expect(page.getByRole("textbox")).toHaveCount(0);await page.screenshot({path:info.outputPath("hors-connexion.png")});
   const cache=await page.evaluate(async()=>{const names=await caches.keys();const paths:string[]=[];for(const name of names){for(const r of await(await caches.open(name)).keys())paths.push(new URL(r.url).pathname);}return paths.sort();});expect(cache).toEqual(["/icons/apple-touch-icon.png","/icons/icon-192.png","/icons/icon-512.png","/icons/maskable-512.png","/offline.html"]);
   unavailable=false;await page.context().setOffline(false);await page.getByRole("link",{name:"Réessayer"}).click();await expect(page.getByRole("heading",{level:1})).toHaveText("Bienvenue chez vous.");
-  await page.getByRole("button",{name:"Me déconnecter",exact:true}).click();await expect(page).toHaveURL(/\/connexion$/);await page.goto(`${proxy.origin}/groupe`);await expect(page).toHaveURL(/\/connexion$/);
+  await page.goto(`${proxy.origin}/groupe/reglages`);await page.getByRole("button",{name:"Me déconnecter",exact:true}).click();await expect(page).toHaveURL(/\/connexion$/);await page.goto(`${proxy.origin}/groupe/reglages`);await expect(page).toHaveURL(/\/connexion$/);
   }finally{await page.context().setOffline(false);await page.goto("about:blank");await proxy.close();}
 });
 test("installation volontaire et report sans bloquer la navigation",async({page})=>{
-  await page.goto("/accueil");await controlled(page);await page.getByText("Installer OnJoueQuand",{exact:true}).click();
+  await page.goto("/groupe/reglages");await controlled(page);await page.getByText("Installer OnJoueQuand",{exact:true}).click();
   await page.evaluate(()=>{document.documentElement.dataset.promptCount="0";const event=new Event("beforeinstallprompt",{cancelable:true});Object.defineProperties(event,{prompt:{value:async()=>{document.documentElement.dataset.promptCount="1";}},userChoice:{value:Promise.resolve({outcome:"dismissed"})}});window.dispatchEvent(event);});
   await expect(page.locator("html")).toHaveAttribute("data-prompt-count","0");
   await page.getByRole("button",{name:"Installer l’application",exact:true}).click();await expect(page.getByText("Installation reportée.",{exact:false})).toBeVisible();await expect(page.locator("html")).toHaveAttribute("data-prompt-count","1");
@@ -44,7 +44,7 @@ test("installation volontaire et report sans bloquer la navigation",async({page}
 });
 test("reprise de focus : saisie conservée et accès révoqué recontrôlé",async({page,request})=>{
   expect((await request.get("/api/session-status")).status()).toBe(401);
-  await page.goto("/groupe");await controlled(page);const input=page.getByLabel("Votre nom dans le groupe",{exact:true});await input.fill("Saisie à conserver au premier plan");
+  await page.goto("/groupe/reglages");await page.getByText("Mon profil",{exact:true}).click();await controlled(page);const input=page.getByLabel("Votre nom dans le groupe",{exact:true});await input.fill("Saisie à conserver au premier plan");
   const verified=page.waitForResponse(response=>response.url().endsWith("/api/session-status")&&response.status()===200);await page.evaluate(()=>window.dispatchEvent(new Event("focus")));const active=await verified;expect(active.headers()["cache-control"]).toContain("no-store");await expect(input).toHaveValue("Saisie à conserver au premier plan");
   const {admin,config}=clients();const cookies=await page.context().cookies();const client=createServerClient(config.url,config.key,{cookies:{getAll:()=>cookies.map(({name,value})=>({name,value})),setAll:()=>{}}});const user=checked(await client.auth.getUser()).user;if(!user)throw new Error("Compte de recette absent.");
   checked(await admin.from("memberships").update({status:"revoked",revoked_at:new Date().toISOString()}).eq("user_id",user.id));
@@ -53,11 +53,12 @@ test("reprise de focus : saisie conservée et accès révoqué recontrôlé",asy
 test("une mise à jour réelle attend et préserve les formulaires des autres onglets",async({page,context})=>{
   test.setTimeout(60_000);page.setDefaultTimeout(10_000);let version=1;const marker=randomUUID();const original=readFileSync("public/sw.js","utf8");
   // Origine locale isolée : vrai changement de script SW, sans modifier les fichiers ni les autres tests.
-  const proxy=await appProxy(()=>original.replace('ojq-public-v1',`ojq-public-${marker}-${version}`));const url=`${proxy.origin}/groupe`;
+  const proxy=await appProxy(()=>original.replace('ojq-public-v1',`ojq-public-${marker}-${version}`));const url=`${proxy.origin}/groupe/reglages`;
   const other=await context.newPage();
   other.setDefaultTimeout(10_000);
   try{
     await page.goto(url);await controlled(page);await other.goto(url);await controlled(other);
+    await page.getByText("Mon profil",{exact:true}).click();await other.getByText("Mon profil",{exact:true}).click();
     const input=page.getByLabel("Votre nom dans le groupe",{exact:true}),otherInput=other.getByLabel("Votre nom dans le groupe",{exact:true});const initial=await input.inputValue();await input.fill("Saisie du premier onglet");await otherInput.fill("Saisie conservée dans l’autre onglet");
     await page.evaluate(async()=>{await caches.open("ojq-public-obsolete");await caches.open("cache-autre-application");});
     version=2;await page.evaluate(async()=>{await(await navigator.serviceWorker.getRegistration())?.update();});

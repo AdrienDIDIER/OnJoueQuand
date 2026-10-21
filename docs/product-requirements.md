@@ -22,14 +22,18 @@ Les profils contiennent un nom d'affichage et des initiales, sans téléversemen
 
 | Onglet | Contenu |
 | --- | --- |
-| Accueil | Prochaine session, tâches personnelles, complétude hebdomadaire, suggestions et centre de notifications. |
+| Accueil | Prochaine session et réponse attendue, complétude hebdomadaire, accès direct aux disponibilités et trois dernières notifications ; précédentes à la demande. |
 | Dispos | Saisie personnelle, copie, calendrier collectif et recherche de créneaux. |
 | Sessions | Brouillons autorisés, propositions, votes, confirmation, RSVP et historique. |
-| Groupe | Profils, jeux, favoris, préférences et fonctions d'administration autorisées. |
+| Groupe | Membres et raccourcis vers les jeux/favoris, les réglages personnels et la gestion réservée aux administrateurs. |
 
 Tous les contenus utilisateur sont en français : interface, e-mails, dates, erreurs, notifications et aide à l'installation. Une date ne doit pas dépendre du fuseau implicite du navigateur : les horaires sont ceux de Paris, avec indication du fuseau lorsque nécessaire.
 
 Identité sombre, accents violets discrets, surfaces hiérarchisées et typographie lisible. Les trois états de disponibilité ont un libellé et un indicateur distinct de la couleur. Les composants sont utilisables au clavier, avec focus visible, réduction des animations et contrastes visant WCAG AA. L'interface s'adapte au téléphone, à la tablette et au bureau.
+
+L’usage quotidien privilégie le téléphone : une action principale par carte et les commandes secondaires à la demande. Les réglages, le profil, l’aide à l’installation et la déconnexion se trouvent dans `/groupe/reglages`, le catalogue dans `/groupe/jeux`, les invitations et la gestion des accès dans `/groupe/gestion` (administrateurs uniquement). Ces écrans conservent l’onglet Groupe actif. Les disponibilités présentent d’abord les réponses personnelles ; copie et calendrier collectif sont repliés, avec une liste par journée sur mobile. La recherche fonctionne avec ses valeurs par défaut sans ouvrir ses filtres. Dans une proposition, voter reste visible, organiser nécessite d’ouvrir les commandes dédiées. Aucun droit ni règle métier n’est retiré par cette simplification.
+
+Une réponse rapide « Dispo 20:00–23:00 » ou « Indispo » enregistre directement une seule journée, avec vérification de sa révision et des horaires affichés. Une journée détaillée ne propose pas ces raccourcis afin d’éviter de remplacer ses intervalles par erreur. Les horaires détaillés, les opérations traversant minuit et la copie conservent leur aperçu puis confirmation.
 
 ## Exigences et traçabilité
 

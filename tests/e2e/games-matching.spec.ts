@@ -32,7 +32,7 @@ test("créer un jeu, gérer ses favoris et trouver un vrai créneau commun",asyn
       }
       checked(await actor.rpc("save_availability",{changes:[{local_date:week,status:"available",mode:"detailed",expected_revision:null,intervals:[{starts_at:localInstant(week,i===0?"20:00":"21:00"),ends_at:localInstant(week,"23:00")}]}]}));
     }
-    await page.goto("/groupe");
+    await page.goto("/groupe/jeux");
     await page.getByText("Ajouter un jeu personnalisé",{exact:true}).click();
     const name=`Jeu J4 ${randomUUID().slice(0,8)}`;
     await page.getByLabel("Nom du jeu",{exact:true}).fill(name);
@@ -53,6 +53,7 @@ test("créer un jeu, gérer ses favoris et trouver un vrai créneau commun",asyn
 
     await page.goto(`/dispos?semaine=${week}`);
     const search=page.getByRole("heading",{name:"Trouver un créneau commun",exact:true}).locator("..");
+    await search.getByText("Affiner la recherche",{exact:true}).click();
     const checks=search.getByRole("checkbox");
     for(const check of await checks.all()) await check.uncheck();
     await search.getByLabel(names[0]!,{exact:true}).check(); await search.getByLabel(names[1]!,{exact:true}).check();
@@ -69,7 +70,7 @@ test("créer un jeu, gérer ses favoris et trouver un vrai créneau commun",asyn
     await search.getByRole("button",{name:"Rechercher des créneaux"}).click();
     await expect(search.getByText("Aucun créneau commun",{exact:false})).toBeVisible();
     await expect(search.getByLabel("Durée en minutes")).toHaveValue("180");
-    await page.goto("/groupe");
+    await page.goto("/groupe/jeux");
     await renamed.getByText("Modifier ou archiver ce jeu",{exact:true}).click();
     await renamed.getByRole("button",{name:"Archiver ce jeu"}).click();
     await expect(renamed).toHaveCount(0);

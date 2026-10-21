@@ -1,30 +1,21 @@
 import Link from "next/link";
-import { ArrowRight, CalendarDays, Check, Gamepad2, Swords, Users } from "lucide-react";
+import { ArrowRight, CalendarDays } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { requireMember } from "@/features/auth/server";
 import { readNextSession } from "@/features/sessions/queries";
+import { loadWeekProgress } from "@/features/availability/server";
 import { slotLabel } from "@/lib/time/paris";
-import {loadInbox} from "@/features/notifications/server";
-import {Inbox} from "@/features/notifications/ui/notifications";
+import { loadInbox } from "@/features/notifications/server";
+import { Inbox } from "@/features/notifications/ui/notifications";
 
 export default async function HomePage() {
   await requireMember();
-  const [next,inbox]=await Promise.all([readNextSession(),loadInbox()]);
-  return <>
-    <div className="page-heading"><p className="eyebrow">ON SE RETROUVE EN JEU ?</p><h1>Bienvenue chez vous<span className="text-primary">.</span></h1><p>Le point de départ de vos prochaines soirées ensemble.</p></div>
-    <section className="hero" aria-labelledby="hero-title">
-      <div className="hero-copy"><span className="hero-label"><span /> LE BON CRÉNEAU CHANGE TOUT</span><h2 id="hero-title">Moins de messages.<br /><span>Plus de parties.</span></h2><p>Vos dispos, vos jeux, votre groupe.<br />Tout pour se retrouver au même moment.</p><div className="hero-actions"><Button asChild><Link href="/dispos">Découvrir les dispos <ArrowRight aria-hidden="true" /></Link></Button><Button asChild variant="outline"><Link href="/sessions">Voir les sessions</Link></Button></div></div>
-      <div className="hero-art" aria-hidden="true"><div className="orbit orbit-one" /><div className="orbit orbit-two" /><div className="orbit orbit-three" /><div className="game-tile"><Gamepad2 size={66} strokeWidth={1.2} /></div><span className="orbit-symbol symbol-calendar"><CalendarDays size={24} /></span><span className="orbit-symbol symbol-check"><Check size={23} /></span><span className="orbit-symbol symbol-people"><Users size={23} /></span><span className="orbit-dot dot-one" /><span className="orbit-dot dot-two" /></div>
-    </section>
-    {next&&<section className="group-card" aria-label="Prochaine session"><p className="eyebrow">PROCHAINE SESSION</p><h2>{next.title}</h2><p>{slotLabel(next.slot.starts_at,next.slot.ends_at)} · Paris</p><p>{next.response==="attending"?"Vous participez.":next.response==="declined"?"Vous ne participez pas.":"Votre participation attend une réponse explicite."}</p><Link className="text-link" href={`/sessions#session-${next.id}`}>Voir la session et répondre <ArrowRight size={16}/></Link></section>}
-    <div className="section-heading"><h2>Une soirée réussie, en trois temps</h2><span>Simple, du début à la partie.</span></div>
-    <div className="steps-grid">{[
-      { n: "01", icon: CalendarDays, title: "Trouvez votre moment", text: "Un soir de libre ou un créneau précis : chacun pourra partager ses disponibilités.", href: "/dispos", label: "Les disponibilités" },
-      { n: "02", icon: Swords, title: "Donnez-vous rendez-vous", text: "Un jeu, plusieurs horaires et l’avis du groupe pour choisir le bon créneau.", href: "/sessions", label: "Les sessions" },
-      { n: "03", icon: Users, title: "Retrouvez votre équipe", text: "Vos amis, vos collègues et vos jeux favoris, réunis dans un espace privé.", href: "/groupe", label: "Le groupe" },
-    ].map(({ n, icon: Icon, title, text, href, label }) => <Card key={n} className="step-card"><div className="step-top"><span className="step-icon"><Icon size={22} aria-hidden="true" /></span><span className="step-number">{n}</span></div><h3>{title}</h3><p>{text}</p><Link href={href} className="text-link">{label}<ArrowRight size={16} aria-hidden="true" /></Link></Card>)}</div>
+  const [next,inbox,answered]=await Promise.all([readNextSession(),loadInbox(),loadWeekProgress()]);
+  return <div className="daily-home">
+    <div className="page-heading"><p className="eyebrow">Votre prochain moment ensemble</p><h1>Bienvenue chez vous.</h1><p>L’essentiel pour votre prochaine partie.</p></div>
+    {next&&<section className="group-card next-session" aria-label="Prochaine session"><p className="eyebrow">Prochaine session</p><h2>{next.title}</h2><p className="session-time">{slotLabel(next.slot.starts_at,next.slot.ends_at)} · Paris</p><p>{next.response==="attending"?"Vous participez.":next.response==="declined"?"Vous ne participez pas.":"Votre place attend votre réponse."}</p><Button asChild><Link href={`/sessions?session=${next.id}#session-${next.id}`}>Voir la session et répondre <ArrowRight size={18}/></Link></Button></section>}
+    <section className="group-card weekly-action" aria-labelledby="week-title"><span className="quiet-icon"><CalendarDays size={22} aria-hidden="true"/></span><p className="eyebrow">Cette semaine</p><h2 id="week-title">{answered===7?"Vos dispos sont à jour.":"Un moment pour jouer ?"}</h2><p>{answered===7?"Vous pouvez encore les modifier si vos plans changent.":`${answered} journée${answered>1?"s":""} renseignée${answered>1?"s":""} sur 7. Partagez vos soirées libres avec le groupe.`}</p><Button asChild variant={next?"outline":"default"}><Link href="/dispos">{answered===7?"Voir mes dispos":"Renseigner mes dispos"}<ArrowRight size={18}/></Link></Button></section>
+    {!next&&<Link href="/sessions" className="simple-row"><span><strong>Une envie de jouer ?</strong><span>Proposez une session au groupe.</span></span><ArrowRight size={20} aria-hidden="true"/></Link>}
     <Inbox view={inbox}/>
-    <div className="welcome-note"><span className="note-line" /><p><strong>À vous de jouer.</strong> Partagez vos disponibilités, proposez une soirée et confirmez votre participation.</p></div>
-  </>;
+  </div>;
 }

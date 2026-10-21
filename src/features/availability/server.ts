@@ -3,6 +3,14 @@ import { requireMember } from "@/features/auth/server";
 import { emptyDay, horizon, normalize, weekDays, type Day } from "./domain";
 import { addDays, monday } from "@/lib/time/paris";
 
+export async function loadWeekProgress() {
+  const { client, member } = await requireMember();
+  const week = horizon(new Date().toISOString()).current;
+  const { data, error } = await client.from("availability_days").select("status").eq("membership_id", member.id).gte("local_date", week).lte("local_date", addDays(week, 6));
+  if (error) throw new Error("Vos disponibilités sont temporairement indisponibles.");
+  return data.filter(day => day.status !== "unanswered").length;
+}
+
 export async function loadCalendar(requested?: string) {
   const { client, member } = await requireMember();
   const now = new Date().toISOString(); const h = horizon(now);
