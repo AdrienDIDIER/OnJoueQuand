@@ -20,7 +20,7 @@
     "test:integration": "node --test --test-concurrency=1 tests/integration/identity.test.mjs tests/integration/availability.test.mjs tests/integration/games.test.mjs tests/integration/sessions.test.mjs tests/integration/notifications.test.mjs tests/integration/operations.test.mjs tests/integration/retention.test.mjs",
     "test:notifications": "node --test tests/integration/notifications.test.mjs",
     "push:keys": "node scripts/generate-push-keys.mjs",
-    "test:ops": "node --test tests/ops/backup.test.mjs tests/ops/monitor.test.mjs tests/ops/backup-age.test.mjs",
+    "test:ops": "node --test tests/ops/backup.test.mjs tests/ops/monitor.test.mjs tests/ops/backup-age.test.mjs tests/ops/mailbox-code.test.mjs",
     "ops:monitor": "node scripts/ops/monitor.mjs",
     "backup:create": "node scripts/ops/backup.mjs",
     "backup:rehearse": "node scripts/ops/rehearse-local.mjs",

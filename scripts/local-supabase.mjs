@@ -26,6 +26,14 @@ export async function identity(admin, anonymous, label, confirmed = true) {
   }
   return { email, user, client };
 }
+export function extractMailboxCode(message) {
+  // Lire le texte visible, pas les chiffres présents dans les couleurs et attributs HTML.
+  const body = message.Text || (message.HTML ?? "")
+    .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, " ")
+    .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, " ")
+    .replace(/<[^>]*>/g, " ");
+  return body.match(/\b\d{6}\b/)?.[0];
+}
 export async function mailboxCode(mailUrl, email) {
   for (let attempt = 0; attempt < 30; attempt++) {
     const response = await fetch(`${mailUrl}/api/v1/search?query=${encodeURIComponent(`to:${email}`)}`);
@@ -33,8 +41,7 @@ export async function mailboxCode(mailUrl, email) {
       const { messages } = await response.json();
       if (messages.length) {
         const message = await (await fetch(`${mailUrl}/api/v1/message/${messages[0].ID}`)).json();
-        const body = message.HTML ?? message.Text ?? "";
-        const code = body.match(/\b\d{6}\b/)?.[0];
+        const code = extractMailboxCode(message);
         if (code) return code;
       }
     }
