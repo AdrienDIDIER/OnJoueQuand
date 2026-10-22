@@ -26,7 +26,7 @@ function probe(deduplicate=true):Promise<Probe> {
   return request;
 }
 
-type NavigationContext={pendingPath:string|null;validate:(target?:string)=>Promise<boolean>};
+type NavigationContext={accessKey:string;pendingPath:string|null;validate:(target?:string)=>Promise<boolean>};
 const Context=createContext<NavigationContext|null>(null);
 export function usePrivateNavigation(){const value=useContext(Context);if(!value)throw new Error("Contexte de navigation absent.");return value;}
 
@@ -36,11 +36,16 @@ export function NavigationCache({accessKey,children}:{accessKey:string;children:
   const [verifiedLocation,setVerifiedLocation]=useState(locationKey);
   const [target,setTarget]=useState<string|null>(null),[error,setError]=useState("");
   const [blocked,setBlocked]=useState(false);
+  const [initialAccessKey]=useState(accessKey);
+  const contextChanged=initialAccessKey!==accessKey;
   const [pending,startTransition]=useTransition();
   const sequence=useRef(0);
+  const alive=useRef(true);
   const redirecting=useRef(false),intent=useRef<string|null>(null);
+  useEffect(()=>{alive.current=true;return()=>{alive.current=false;};},[]);
+  useEffect(()=>{if(contextChanged){redirecting.current=true;window.location.replace(window.location.href);}},[contextChanged]);
   const receive=useCallback((result:Probe,destination?:string)=>{
-    if(redirecting.current)return false;
+    if(!alive.current||redirecting.current)return false;
     if(result.status===401||result.status===403){redirecting.current=true;setBlocked(true);window.location.replace("/connexion");return false;}
     if(result.status!==200){setError("Connexion au groupe impossible. Réessayez dans un instant.");return false;}
     if(result.accessKey!==accessKey){redirecting.current=true;setBlocked(true);window.location.replace(intent.current??destination??window.location.href);return false;}
@@ -58,7 +63,7 @@ export function NavigationCache({accessKey,children}:{accessKey:string;children:
       const nextLocation=url.pathname+url.search;
       if(nextLocation===locationKey){
         // Un lien d’ancre garde son comportement natif ; retoucher l’onglet courant ne relance rien.
-        ++sequence.current;intent.current=null;setTarget(null);
+        setTarget(null);
         if(!url.hash){event.preventDefault();event.stopImmediatePropagation();}
         return;
       }
@@ -66,21 +71,17 @@ export function NavigationCache({accessKey,children}:{accessKey:string;children:
       const serial=++sequence.current;
       intent.current=nextLocation+url.hash;
       setTarget(url.pathname);setError("");
-      startTransition(async()=>{
-        if(cachedPages.has(url.pathname)&&!url.search){
-          const result=await probe(false);
-          if(serial!==sequence.current||!receive(result,nextLocation+url.hash))return;
-        }
-        if(serial!==sequence.current)return;
-        // Les autres liens n’ont pas de préchargement complet : leurs pages se réautorisent au serveur.
-        startTransition(()=>{setVerifiedLocation(nextLocation);router.push(nextLocation+url.hash);});
+      // Réafficher le snapshot déjà reçu sans attendre le réseau. Toute nouvelle lecture reste autorisée au serveur.
+      startTransition(()=>{setVerifiedLocation(nextLocation);router.push(nextLocation+url.hash);});
+      void probe(false).then(result=>{
+        if(serial===sequence.current)receive(result,nextLocation+url.hash);
       });
     };
     document.addEventListener("click",capture,true);
     return()=>document.removeEventListener("click",capture,true);
   },[locationKey,router,receive]);
 
-  // Retour navigateur : le snapshot peut être en mémoire, le contexte doit être frais avant affichage.
+  // Historique : les quatre onglets reçus sont réaffichés immédiatement ; les sous-routes restent masquées.
   useEffect(()=>{
     if(blocked)return;
     if(locationKey===verifiedLocation){intent.current=null;return;}
@@ -88,8 +89,8 @@ export function NavigationCache({accessKey,children}:{accessKey:string;children:
     void probe().then(result=>{if(!cancelled&&receive(result,locationKey))setVerifiedLocation(locationKey);});
     return()=>{cancelled=true;};
   },[locationKey,verifiedLocation,receive,blocked]);
-  const gated=blocked||locationKey!==verifiedLocation;
-  return <Context value={{pendingPath:pending?target:null,validate}}>
+  const gated=blocked||contextChanged||(locationKey!==verifiedLocation&&!(cachedPages.has(pathname)&&!search));
+  return <Context value={{accessKey,pendingPath:pending?target:null,validate}}>
     <div hidden={gated}>{children}</div>
     {gated&&<div className="navigation-check"><LoadingPlaceholder label="On retrouve votre groupe…" shape="page"/>{error&&<><p role="status">{error}</p><button type="button" onClick={()=>window.location.reload()}>Réessayer</button></>}</div>}
     {!gated&&error&&<p className="navigation-error" role="status">{error}</p>}

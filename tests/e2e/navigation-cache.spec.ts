@@ -74,12 +74,12 @@ test("un accès révoqué bloque le retour sur un onglet déjà en mémoire",asy
   await expect(page).toHaveURL(/\/connexion$/);await expect(page.locator(".day-editor")).toHaveCount(0);
 });
 
-test("une vérification indisponible ne révèle pas la destination en cache",async({page})=>{
+test("une vérification indisponible signale l’erreur sans bloquer les données déjà reçues",async({page})=>{
   await page.goto("/accueil");await page.waitForLoadState("networkidle");
   await page.route("**/api/session-status",route=>route.fulfill({status:503,contentType:"application/json",body:'{"message":"Indisponible"}'}));
   await page.getByRole("navigation",{name:"Navigation principale"}).getByRole("link",{name:"Dispos",exact:true}).click();
   await expect(page.getByRole("status").filter({hasText:"Connexion au groupe impossible"})).toBeVisible();
-  await expect(page).toHaveURL(/\/accueil$/);await expect(page.locator(".day-editor")).toHaveCount(0);
+  await expect(page).toHaveURL(/\/dispos$/);await expect(page.locator(".day-editor")).toHaveCount(7);
 });
 
 test("le retour navigateur recontrôle les droits avant l’affichage de l’historique",async({page,authCookies})=>{
@@ -138,4 +138,18 @@ test("Actualiser récupère les changements d’un autre membre",async({page,aut
   checked(await admin.from("profiles").update({display_name:"Nom actualisé depuis une autre requête"}).eq("user_id",user.id));
   await page.getByRole("button",{name:"Actualiser les informations du groupe",exact:true}).click();
   await expect(page.getByRole("heading",{name:"Nom actualisé depuis une autre requête",exact:true})).toBeVisible();
+});
+
+test("un contexte modifié pendant une commande abandonne aussi les anciens snapshots",async({page,authCookies})=>{
+  const {admin,user}=await actor(authCookies);
+  await page.goto("/groupe/reglages");await page.getByText("Mon profil",{exact:true}).click();
+  await page.getByLabel("Votre nom dans le groupe",{exact:true}).fill("Profil après changement de rôle");
+  checked(await admin.from("memberships").update({role:"member"}).eq("user_id",user.id));
+  let documents=0;
+  page.on("request",request=>{if(request.isNavigationRequest()&&request.resourceType()==="document")documents++;});
+  await page.getByRole("button",{name:"Enregistrer mon profil",exact:true}).click();
+  await expect.poll(()=>documents).toBeGreaterThan(0);
+  await page.getByRole("navigation",{name:"Navigation principale"}).getByRole("link",{name:"Groupe",exact:true}).click();
+  await expect(page.getByRole("heading",{name:"Les membres",exact:true})).toBeVisible();
+  await expect(page.getByRole("link",{name:/Gérer le groupe/})).toHaveCount(0);
 });

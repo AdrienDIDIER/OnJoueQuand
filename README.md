@@ -6,7 +6,7 @@ Application web progressive privée pour aider un groupe de 6 à 15 amis et coll
 
 ## Démarrer
 
-Dernière revue : [fluidité et interface mobile](docs/fluidity-validation.md), avec chargements visuels, transitions discrètes et contrôles serveur en parallèle. Les limites des mesures et essais sur appareils réels y sont explicites.
+Dernière revue : [navigation immédiate et commandes légères](docs/instant-navigation-validation.md). Les onglets déjà reçus s’affichent sans attendre leur contrôle en arrière-plan ; Dispo/Non ne renvoie plus un rendu global. Mesure locale : 65,5 ms contre 234,5 ms entre onglets préchargés, sans engagement de latence sur téléphone réel. Les [chargements et transitions](docs/fluidity-validation.md) restent en place.
 
 La préparation initiale J8 est commitée dans `40f6abb`, puis complétée par conservation, liens de sessions, configuration de préproduction et revue mobile. Les tests de purge et les appels HTTP de recette du worker doivent toujours viser une stack synthétique dédiée ; voir le [rapport J8](docs/j8-validation.md).
 

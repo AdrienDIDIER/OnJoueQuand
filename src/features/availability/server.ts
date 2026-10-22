@@ -20,10 +20,10 @@ export const loadOwnWeek = cache(async function loadOwnWeek(requested?: string) 
 export async function loadWeekProgress() {
   const { client, member } = await requireMember();
   const week = horizon(new Date().toISOString()).current;
-  const { data, error } = await client.from("availability_days").select("local_date,status").eq("membership_id", member.id).gte("local_date", week).lte("local_date", addDays(week, 6));
+  const { data, error } = await client.from("availability_days").select("local_date,status,revision").eq("membership_id", member.id).gte("local_date", week).lte("local_date", addDays(week, 6));
   if (error) throw new Error("Vos disponibilités sont temporairement indisponibles.");
-  const days=weekDays(week).map(local_date=>({local_date,status:data.find(day=>day.local_date===local_date)?.status??"unanswered"}));
-  return {answered:days.filter(day=>day.status!=="unanswered").length,days};
+  const days=weekDays(week).map(local_date=>{const day=data.find(day=>day.local_date===local_date);return{local_date,status:(day?.status??"unanswered") as Day["status"],revision:day?.revision??null};});
+  return {answered:days.filter(day=>day.status!=="unanswered").length,days,memberId:member.id};
 }
 
 export async function loadCalendar(requested?: string) {

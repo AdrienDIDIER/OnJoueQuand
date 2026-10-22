@@ -1,5 +1,7 @@
 # ADR 023 — Lectures autorisées en parallèle et retours visuels
 
+L’[ADR 024](024-navigation-immediate-et-commandes-legeres.md) remplace ensuite le contrôle bloquant des onglets reçus et le parcours de réponse rapide. Les lectures Auth/RLS parallèles et les effets visuels de cette décision restent en place.
+
 - Date : 22 octobre 2026.
 - Statut : implémentée ; résultats dans la [recette](../fluidity-validation.md).
 - Complète les ADR 018 et 019, sans modifier leurs règles de cache.

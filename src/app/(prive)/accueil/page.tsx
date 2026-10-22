@@ -9,14 +9,15 @@ import { dayLabel,slotLabel } from "@/lib/time/paris";
 import { loadInbox } from "@/features/notifications/server";
 import { Inbox } from "@/features/notifications/ui/notifications";
 import {LoadingPlaceholder} from "@/components/ui/loading";
+import {WeekProgressView} from "@/features/availability/ui/progress";
 
 async function NextSession() {
   const next=await readNextSession();
   return next?<section className="next-session" aria-label="Prochaine session"><p className="eyebrow">Prochaine partie</p><h2>{next.title}</h2><p className="session-time">{slotLabel(next.slot.starts_at,next.slot.ends_at)} · Paris</p><p>{next.response==="attending"?"Vous participez.":next.response==="declined"?"Vous ne participez pas.":"Vous venez ?"}</p><Button asChild><Link href={`/sessions?session=${next.id}#session-${next.id}`}>{next.response?"Voir la session":"Répondre à l’invitation"}<ArrowRight size={18}/></Link></Button></section>:<section className="no-session"><span className="quiet-icon"><CalendarDays size={22}/></span><h2>Une partie ensemble ?</h2><p>Choisissez un soir, les amis vous disent s’ils viennent.</p><Button asChild><Link href="/sessions">Organiser une soirée <Plus size={18}/></Link></Button></section>;
 }
 async function WeekProgress() {
-  const {answered,days}=await loadWeekProgress();
-  return <Link className="availability-shortcut" href="/dispos"><CalendarDays size={22} aria-hidden="true"/><span><strong>{answered===7?"Vos dispos sont à jour":"Vos soirées cette semaine"}</strong><span>{answered}/7 journées renseignées · {answered===7?"Modifier":"Compléter"}</span><span className="week-progress" role="img" aria-label={days.map(day=>`${dayLabel(day.local_date)} : ${day.status==="available"?"dispo":day.status==="unavailable"?"indispo":"sans réponse"}`).join(" ; ")}>{days.map(day=><i key={day.local_date} data-date={day.local_date} data-status={day.status} aria-hidden="true"/>)}</span></span><ArrowRight size={20} aria-hidden="true"/></Link>;
+  const {days,memberId}=await loadWeekProgress();
+  return <WeekProgressView memberId={memberId} days={days.map(day=>({...day,label:dayLabel(day.local_date)}))}/>;
 }
 async function Notifications(){return <Inbox view={await loadInbox()}/>;}
 export default async function HomePage() {

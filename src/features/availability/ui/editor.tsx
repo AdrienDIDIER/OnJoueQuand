@@ -1,11 +1,14 @@
 "use client";
-import { useActionState, useOptimistic, useState } from "react";
+import { useActionState, useRef, useState } from "react";
 import { Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet } from "@/components/ui/sheet";
 import { addDays, dayLabel, intervalLabel, localParts, type Occurrence } from "@/lib/time/paris";
 import type { Day, LocalRange } from "../domain";
-import { applyAvailability, previewCopy, previewDay, saveQuickDay, type AvailabilityState } from "../actions";
+import { applyAvailability, previewCopy, previewDay, type AvailabilityState } from "../actions";
+import {useAvailabilityUpdates,useLiveDay} from "../client";
+import type {QuickReplyResult} from "../quick-command";
+import {usePrivateNavigation} from "@/features/navigation/client";
 const initial: AvailabilityState = { message: "" };
 
 function Confirmation({ state }: { state: AvailabilityState }) {
@@ -22,19 +25,41 @@ function OccurrenceSelect({ label, value, onChange }: { label: string; value?: O
     <option value="">Heure habituelle</option><option value="earlier">Première occurrence</option><option value="later">Seconde occurrence</option>
   </select></label>;
 }
-function QuickReply({day,quick}:{day:Day;quick:{start:string;end:string}}) {
-  const [choice,choose]=useOptimistic(day.status,(_old:Day["status"],next:Day["status"])=>next);
-  const [state,action,pending]=useActionState(async(previous:AvailabilityState,form:FormData)=>{choose(form.get("status") as Day["status"]);return saveQuickDay(previous,form);},initial);
-  return <form action={action} className="quick-reply" aria-busy={pending}><input type="hidden" name="date" value={day.local_date}/><input type="hidden" name="revision" value={day.revision??""}/><input type="hidden" name="quickStart" value={quick.start}/><input type="hidden" name="quickEnd" value={quick.end}/>
+function QuickReply({day,quick,memberId}:{day:Day;quick:{start:string;end:string};memberId:string}) {
+  const {commit,memberId:owner}=useAvailabilityUpdates();
+  const {accessKey}=usePrivateNavigation();
+  const saving=useRef(false);
+  const [pending,setPending]=useState(false),[message,setMessage]=useState("");
+  const [optimistic,setOptimistic]=useState<Day["status"]|null>(null);
+  const choice=optimistic??day.status;
+  return <form onSubmit={async event=>{
+    event.preventDefault();
+    const submitter=(event.nativeEvent as SubmitEvent).submitter;
+    const status=submitter instanceof HTMLButtonElement?submitter.value:undefined;
+    if(saving.current||!(status==="available"||status==="unavailable"))return;
+    if(owner!==memberId){window.location.reload();return;}
+    saving.current=true;setPending(true);setMessage("");setOptimistic(status);
+    const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),20_000);
+    try{
+      const response=await fetch("/api/availability/quick",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json","X-OJQ-Context":accessKey},body:JSON.stringify({date:day.local_date,revision:day.revision,status,quickStart:quick.start,quickEnd:quick.end}),signal:controller.signal});
+      if(response.redirected){window.location.replace("/connexion");return;}
+      const result=await response.json() as QuickReplyResult;
+      if(result.code==="context_changed"){window.location.reload();return;}
+      if(!response.ok||!result.done||!result.day){setMessage(result.message||"Réponse refusée. Actualisez puis réessayez.");return;}
+      commit(result.day);
+    }catch{setMessage("Enregistrement non confirmé. Actualisez avant de réessayer.");}
+    finally{clearTimeout(timeout);saving.current=false;setOptimistic(null);setPending(false);}
+  }} className="quick-reply" aria-busy={pending}><input type="hidden" name="date" value={day.local_date}/><input type="hidden" name="revision" value={day.revision??""}/><input type="hidden" name="quickStart" value={quick.start}/><input type="hidden" name="quickEnd" value={quick.end}/>
     <div><Button variant="outline" name="status" value="available" aria-label={`Dispo ${quick.start}–${quick.end}`} aria-pressed={choice==="available"} disabled={pending} aria-busy={pending}><Check size={16} aria-hidden="true"/>Dispo</Button><Button variant="outline" name="status" value="unavailable" aria-label="Indispo" aria-pressed={choice==="unavailable"} disabled={pending} aria-busy={pending}><X size={16} aria-hidden="true"/>Non</Button></div>
-    {pending?<p className="sr-only" role="status">Enregistrement…</p>:state.message&&<p role="status">{state.message}</p>}
+    {pending?<p className="sr-only" role="status">Enregistrement…</p>:message&&<p role="status">{message}</p>}
   </form>;
 }
-export function DayEditor({ day, next, editable, quick, isToday=false }: { day: Day; next: Day; editable: boolean; quick: { start: string; end: string }; isToday?:boolean }) {
+export function DayEditor({ day:initialDay, next:initialNext, editable, quick,memberId, isToday=false }: { day: Day; next: Day; editable: boolean; quick: { start: string; end: string };memberId:string; isToday?:boolean }) {
+  const day=useLiveDay(initialDay,memberId),next=useLiveDay(initialNext,memberId);
   const summary=day.status==="unanswered"?"Sans réponse":day.status==="unavailable"?"Indisponible":day.mode==="detailed"?day.intervals.map(r=>intervalLabel(r.starts_at,r.ends_at,day.local_date)).join(" · "):"Disponible";
   return <div className={`day-editor${isToday?" day-today":""}`} role="group" aria-label={dayLabel(day.local_date)}>
     <Sheet title={`Horaires du ${dayLabel(day.local_date)}`} trigger={<><strong>{dayLabel(day.local_date).split(" ").slice(0,2).join(" ")}</strong><span>{summary}</span><span className="sr-only">{dayLabel(day.local_date)}</span></>}><DetailedDayEditor day={day} next={next} editable={editable} quick={quick}/></Sheet>
-    {editable&&day.mode!=="detailed"&&<QuickReply day={day} quick={quick}/>}
+    {editable&&day.mode!=="detailed"&&<QuickReply day={day} quick={quick} memberId={memberId}/>}
   </div>;
 }
 

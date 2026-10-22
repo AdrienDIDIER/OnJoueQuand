@@ -3,7 +3,7 @@ import {test} from "./fixtures";
 
 test.use({serviceWorkers:"block"});
 
-test("revenir sur l’onglet courant annule une intention encore en attente",async({page})=>{
+test("un ancien contrôle lent ne bloque pas les onglets suivants",async({page})=>{
   await page.goto("/accueil");await page.waitForLoadState("networkidle");
   let resume!:()=>void,requests=0;
   const gate=new Promise<void>(resolve=>{resume=resolve;});
@@ -15,14 +15,14 @@ test("revenir sur l’onglet courant annule une intention encore en attente",asy
   const oldResponse=page.waitForResponse(response=>response.url().endsWith("/api/session-status")&&response.status()===503);
   try{
     await nav.getByRole("link",{name:"Dispos",exact:true}).click();
-    await expect(nav.locator(".nav-loading")).toBeVisible();
+    await expect(page.locator(".day-editor")).toHaveCount(7);
+    await expect.poll(()=>requests).toBe(1);
     await nav.getByRole("link",{name:"Accueil",exact:true}).click();
-    await expect(nav.locator(".nav-loading")).toHaveCount(0);
-    expect(requests).toBe(1);
+    await expect(page).toHaveURL(/\/accueil$/);
+    await nav.getByRole("link",{name:"Groupe",exact:true}).click();
+    await expect(page.getByRole("heading",{name:"Les membres",exact:true})).toBeVisible();
   }finally{resume();}
   await oldResponse;
-  await nav.getByRole("link",{name:"Groupe",exact:true}).click();
-  await expect(page.getByRole("heading",{name:"Les membres",exact:true})).toBeVisible();
   await expect(page.locator(".navigation-error")).toHaveCount(0);
   await expect(page).toHaveURL(/\/groupe$/);
 });
@@ -59,47 +59,38 @@ test("l’onglet courant ne déclenche aucun aller-retour inutile",async({page})
   expect(requests).toEqual([]);
 });
 
-test("une vérification lente reste visible puis s’efface, même sans animations",async({page},info)=>{
-  await page.emulateMedia({reducedMotion:"reduce"});
-  await page.setViewportSize({width:390,height:844});
+test("les onglets reçus s’affichent avant le contrôle réseau, même sans animations",async({page},info)=>{
+  await page.emulateMedia({reducedMotion:"reduce"});await page.setViewportSize({width:390,height:844});
   await page.goto("/accueil");await page.waitForLoadState("networkidle");
   let resume!:()=>void;
   const gate=new Promise<void>(resolve=>{resume=resolve;});
   await page.route("**/api/session-status",async route=>{await gate;await route.continue().catch(()=>{});});
+  const check=page.waitForResponse(response=>response.url().endsWith("/api/session-status"));
   const tab=page.getByRole("navigation",{name:"Navigation principale"}).getByRole("link",{name:"Dispos",exact:true});
   try{
     await tab.click();
-    await expect(tab.locator(".nav-content")).toHaveAttribute("aria-busy","true");
-    await expect(tab.locator(".nav-loading")).toBeVisible();
-    await expect(page.getByRole("heading",{level:1})).toHaveText("On se retrouve ?");
-    expect(await tab.locator(".nav-loading").evaluate(node=>getComputedStyle(node,"::after").animationName)).toBe("none");
-    await page.screenshot({path:info.outputPath("navigation-en-attente.png"),fullPage:true});
-  }finally{resume();}
-  await expect(page).toHaveURL(/\/dispos$/);
-  await expect(page.locator(".nav-loading")).toHaveCount(0);
-  await expect(page.locator(".page-enter")).toHaveCSS("animation-name","none");
-  await page.locator(".day-editor").first().getByRole("button",{name:/Horaires du/}).click();
-  await expect(page.getByRole("dialog")).toHaveCSS("animation-name","none");
+    await expect(page).toHaveURL(/\/dispos$/);
+    await expect(page.locator(".day-editor")).toHaveCount(7);
+    await expect(tab.locator(".nav-content")).toHaveAttribute("aria-busy","false");
+    await expect(page.locator(".nav-loading")).toHaveCount(0);
+    await expect(page.locator(".page-enter")).toHaveCSS("animation-name","none");
+    await page.locator(".day-editor").first().getByRole("button",{name:/Horaires du/}).click();
+    await expect(page.getByRole("dialog")).toHaveCSS("animation-name","none");
+    await page.screenshot({path:info.outputPath("onglet-sans-attente.png"),fullPage:true});
+  }finally{resume();await check;}
 });
 
-test("le retour navigateur présente un aperçu neutre jusqu’à la vérification des droits",async({page},info)=>{
-  await page.setViewportSize({width:390,height:844});
+test("le retour vers un onglet reçu n’attend plus le contrôle réseau",async({page})=>{
   await page.goto("/groupe");await page.waitForLoadState("networkidle");
   await page.getByRole("navigation",{name:"Navigation principale"}).getByRole("link",{name:"Dispos",exact:true}).click();
-  await expect(page).toHaveURL(/\/dispos$/);
+  await expect(page).toHaveURL(/\/dispos$/);await page.waitForLoadState("networkidle");
   let resume!:()=>void;
   const gate=new Promise<void>(resolve=>{resume=resolve;});
   await page.route("**/api/session-status",async route=>{await gate;await route.continue().catch(()=>{});});
-  const back=page.goBack();
+  const check=page.waitForResponse(response=>response.url().endsWith("/api/session-status"));
   try{
-    const placeholder=page.getByRole("status").filter({hasText:"On retrouve votre groupe…"});
-    await expect(placeholder).toBeVisible();
-    await expect(placeholder).toHaveAttribute("aria-busy","true");
-    await expect(page.getByRole("heading",{name:"Les membres",exact:true})).not.toBeVisible();
-    expect(await placeholder.locator(".loading-art").getAttribute("aria-hidden")).toBe("true");
-    expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
-    await page.screenshot({path:info.outputPath("chargement-telephone.png"),fullPage:true});
-  }finally{resume();await back;}
-  await expect(page.getByRole("heading",{name:"Les membres",exact:true})).toBeVisible();
-  await expect(page.locator(".navigation-check")).toHaveCount(0);
+    await page.goBack();
+    await expect(page.getByRole("heading",{name:"Les membres",exact:true})).toBeVisible();
+    await expect(page.locator(".navigation-check")).toHaveCount(0);
+  }finally{resume();await check;}
 });

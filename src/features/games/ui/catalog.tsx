@@ -1,5 +1,5 @@
 "use client";
-import { useActionState, useState } from "react";
+import { useActionState, useOptimistic, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { archiveGame,createGame,setFavorite,updateGame } from "../actions";
 type Game = {id:string;name:string;description:string;created_by:string;archived_at:string|null;revision:number;favorite:boolean;favoriteCount:number};
@@ -11,13 +11,14 @@ function CreateForm({requestId}:{requestId:string}) {
     <Button disabled={pending}>Ajouter ce jeu</Button><p role="status">{state.message}</p></form>;
 }
 function GameCard({game,canEdit}:{game:Game;canEdit:boolean}) {
-  const [favorite,favoriteAction,favoriting]=useActionState(setFavorite,initial);
+  const [chosen,choose]=useOptimistic(game.favorite,(_old:boolean,next:boolean)=>next);
+  const [favorite,favoriteAction,favoriting]=useActionState(async(previous:typeof initial,form:FormData)=>{choose(!game.favorite);return setFavorite(previous,form);},initial);
   const [saved,save,saving]=useActionState(updateGame,initial);
   const [archived,archive,archiving]=useActionState(archiveGame,initial);
   return <article className="game-card"><h3>{game.name}</h3><p>{game.description || "Aucune description pour le moment."}</p>
     <p>{game.archived_at ? "Archivé · historique conservé" : `${game.favoriteCount} favori${game.favoriteCount>1?"s":""} dans le groupe`}</p>
     {(!game.archived_at || game.favorite) && <form action={favoriteAction}><input type="hidden" name="id" value={game.id} /><input type="hidden" name="expectedFavorite" value={String(game.favorite)} />
-      <Button variant="outline" disabled={favoriting} aria-pressed={game.favorite}>{game.favorite ? "Retirer de mes favoris" : "Ajouter à mes favoris"}</Button><p role="status">{favorite.message}</p></form>}
+      <Button variant="outline" disabled={favoriting} aria-busy={favoriting} aria-pressed={chosen}>{chosen ? "Retirer de mes favoris" : "Ajouter à mes favoris"}</Button><p role="status">{favoriting?"Enregistrement…":favorite.message}</p></form>}
     {canEdit && !game.archived_at && <details><summary>Modifier ou archiver ce jeu</summary>
       <form action={save} className="form-stack"><input type="hidden" name="id" value={game.id} /><input type="hidden" name="revision" value={game.revision} />
         <label>Nouveau nom<input name="name" defaultValue={game.name} required maxLength={80} /></label>
@@ -34,6 +35,6 @@ export function Catalog({games,memberId,admin,requestId}:{games:Game[];memberId:
     <details className="game-create"><summary>Ajouter un jeu personnalisé</summary><CreateForm requestId={requestId} /></details>
     <label className="catalog-toggle"><input type="checkbox" checked={showArchived} onChange={e=>setShowArchived(e.target.checked)} />Afficher aussi les jeux archivés</label>
     {!games.some(g=>showArchived || !g.archived_at) && <p>Aucun jeu pour le moment. Ajoutez le premier jeu de votre groupe.</p>}
-    <div className="games-grid">{games.filter(g=>showArchived || !g.archived_at).map(g=><GameCard key={`${g.id}-${g.revision}-${g.favorite}`} game={g} canEdit={admin || g.created_by===memberId} />)}</div>
+    <div className="games-grid">{games.filter(g=>showArchived || !g.archived_at).map(g=><GameCard key={`${g.id}-${g.revision}`} game={g} canEdit={admin || g.created_by===memberId} />)}</div>
   </section>;
 }

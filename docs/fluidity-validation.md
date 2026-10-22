@@ -2,6 +2,8 @@
 
 Date : 22 octobre 2026. Référence avant modification : `bc10f9a`.
 
+Rapport de la livraison `a150770`. Le contrôle bloquant des vues reçues est ensuite remplacé par l’[ADR 024](decisions/024-navigation-immediate-et-commandes-legeres.md) ; les [nouvelles mesures](instant-navigation-validation.md) distinguent cette évolution.
+
 ## Changements
 
 - Vérification du compte et lecture RLS de l’adhésion en parallèle, avec les deux validations obligatoires : [ADR 023](decisions/023-fluidite-et-retours-visuels.md).

@@ -1,5 +1,5 @@
 "use client";
-import { useActionState,useEffect,useState,useTransition,type ReactNode } from "react";
+import { useActionState,useEffect,useOptimistic,useState,useTransition,type ReactNode } from "react";
 import { useCloseSheet } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { addDays,compareInstant,dateTimeLabel,localParts,slotLabel,today,type Occurrence } from "@/lib/time/paris";
@@ -34,8 +34,9 @@ function Command({session,command,children,label}:{session:SessionView;command:s
   return <form action={action} className="form-stack session-command"><input type="hidden" name="id" value={session.id}/><input type="hidden" name="revision" value={session.revision}/><input type="hidden" name="command" value={command}/>{children}<Button disabled={pending} aria-busy={pending}>{label}</Button><p role="status">{state.message}</p></form>;
 }
 function Participation({session,answer}:{session:SessionView;answer:SessionView["ownRsvp"]}) {
-  const [state,action,pending]=useActionState(changeSession,initial);
-  return <form action={action} className="participation-actions"><input type="hidden" name="id" value={session.id}/><input type="hidden" name="revision" value={session.revision}/><input type="hidden" name="command" value="rsvp"/><input type="hidden" name="rsvpRevision" value={session.ownRsvp?.revision??""}/><div><Button name="response" value="attending" aria-pressed={answer?.response==="attending"} disabled={pending} aria-busy={pending}>Je viens</Button><Button name="response" value="declined" variant="outline" aria-pressed={answer?.response==="declined"} disabled={pending} aria-busy={pending}>Sans moi</Button></div><p role="status">{pending?"Enregistrement…":state.message}</p></form>;
+  const [chosen,choose]=useOptimistic(answer?.response,(_old:string|undefined,next:string)=>next);
+  const [state,action,pending]=useActionState(async(previous:SessionActionState,form:FormData)=>{choose(String(form.get("response")));return changeSession(previous,form);},initial);
+  return <form action={action} className="participation-actions"><input type="hidden" name="id" value={session.id}/><input type="hidden" name="revision" value={session.revision}/><input type="hidden" name="command" value="rsvp"/><input type="hidden" name="rsvpRevision" value={session.ownRsvp?.revision??""}/><div><Button name="response" value="attending" aria-pressed={chosen==="attending"} disabled={pending} aria-busy={pending}>Je viens</Button><Button name="response" value="declined" variant="outline" aria-pressed={chosen==="declined"} disabled={pending} aria-busy={pending}>Sans moi</Button></div><p role="status">{pending?"Enregistrement…":state.message}</p></form>;
 }
 export function SessionCard({session:s,view}:{session:SessionView;view:Pick<SessionsView,"now"|"member"|"people"|"games">}){
   const chosen=s.slots.find(x=>x.id===s.confirmed_slot_id),answer=s.ownRsvp?.membership_epoch===view.member.participation_epoch?s.ownRsvp:undefined;

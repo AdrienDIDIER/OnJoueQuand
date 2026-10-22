@@ -1,5 +1,7 @@
 # Recette — Navigation et cache en mémoire
 
+Rapport historique de l’ADR 019. Le contrôle bloquant décrit ici a été remplacé, après accord explicite, par l’[ADR 024](decisions/024-navigation-immediate-et-commandes-legeres.md) ; voir les [nouvelles mesures](instant-navigation-validation.md).
+
 ## Périmètre
 
 L’[ADR 019](decisions/019-cache-navigation-privee.md) décrit le cache des quatre onglets, son contrôle d’accès et son invalidation. Aucune migration, modification de compte réel ou activation de cron. Le service worker conserve uniquement sa liste publique existante.

@@ -1,5 +1,7 @@
 # ADR 019 — Cache de navigation en mémoire avec contrôle d’accès frais
 
+Le contrôle bloquant de cette décision est supersédé par l’[ADR 024](024-navigation-immediate-et-commandes-legeres.md), après accord explicite de l’utilisateur. Le préchargement, les contrôles serveur et l’abandon des contextes périmés restent en place.
+
 - Statut : implémentée ; validation détaillée dans la [recette](../navigation-validation.md).
 - Date : 2026-10-21.
 - Remplace les décisions de l’ADR 018 concernant l’absence de cache de pages et le layout sans contrôle initial. Ne change pas les règles du service worker des ADR 008 et 014.
