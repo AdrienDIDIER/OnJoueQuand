@@ -4,6 +4,7 @@ import {useRouter,usePathname,useSearchParams} from "next/navigation";
 import {Button} from "@/components/ui/button";
 import {InstallationHelp} from "./installation";
 import {usePrivateNavigation} from "@/features/navigation/client";
+import {useRecordViewport} from "./viewport-diagnostics";
 function subscribeConnectivity(changed:()=>void){window.addEventListener("online",changed);window.addEventListener("offline",changed);return()=>{window.removeEventListener("online",changed);window.removeEventListener("offline",changed);};}
 function restoredFormValues(){
   // Certains navigateurs restaurent/autoremplissent les champs sans événement input.
@@ -14,6 +15,7 @@ function restoredFormValues(){
   });
 }
 export function PwaExperience(){
+  useRecordViewport();
   const {validate}=usePrivateNavigation();
   const pathname=usePathname();
   const search=useSearchParams().toString(),place=pathname+(search?`?${search}`:"");

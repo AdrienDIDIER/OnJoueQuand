@@ -5,6 +5,7 @@ import { ProfileForm } from "@/features/group/ui/forms";
 import { loadNotificationSettings } from "@/features/notifications/server";
 import { NotificationSettings } from "@/features/notifications/ui/notifications";
 import { Button } from "@/components/ui/button";
+import {ViewportDiagnostics} from "@/features/pwa/ui/viewport-diagnostics";
 
 export default async function SettingsPage() {
   const {client,user}=await requireMember();
@@ -13,6 +14,7 @@ export default async function SettingsPage() {
   return <div className="group-page"><Link className="back-link" href="/groupe">← Groupe</Link><h1>Mes réglages.</h1>
     <NotificationSettings view={notifications}/>
     <details className="group-card disclosure"><summary>Mon profil</summary><div className="disclosure-body"><ProfileForm name={profile.data.display_name} revision={profile.data.revision}/></div></details>
+    <ViewportDiagnostics/>
     <form action={signOut} className="signout"><Button variant="outline">Me déconnecter</Button></form>
   </div>;
 }
