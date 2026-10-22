@@ -5,6 +5,7 @@ import { loadSessions } from "@/features/sessions/server";
 import { SessionCard } from "@/features/sessions/ui/sessions";
 import {EveningForm} from "@/features/sessions/ui/evening";
 import { Sheet } from "@/components/ui/sheet";
+import {Moon} from "lucide-react";
 export const metadata: Metadata = { title: "Soirées" };
 export default async function Page({searchParams}:{searchParams:Promise<{page?:string;session?:string;soir?:string}>}) {
   const params=await searchParams;
@@ -19,7 +20,7 @@ export default async function Page({searchParams}:{searchParams:Promise<{page?:s
     <div className="page-heading page-with-action"><h1>Vos soirées<span className="text-primary">.</span></h1><Sheet defaultOpen={params.soir!==undefined} title="Organiser une soirée" trigger={<span className="primary-trigger">+ Organiser une soirée</span>}><EveningForm games={view.games} now={view.now} requestId={randomUUID()} day={/^\d{4}-\d{2}-\d{2}$/.test(params.soir??"")?params.soir:undefined}/></Sheet></div>
     <div className="session-list">{current.map(s=><SessionCard key={`${s.id}-${s.revision}-${s.ownBallot?.revision??0}-${s.ownRsvp?.revision??0}`} session={s} view={cardView}/>)}</div>
     {history.length>0&&<details className="group-card disclosure"><summary>Soirées passées et annulées · {history.length}</summary><div className="session-list">{history.map(s=><SessionCard key={`${s.id}-${s.revision}`} session={s} view={cardView}/>)}</div></details>}
-    {!view.sessions.length&&<p>{focused?"Cette soirée n’est plus disponible.":"Pas encore de soirée. Choisissez un soir pour vous retrouver."}</p>}
+    {!view.sessions.length&&(focused?<p>Cette soirée n’est plus disponible.</p>:<section className="evenings-empty"><span className="quiet-icon" aria-hidden="true"><Moon size={24}/></span><h2>Un soir, ensemble.</h2><p>Pas encore de soirée. Choisissez un soir pour vous retrouver.</p><p className="form-hint">Un horaire, puis chacun dit s’il vient. C’est tout.</p></section>)}
     {focused?<Link href="/sessions">Voir toutes les soirées</Link>:<nav aria-label="Pages des soirées" className="session-pagination">{page>0&&<Link href={`/sessions?page=${page-1}`}>Soirées plus récentes</Link>}{view.sessions.length===20&&<Link href={`/sessions?page=${page+1}`}>Soirées plus anciennes</Link>}</nav>}
   </>;
 }

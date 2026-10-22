@@ -46,6 +46,9 @@ body { background:var(--background); color:var(--foreground); font-family:ui-san
 .nav-pending svg { opacity:.5; }
 .refresh-button { display:grid; place-items:center; width:44px; height:44px; color:#c5c9b7; border-radius:50%; cursor:pointer; position:absolute; right:18px; bottom:128px; }
 .refresh-button:hover { background:#34382b; color:#f3eee5; }
+.refresh-button[aria-busy=true] svg { animation:refresh-turn 900ms linear infinite; }
+.refresh-button:disabled { cursor:wait; }
+@keyframes refresh-turn { to { transform:rotate(360deg); } }
 .navigation-check { min-height:100dvh; padding:15vh 24px; text-align:center; color:#d9dccd; }
 .navigation-check button { margin-top:16px; padding:12px 18px; min-height:44px; border:1px solid var(--border); border-radius:10px; }
 .navigation-error { position:fixed; left:20px; right:20px; bottom:calc(80px + env(safe-area-inset-bottom)); z-index:30; padding:14px 18px; background:#4b3834; color:#f5e7df; border:1px solid #a07d6e; border-radius:12px; }
@@ -128,6 +131,11 @@ body { background:var(--background); color:var(--foreground); font-family:ui-san
 .page-with-action h1 { margin:0; }
 .primary-trigger { display:inline-flex; align-items:center; justify-content:center; min-height:44px; border-radius:10px; padding:10px 13px; color:#211a25; background:#c6b3d2; font-size:13px; font-weight:550; }
 .session-card { background:#25271f; padding:22px; }
+.evenings-empty { margin-top:28px; padding:32px 26px; border:1px solid #434837; border-radius:18px; background:#25271f; }
+.evenings-empty .quiet-icon { display:grid; place-items:center; width:48px; height:48px; margin-bottom:24px; }
+.evenings-empty h2 { font:400 29px/1.2 Georgia,'Times New Roman',serif; letter-spacing:-.5px; margin-bottom:14px; }
+.evenings-empty p { max-width:340px; color:#c5c2b4; font-size:15px; line-height:1.6; }
+.evenings-empty .form-hint { font-size:13px; margin-top:18px; }
 .session-card > .eyebrow { display:inline-block; padding:4px 8px; background:#383c2e; border-radius:6px; color:#d4debf; font-size:11px; }
 .session-card h2 { font-family:Georgia,'Times New Roman',serif; font-size:25px; font-weight:400; }
 .session-time { color:#d1d9bc !important; }
@@ -149,6 +157,43 @@ body { background:var(--background); color:var(--foreground); font-family:ui-san
 .group-page .device-push > p { color:#c3bfb2; }
 .game-card { border-color:var(--border); background:#292b23; }
 .content-placeholder { padding:22px; margin-block:16px; border-radius:14px; background:#272920; color:#c3bfb2; font-size:14px; }
+/* Retours immédiats, sans bloquer les gestes ni attendre la fin d’une animation. */
+.page-enter { animation:page-arrive 180ms ease-out; }
+.nav-content { position:relative; }
+.nav-loading { position:absolute; bottom:-5px; left:0; right:0; height:2px; border-radius:2px; background:#535a46; overflow:hidden; }
+.nav-loading::after { content:""; display:block; width:45%; height:100%; background:#d0d9bb; animation:loading-travel 950ms ease-in-out infinite alternate; }
+.loading-placeholder { padding:26px; margin-block:0 20px; border:1px solid #3a3e32; border-radius:18px; background:#25271f; overflow:hidden; }
+.loading-art { max-width:560px; }
+.skeleton { display:block; background:#414537; border-radius:5px; animation:loading-breathe 1400ms ease-in-out infinite alternate; }
+.loading-lines { display:grid; gap:12px; }
+.loading-lines .skeleton { height:12px; width:72%; }
+.loading-lines .skeleton:first-child { width:48%; height:25px; margin-bottom:10px; }
+.loading-lines .skeleton:last-child { width:58%; animation-delay:160ms; }
+.loading-action { margin-top:26px; height:44px; width:165px; border-radius:10px; }
+.loading-row { padding:22px 0; border-radius:0; background:transparent; border-inline:0; }
+.loading-row .loading-lines .skeleton:first-child { height:16px; width:66%; margin-bottom:0; }
+.loading-row .loading-lines .skeleton:last-child { height:4px; width:180px; }
+.loading-page { background:transparent; border:0; padding:0; min-height:350px; }
+.loading-title { height:36px; width:55%; margin:12px 0 32px; }
+.loading-page .loading-lines { padding:26px; border:1px solid #3a3e32; border-radius:18px; background:#25271f; min-height:180px; }
+.navigation-check .loading-placeholder { max-width:620px; margin:auto; text-align:left; }
+.action-sheet[open],.install-dialog[open] { animation:sheet-arrive 180ms ease-out; }
+.action-sheet[open]::backdrop,.install-dialog[open]::backdrop { animation:backdrop-arrive 160ms ease-out; }
+[data-slot=button],.primary-trigger,.sheet-trigger,.simple-row,.availability-shortcut { -webkit-tap-highlight-color:transparent; touch-action:manipulation; transition:background-color 150ms,color 150ms,border-color 150ms,transform 100ms; }
+[data-slot=button]:active:not(:disabled),.sheet-trigger:active,.simple-row:active,.availability-shortcut:active { transform:translateY(1px); }
+[data-slot=button][aria-busy=true] { animation:loading-breathe 1000ms ease-in-out infinite alternate; }
+.quick-reply[aria-busy=true]::after { content:""; position:absolute; bottom:2px; right:0; width:166px; height:2px; background:#c6d2ad; border-radius:2px; animation:loading-breathe 650ms ease-in-out infinite alternate; }
+.quick-reply { transition:opacity 150ms; }
+.week-progress i { transition:background-color 180ms,border-color 180ms; }
+.simple-row:focus-visible,.availability-shortcut:focus-visible,.sheet-trigger:focus-visible { outline:2px solid #c6b3d2; outline-offset:4px; border-radius:10px; }
+@keyframes page-arrive { from { opacity:.65; transform:translateY(4px); } to { opacity:1; transform:translateY(0); } }
+@keyframes sheet-arrive { from { opacity:.6; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+@keyframes backdrop-arrive { from { opacity:0; } to { opacity:1; } }
+@keyframes loading-breathe { from { opacity:.55; } to { opacity:1; } }
+@keyframes loading-travel { from { transform:translateX(0); } to { transform:translateX(125%); } }
+@media(prefers-reduced-motion:reduce) {
+  .page-enter,.skeleton,.nav-loading::after,.action-sheet[open],.install-dialog[open],.action-sheet[open]::backdrop,.install-dialog[open]::backdrop,[data-slot=button][aria-busy=true],.quick-reply[aria-busy=true]::after { animation:none; }
+}
 @media(max-width:760px) {
   .refresh-button { top:11px; right:16px; bottom:auto; }
   .sidebar { padding:16px 20px 10px; min-height:56px; background:var(--background); }

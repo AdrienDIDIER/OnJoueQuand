@@ -18,7 +18,7 @@ function NavigationContent({label,children}:{label:string;children:ReactNode}) {
   const link=useLinkStatus();
   const {pendingPath}=usePrivateNavigation();
   const pending=link.pending||items.some(item=>item.label===label&&pendingPath===item.href);
-  return <span className={cn("nav-content",pending&&"nav-pending")} aria-busy={pending}>{children}<span>{label}</span>{pending&&<span className="sr-only" role="status">Chargement de {label}…</span>}</span>;
+  return <span className={cn("nav-content",pending&&"nav-pending")} aria-busy={pending}>{children}<span>{label}</span>{pending&&<><span className="nav-loading" aria-hidden="true"/><span className="sr-only" role="status">Chargement de {label}…</span></>}</span>;
 }
 
 export function AppNavigation() {

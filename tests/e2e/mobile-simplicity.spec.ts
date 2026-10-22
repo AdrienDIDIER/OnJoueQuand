@@ -8,6 +8,8 @@ test("sur téléphone, les écrans quotidiens ne présentent pas les réglages",
   for (const route of ["accueil", "dispos", "sessions", "groupe"]) {
     await page.goto(`/${route}`);
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    if(route==="accueil") await expect(page.getByRole("link",{name:/Vos soirées cette semaine/})).toBeVisible();
+    await page.locator(".page-enter").evaluate(node=>Promise.all(node.getAnimations().map(animation=>animation.finished.catch(()=>{}))));
     await expect(page.getByRole("button", { name: "Me déconnecter", exact: true })).toHaveCount(0);
     await expect(page.getByText("Installer OnJoueQuand", { exact: true })).toHaveCount(0);
     await expect(page.getByLabel("Votre nom dans le groupe", { exact: true })).toHaveCount(0);

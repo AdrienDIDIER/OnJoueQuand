@@ -1,5 +1,5 @@
 "use client";
-import {useEffect,useRef,useState,useSyncExternalStore} from "react";
+import {useEffect,useRef,useState,useSyncExternalStore,useTransition} from "react";
 import {useRouter,usePathname,useSearchParams} from "next/navigation";
 import {Button} from "@/components/ui/button";
 import {InstallationHelp} from "./installation";
@@ -20,6 +20,8 @@ export function PwaExperience(){
   const router=useRouter();const dirty=useRef<string|null>(null),checking=useRef(false),reloadRequested=useRef(false);
   const offline=useSyncExternalStore(subscribeConnectivity,()=>!navigator.onLine,()=>false);
   const [waiting,setWaiting]=useState<ServiceWorker|null>(null);
+  const [refreshing,startRefresh]=useTransition();
+  useEffect(()=>{window.dispatchEvent(new CustomEvent("ojq:refresh-state",{detail:refreshing}));},[refreshing]);
   const [changed,setChanged]=useState(false),[acknowledged,setAcknowledged]=useState(false),[editedPlace,setEditedPlace]=useState<string|null>(null),[message,setMessage]=useState("");
   const edited=editedPlace===place;
   useEffect(()=>{
@@ -27,8 +29,9 @@ export function PwaExperience(){
     const currentPlace=()=>window.location.pathname+window.location.search;
     const rememberEdits=()=>{if(dirty.current===currentPlace()||restoredFormValues()){dirty.current=currentPlace();setEditedPlace(currentPlace());return true;}return false;};
     const edit=(event:Event)=>{if((event.target as Element)?.closest?.("form")){dirty.current=currentPlace();setEditedPlace(currentPlace());setAcknowledged(false);}};
-    const onlineEvent=()=>{void verify(true);};
-    const manualRefresh=()=>{void verify(true);};
+    const refreshData=()=>startRefresh(async()=>{await verify(true);});
+    const onlineEvent=refreshData;
+    const manualRefresh=refreshData;
     const preventOfflineSubmit=(event:Event)=>{if(!navigator.onLine){event.preventDefault();event.stopImmediatePropagation();setMessage("Enregistrement impossible hors connexion. Votre saisie est conservée sur cette page ; réessayez après reconnexion.");}};
     const offlineNavigation=(event:MouseEvent)=>{
       if(navigator.onLine||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;
@@ -46,7 +49,7 @@ export function PwaExperience(){
         else if(rememberEdits())setMessage("La connexion est disponible. Vos saisies sont conservées ; actualisez après les avoir enregistrées ou abandonnées.");
       }catch{if(!disposed)setMessage("Connexion au service impossible. Vos saisies restent sur cette page.");}finally{checking.current=false;}
     };
-    const visibility=()=>{if(document.visibilityState==="visible")void verify(true);};
+    const visibility=()=>{if(document.visibilityState==="visible")refreshData();};
     const focus=()=>{void verify(false);};
     const restored=(event:PageTransitionEvent)=>{if(event.persisted)location.reload();};
     const controllerChanged=()=>{rememberEdits();setWaiting(null);if(reloadRequested.current){location.reload();return;}if(hadController)setChanged(true);hadController=true;};

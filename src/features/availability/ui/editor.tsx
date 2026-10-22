@@ -13,7 +13,7 @@ function Confirmation({ state }: { state: AvailabilityState }) {
   return <div className="availability-preview" aria-live="polite">
     <p>{state.message}</p>
     {state.token && !saved.done && <><ul>{state.summary?.map((s) => <li key={s}>{s}</li>)}</ul>
-      <form action={action}><input type="hidden" name="token" value={state.token} /><Button disabled={pending}>Confirmer ces disponibilités</Button></form></>}
+      <form action={action}><input type="hidden" name="token" value={state.token} /><Button disabled={pending} aria-busy={pending}>Confirmer ces disponibilités</Button></form></>}
     <p role="status">{saved.message}</p>
   </div>;
 }
@@ -25,8 +25,8 @@ function OccurrenceSelect({ label, value, onChange }: { label: string; value?: O
 function QuickReply({day,quick}:{day:Day;quick:{start:string;end:string}}) {
   const [choice,choose]=useOptimistic(day.status,(_old:Day["status"],next:Day["status"])=>next);
   const [state,action,pending]=useActionState(async(previous:AvailabilityState,form:FormData)=>{choose(form.get("status") as Day["status"]);return saveQuickDay(previous,form);},initial);
-  return <form action={action} className="quick-reply"><input type="hidden" name="date" value={day.local_date}/><input type="hidden" name="revision" value={day.revision??""}/><input type="hidden" name="quickStart" value={quick.start}/><input type="hidden" name="quickEnd" value={quick.end}/>
-    <div><Button variant="outline" name="status" value="available" aria-label={`Dispo ${quick.start}–${quick.end}`} aria-pressed={choice==="available"} disabled={pending}><Check size={16} aria-hidden="true"/>Dispo</Button><Button variant="outline" name="status" value="unavailable" aria-label="Indispo" aria-pressed={choice==="unavailable"} disabled={pending}><X size={16} aria-hidden="true"/>Non</Button></div>
+  return <form action={action} className="quick-reply" aria-busy={pending}><input type="hidden" name="date" value={day.local_date}/><input type="hidden" name="revision" value={day.revision??""}/><input type="hidden" name="quickStart" value={quick.start}/><input type="hidden" name="quickEnd" value={quick.end}/>
+    <div><Button variant="outline" name="status" value="available" aria-label={`Dispo ${quick.start}–${quick.end}`} aria-pressed={choice==="available"} disabled={pending} aria-busy={pending}><Check size={16} aria-hidden="true"/>Dispo</Button><Button variant="outline" name="status" value="unavailable" aria-label="Indispo" aria-pressed={choice==="unavailable"} disabled={pending} aria-busy={pending}><X size={16} aria-hidden="true"/>Non</Button></div>
     {pending?<p className="sr-only" role="status">Enregistrement…</p>:state.message&&<p role="status">{state.message}</p>}
   </form>;
 }
@@ -75,7 +75,7 @@ function DetailedDayEditor({ day, next, editable, quick }: { day: Day; next: Day
           </fieldset>)}
           <Button type="button" variant="outline" disabled={ranges.length >= 16} onClick={() => { setDirty(true); setRanges([...ranges, { start: "20:00", end: "23:00" }]); }}>Ajouter un intervalle</Button>
         </>}
-        <Button disabled={pending}>Prévisualiser cette journée</Button>
+        <Button disabled={pending} aria-busy={pending}>Prévisualiser cette journée</Button>
       </form>
       {!dirty && <Confirmation key={state.token ?? state.message} state={state} />}
     </>}
@@ -95,7 +95,7 @@ export function CopyEditor({ week, first, last }: { week: string; first: string;
       <label className="checkbox-label"><input name="replace" type="checkbox" />Remplacer aussi mes journées déjà renseignées</label>
       {state.resolutions?.map((r) => r.kind === "occurrence" ? <OccurrenceSelect key={r.key} label={r.label} value={choices[r.key]} onChange={(value) => setChoices({ ...choices, [r.key]: value })} /> :
         <label key={r.key}>{r.label} · heure inexistante : choisir un autre horaire<input type="time" step="900" value={corrections[r.key] ?? ""} onChange={(e) => setCorrections({ ...corrections, [r.key]: e.target.value })} /></label>)}
-      <Button disabled={pending}>Prévisualiser la copie</Button>
+      <Button disabled={pending} aria-busy={pending}>Prévisualiser la copie</Button>
     </form>
     {!dirty && <Confirmation key={state.token ?? state.message} state={state} />}
   </section></details>;

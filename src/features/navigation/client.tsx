@@ -2,6 +2,7 @@
 
 import {createContext,useCallback,useContext,useEffect,useRef,useState,useTransition,type ReactNode} from "react";
 import {usePathname,useRouter,useSearchParams} from "next/navigation";
+import {LoadingPlaceholder} from "@/components/ui/loading";
 
 const cachedPages=new Set(["/accueil","/dispos","/sessions","/groupe"]);
 type Probe={status:number;accessKey?:string};
@@ -55,13 +56,21 @@ export function NavigationCache({accessKey,children}:{accessKey:string;children:
       const url=new URL(anchor.href);
       if(url.origin!==window.location.origin||!/^\/(accueil|dispos|sessions|groupe)(\/|$)/.test(url.pathname))return;
       const nextLocation=url.pathname+url.search;
-      if(nextLocation===locationKey&&url.hash)return;
+      if(nextLocation===locationKey){
+        // Un lien d’ancre garde son comportement natif ; retoucher l’onglet courant ne relance rien.
+        ++sequence.current;intent.current=null;setTarget(null);
+        if(!url.hash){event.preventDefault();event.stopImmediatePropagation();}
+        return;
+      }
       event.preventDefault();event.stopImmediatePropagation();
       const serial=++sequence.current;
       intent.current=nextLocation+url.hash;
       setTarget(url.pathname);setError("");
       startTransition(async()=>{
-        if(cachedPages.has(url.pathname)&&!url.search&&!receive(await probe(false),nextLocation+url.hash))return;
+        if(cachedPages.has(url.pathname)&&!url.search){
+          const result=await probe(false);
+          if(serial!==sequence.current||!receive(result,nextLocation+url.hash))return;
+        }
         if(serial!==sequence.current)return;
         // Les autres liens n’ont pas de préchargement complet : leurs pages se réautorisent au serveur.
         startTransition(()=>{setVerifiedLocation(nextLocation);router.push(nextLocation+url.hash);});
@@ -82,7 +91,7 @@ export function NavigationCache({accessKey,children}:{accessKey:string;children:
   const gated=blocked||locationKey!==verifiedLocation;
   return <Context value={{pendingPath:pending?target:null,validate}}>
     <div hidden={gated}>{children}</div>
-    {gated&&<div className="navigation-check" role="status"><p>On retrouve votre groupe…</p>{error&&<><p>{error}</p><button type="button" onClick={()=>window.location.reload()}>Réessayer</button></>}</div>}
+    {gated&&<div className="navigation-check"><LoadingPlaceholder label="On retrouve votre groupe…" shape="page"/>{error&&<><p role="status">{error}</p><button type="button" onClick={()=>window.location.reload()}>Réessayer</button></>}</div>}
     {!gated&&error&&<p className="navigation-error" role="status">{error}</p>}
   </Context>;
 }

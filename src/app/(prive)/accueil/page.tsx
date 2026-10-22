@@ -8,6 +8,7 @@ import { loadWeekProgress } from "@/features/availability/server";
 import { dayLabel,slotLabel } from "@/lib/time/paris";
 import { loadInbox } from "@/features/notifications/server";
 import { Inbox } from "@/features/notifications/ui/notifications";
+import {LoadingPlaceholder} from "@/components/ui/loading";
 
 async function NextSession() {
   const next=await readNextSession();
@@ -21,8 +22,8 @@ async function Notifications(){return <Inbox view={await loadInbox()}/>;}
 export default async function HomePage() {
   await requireMember();
   return <div className="daily-home compact-page"><div className="page-heading"><p className="eyebrow">Votre groupe, vos soirées</p><h1>On se retrouve ?</h1></div>
-    <Suspense fallback={<div className="content-placeholder" role="status">Votre prochaine partie…</div>}><NextSession/></Suspense>
-    <Suspense fallback={<div className="content-placeholder" role="status">Vos disponibilités…</div>}><WeekProgress/></Suspense>
+    <Suspense fallback={<LoadingPlaceholder label="Votre prochaine partie…"/>}><NextSession/></Suspense>
+    <Suspense fallback={<LoadingPlaceholder label="Vos disponibilités…" shape="row"/>}><WeekProgress/></Suspense>
     <Suspense fallback={null}><Notifications/></Suspense>
   </div>;
 }

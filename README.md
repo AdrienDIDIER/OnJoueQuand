@@ -6,6 +6,8 @@ Application web progressive privée pour aider un groupe de 6 à 15 amis et coll
 
 ## Démarrer
 
+Dernière revue : [fluidité et interface mobile](docs/fluidity-validation.md), avec chargements visuels, transitions discrètes et contrôles serveur en parallèle. Les limites des mesures et essais sur appareils réels y sont explicites.
+
 La préparation initiale J8 est commitée dans `40f6abb`, puis complétée par conservation, liens de sessions, configuration de préproduction et revue mobile. Les tests de purge et les appels HTTP de recette du worker doivent toujours viser une stack synthétique dédiée ; voir le [rapport J8](docs/j8-validation.md).
 
 Prérequis : **Node.js 24 LTS**, **npm 11.21.1** et, pour Supabase uniquement, Docker Desktop avec moteur Linux démarré. La version Node est déclarée dans `.nvmrc` et `package.json`. Les versions exactes et résultats figurent dans le [rapport J1](docs/j1-validation.md).

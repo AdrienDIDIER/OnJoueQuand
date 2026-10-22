@@ -23,6 +23,6 @@ export function EveningForm({games,now,requestId,day}:{games:SessionsView["games
       <label>Fin prévue<input name="end" type="time" step={900} value={end} onChange={event=>setEnd(event.target.value)}/></label>
       <details><summary>En cas de changement d’heure</summary><label>Occurrence du début<select name="startOccurrence"><option value="">Horaire habituel</option><option value="earlier">Première occurrence</option><option value="later">Seconde occurrence</option></select></label><label>Occurrence de la fin<select name="endOccurrence"><option value="">Horaire habituel</option><option value="earlier">Première occurrence</option><option value="later">Seconde occurrence</option></select></label></details>
     </div></details>
-    <Button disabled={pending}>{pending?"Organisation…":"Organiser la soirée"}</Button><p role="status">{state.message}</p>
+    <Button disabled={pending} aria-busy={pending}>{pending?"Organisation…":"Organiser la soirée"}</Button><p role="status">{state.message}</p>
   </form>;
 }
