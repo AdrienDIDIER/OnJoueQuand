@@ -195,6 +195,10 @@ body { background:var(--background); color:var(--foreground); font-family:ui-san
   .page-enter,.skeleton,.nav-loading::after,.action-sheet[open],.install-dialog[open],.action-sheet[open]::backdrop,.install-dialog[open]::backdrop,[data-slot=button][aria-busy=true],.quick-reply[aria-busy=true]::after { animation:none; }
 }
 @media(max-width:760px) {
+  /* Peindre aussi le canevas racine exposé pendant le lancement autonome iOS.
+     La zone système garde le fond de la navigation, sans retirer ses insets. */
+  html:has(.app-shell) { background:#22241d; }
+  body:has(.app-shell) { min-height:100dvh; background:var(--background); }
   .refresh-button { top:11px; right:16px; bottom:auto; }
   .sidebar { padding:16px 20px 10px; min-height:56px; background:var(--background); }
   .wordmark { font-size:26px; }
@@ -209,7 +213,13 @@ body { background:var(--background); color:var(--foreground); font-family:ui-san
   .no-session > a,.next-session > a { width:100%; }
   .section-tabs { margin-top:16px; }
   .nav-content { flex-direction:column; gap:5px; width:100%; }
-  .app-nav { background:#22241dfc; border-color:#46493c; padding:7px 12px calc(7px + env(safe-area-inset-bottom)); }
+  .app-nav {
+    background:#22241d;
+    backdrop-filter:none;
+    -webkit-backdrop-filter:none;
+    border-color:#46493c;
+    padding:7px max(12px,env(safe-area-inset-right)) calc(7px + env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));
+  }
   .nav-item { min-height:52px; padding:7px 3px; font-size:11px; border-radius:10px; }
   .nav-item.nav-active { background:transparent; color:#e0e7d2; }
   .nav-active svg { color:#c6d2ad; }
