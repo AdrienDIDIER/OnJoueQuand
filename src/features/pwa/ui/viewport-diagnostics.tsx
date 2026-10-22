@@ -4,7 +4,7 @@ import {useEffect,useState,useSyncExternalStore} from "react";
 import {Button} from "@/components/ui/button";
 
 // Géométrie uniquement, en mémoire de cet onglet : aucun compte, URL ou stockage.
-const VERSION="affichage-20261022-1";
+const VERSION="affichage-20261022-2";
 type Reading={
   etape:string;ms:number;autonome:boolean;ecran:number[];fenetre:number[];
   document:number[];visible:number[]|null;unites:number[];zones:number[];

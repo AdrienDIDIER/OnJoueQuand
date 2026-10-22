@@ -214,11 +214,6 @@ body { background:var(--background); color:var(--foreground); font-family:ui-san
   .section-tabs { margin-top:16px; }
   .nav-content { flex-direction:column; gap:5px; width:100%; }
   .app-nav {
-    /* Éviter l’ancrage bottom des calques fixes, décalé au lancement sur iOS.
-       La translation dépend de la hauteur réelle de la barre, insets compris. */
-    top:100dvh;
-    bottom:auto;
-    transform:translateY(-100%);
     background:#22241d;
     backdrop-filter:none;
     -webkit-backdrop-filter:none;

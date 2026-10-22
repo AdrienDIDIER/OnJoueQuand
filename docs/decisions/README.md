@@ -26,5 +26,6 @@ Ces ADR consignent le plan approuvé le **15 octobre 2026**. Leur statut « Acce
 | [020](020-soirees-simples-et-test-push.md) | Soirée à horaire unique, états quotidiens et test Push personnel | Validée localement ; migrations distantes appliquées | Simplification produit |
 | [021](021-invitation-installation-au-demarrage.md) | Invitation au démarrage et installation native si disponible | Validée localement ; aucune migration supplémentaire | Installation PWA |
 | [022](022-notifications-au-lancement-installe.md) | Invitation Push après lancement depuis l’icône et connexion | Validée localement ; aucune migration | Notifications PWA |
+| [025](025-viewport-ios-sans-superposition.md) | Viewport installé sans superposition de la barre système | Appliquée ; nouvelle installation iOS à vérifier | Affichage PWA |
 
 Chaque ADR contient contexte, décision, alternatives, conséquences et vérification. Une modification structurelle crée une nouvelle ADR qui remplace explicitement l'ancienne ; ne pas effacer l'historique d'une décision appliquée. Les détails normatifs évoluent dans le [PRD](../product-requirements.md), l'[architecture](../architecture.md) et le [modèle de données](../database.md) avec la même modification.

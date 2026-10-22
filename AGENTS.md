@@ -27,6 +27,7 @@ La revue mobile précharge les quatre onglets dans le Router Cache en mémoire. 
 - Privilégier les Server Components pour les lectures, les Server Actions validées pour les commandes et les transactions SQL/RPC pour les invariants concurrents.
 - Les imports entre fonctionnalités passent par des contrats publics ; pas de dépendance à leurs composants ou dépôts internes.
 - Pas de microservices, ORM, Redis, bus externe ou cache de données privées sans ADR motivée.
+- Cadrage PWA : conserver `viewport-fit=auto` et la barre système Apple `black` ; voir [ADR 025](docs/decisions/025-viewport-ios-sans-superposition.md). Ne pas réintroduire une compensation de hauteur ni un scroll forcé pour masquer la bande de lancement iOS. La validation native nécessite une nouvelle installation et un retour appareil.
 - npm et lockfile ; versions stables compatibles, aucun canary applicatif. Vérifier les versions et correctifs officiels au démarrage de J1 ; ne pas traiter les repères documentaires comme des paquets déjà installés.
 
 ## Sécurité et données

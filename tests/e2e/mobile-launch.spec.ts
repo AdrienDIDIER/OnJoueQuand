@@ -4,6 +4,8 @@ import {test} from "./fixtures";
 test("la navigation touche le bas dès la première ouverture et après redimensionnement",async({page})=>{
   await page.setViewportSize({width:390,height:844});
   await page.goto("/accueil");
+  await expect(page.locator('meta[name="viewport"]')).toHaveAttribute("content",/viewport-fit=auto/);
+  await expect(page.locator('meta[name="apple-mobile-web-app-status-bar-style"]')).toHaveAttribute("content","black");
   await expect(page.getByRole("link",{name:/Vos soirées cette semaine/})).toBeVisible();
   const navigation=page.getByRole("navigation",{name:"Navigation principale"});
   const assertDock=async()=>{
@@ -61,7 +63,9 @@ test("le diagnostic garde le lancement, reste borné et se vide au rechargement"
   const report=page.getByLabel("Diagnostic de l’écran",{exact:true});
   await expect(report).toHaveAttribute("readonly","");
   const initial=JSON.parse(await report.inputValue());
-  expect(initial.version).toBe("affichage-20261022-1");
+  expect(initial.version).toBe("affichage-20261022-2");
+  expect(initial.releves[0].viewport).toContain("viewport-fit=auto");
+  expect(initial.releves[0].barreSysteme).toBe("black");
   expect(initial.releves[0].etape).toBe("ouverture");
   expect(initial.releves[0].navigation).toHaveLength(3);
   expect(initial.releves[0].unites).toHaveLength(3);

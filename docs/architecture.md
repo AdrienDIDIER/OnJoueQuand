@@ -233,6 +233,8 @@ J7 réalise cette section ; [ADR 014](decisions/014-pwa-cache-et-mises-a-jour.md
 
 Manifest avec `id` stable, `name` OnJoueQuand, `lang: fr`, `display: standalone`, couleurs sombres, icônes 192/512 et variante maskable, icône Apple. Le `start_url` ne contient aucun jeton et conduit vers Accueil ou la connexion selon la session.
 
+L’[ADR 025](decisions/025-viewport-ios-sans-superposition.md) fixe `viewport-fit=auto` et la barre système Apple `black`, pour laisser le navigateur réserver la zone système. Elle remplace les tentatives de compensation de position de la navigation après le relevé réel iOS 27.0.1. Le cadrage natif doit encore être contre-vérifié avec une installation neuve ; aucun défilement artificiel ni hauteur d’écran codée en dur.
+
 Le service worker gère Push, clic de notification et repli hors connexion. Il ne conserve que les icônes et la page générique hors connexion explicitement autorisées. Aucun cache de HTML authentifié, RSC, API ou jeton ; les données privées utilisent des réponses non partageables et non stockées par le service worker. La déconnexion nettoie les données de session et toute mémoire cliente sensible.
 
 Les navigations utilisent le réseau ; en son absence, afficher « Vous êtes hors connexion. Reconnectez-vous pour consulter ou modifier vos disponibilités. » Aucun brouillon sensible n'est persisté pour une synchronisation ultérieure. Une mise à jour du worker ne recharge pas brutalement un formulaire ; proposer une actualisation après sauvegarde ou abandon.
